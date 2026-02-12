@@ -1,0 +1,17 @@
+# Default owners for everything
+* @furkan @omer
+
+# Backend (Spring Boot) - Ömer
+/backend/ @omer
+
+# Frontend (Next.js) - Shared, but Ömer leads infrastructure
+/frontend/ @furkan @omer
+
+# Extraction Service (Python) - Furkan
+/extraction-service/ @furkan
+
+# CI/CD - Ömer
+/.github/ @omer
+
+# Documentation - Both
+/docs/ @furkan @omer
