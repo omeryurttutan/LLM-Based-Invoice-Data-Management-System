@@ -1,0 +1,16 @@
+# Linting & Formatting
+ruff==0.1.14
+
+# Type Checking
+mypy==1.8.0
+types-requests==2.31.0.20240125
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+httpx==0.26.0
+
+# Development
+black==24.1.1
+isort==5.13.2

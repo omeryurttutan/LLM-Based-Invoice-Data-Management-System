@@ -1,4 +1,7 @@
-# Fatura OCR ve Veri Yönetim Sistemi (Phase 0)
+# Fatura OCR ve Veri Yönetim Sistemi
+
+![CI Pipeline](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg)
+![Backend](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg?branch=main&event=push&label=Backend)
 
 ## Proje Hakkında
 Fatura verilerinin OCR ve LLM teknolojileri kullanılarak otomatik işlenmesini sağlayan, muhasebe süreçlerini hızlandıran modern bir web uygulamasıdır.
