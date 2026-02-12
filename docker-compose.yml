@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: fatura-ocr-postgres
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: fatura_ocr_db
+      POSTGRES_USER: ${DB_USER:-fatura_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-fatura_secret_2026}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fatura-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-fatura_user} -d fatura_ocr_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: fatura-ocr-redis
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - fatura-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: fatura-ocr-rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-fatura_mq}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-mq_secret_2026}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - fatura-network
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fatura-ocr-backend
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fatura_ocr_db
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-fatura_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-fatura_secret_2026}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-fatura_mq}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-mq_secret_2026}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./backend:/workspace/app:delegated
+    networks:
+      - fatura-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fatura-ocr-frontend
+    ports:
+      - "3001:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8082/api/v1
+      NODE_ENV: development
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - fatura-network
+
+  extraction-service:
+    build:
+      context: ./extraction-service
+      dockerfile: Dockerfile
+    container_name: fatura-ocr-extraction
+    ports:
+      - "8001:8000"
+    environment:
+      PYTHONUNBUFFERED: 1
+      ENVIRONMENT: development
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-fatura_mq}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-mq_secret_2026}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./extraction-service:/app
+    networks:
+      - fatura-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+
+
+networks:
+  fatura-network:
+    driver: bridge
