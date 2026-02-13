@@ -2,9 +2,16 @@ package com.faturaocr.interfaces.rest.user.dto;
 
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 /**
  * API response DTO for user data.
  */
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserApiResponse {
 
     private UUID id;
@@ -12,36 +19,4 @@ public class UserApiResponse {
     private String lastName;
     private String email;
     private String role;
-
-    public UserApiResponse() {
-    }
-
-    public UserApiResponse(UUID id, String firstName, String lastName, String email, String role) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.role = role;
-    }
-
-    // Getters
-    public UUID getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getRole() {
-        return role;
-    }
 }

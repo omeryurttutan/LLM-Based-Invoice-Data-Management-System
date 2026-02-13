@@ -5,10 +5,13 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+import lombok.Getter;
+
 /**
  * Base class for all domain entities.
  * Provides common fields and behavior for entity identity and auditing.
  */
+@Getter
 public abstract class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -31,26 +34,6 @@ public abstract class BaseEntity implements Serializable {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.isDeleted = false;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
     }
 
     public void markAsUpdated() {

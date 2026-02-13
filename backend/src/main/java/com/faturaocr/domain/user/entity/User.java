@@ -7,9 +7,12 @@ import com.faturaocr.domain.user.valueobject.UserRole;
 import java.util.Objects;
 import java.util.UUID;
 
+import lombok.Getter;
+
 /**
  * User domain entity representing a system user.
  */
+@Getter
 public class User extends BaseEntity {
 
     private String firstName;
@@ -79,26 +82,5 @@ public class User extends BaseEntity {
 
     public String getFullName() {
         return firstName + " " + lastName;
-    }
-
-    // Getters
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public UserRole getRole() {
-        return role;
     }
 }

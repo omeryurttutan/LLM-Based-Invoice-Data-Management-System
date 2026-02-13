@@ -7,11 +7,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * JPA entity for User persistence.
  * Separate from domain entity to keep domain layer pure.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class UserJpaEntity extends BaseJpaEntity {
@@ -31,51 +37,6 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private UserJpaRole role;
-
-    protected UserJpaEntity() {
-        super();
-    }
-
-    // Getters and setters
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public UserJpaRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserJpaRole role) {
-        this.role = role;
-    }
 
     /**
      * JPA-specific role enum (mirrors domain UserRole).

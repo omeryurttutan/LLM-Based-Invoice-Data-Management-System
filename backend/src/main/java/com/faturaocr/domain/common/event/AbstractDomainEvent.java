@@ -3,9 +3,12 @@ package com.faturaocr.domain.common.event;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import lombok.Getter;
+
 /**
  * Abstract base class for domain events.
  */
+@Getter
 public abstract class AbstractDomainEvent implements DomainEvent {
 
     private final UUID eventId;
@@ -14,16 +17,6 @@ public abstract class AbstractDomainEvent implements DomainEvent {
     protected AbstractDomainEvent() {
         this.eventId = UUID.randomUUID();
         this.occurredAt = LocalDateTime.now();
-    }
-
-    @Override
-    public UUID getEventId() {
-        return eventId;
-    }
-
-    @Override
-    public LocalDateTime getOccurredAt() {
-        return occurredAt;
     }
 
     @Override
