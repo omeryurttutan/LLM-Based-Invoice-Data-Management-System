@@ -1,19 +1,15 @@
 package com.faturaocr.application.user.dto;
 
-import com.faturaocr.application.common.usecase.Command;
+import com.faturaocr.domain.user.valueobject.Role;
+import lombok.Builder;
+import lombok.Data;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-/**
- * Command DTO for creating a new user.
- */
-@Getter
-@AllArgsConstructor
-public class CreateUserCommand implements Command {
-
-    private final String firstName;
-    private final String lastName;
-    private final String email;
-    private final String password;
+@Data
+@Builder
+public class CreateUserCommand {
+    private String email;
+    private String fullName;
+    private String password;
+    private String phone;
+    private Role role;
 }

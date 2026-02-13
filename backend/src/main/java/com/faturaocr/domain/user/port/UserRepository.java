@@ -2,13 +2,16 @@ package com.faturaocr.domain.user.port;
 
 import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.valueobject.Email;
+import com.faturaocr.domain.user.valueobject.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Output port for User persistence.
- * Implemented by infrastructure layer adapters.
+ * User repository port (interface).
+ * Implemented by infrastructure layer.
  */
 public interface UserRepository {
 
@@ -18,7 +21,15 @@ public interface UserRepository {
 
     Optional<User> findByEmail(Email email);
 
+    Optional<User> findByEmailAndCompanyId(Email email, UUID companyId);
+
     boolean existsByEmail(Email email);
 
+    boolean existsByEmailAndCompanyId(Email email, UUID companyId);
+
+    Page<User> findAllByCompanyId(UUID companyId, Pageable pageable);
+
     void deleteById(UUID id);
+
+    long countByCompanyIdAndRole(UUID companyId, Role role);
 }
