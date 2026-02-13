@@ -5,10 +5,17 @@ import java.math.RoundingMode;
 import java.util.Currency;
 import java.util.Objects;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 /**
  * Value Object representing monetary amounts.
  * Immutable and compared by value.
  */
+@Getter
+@EqualsAndHashCode
+@ToString
 public final class Money implements ValueObject {
 
     private final BigDecimal amount;
@@ -79,36 +86,7 @@ public final class Money implements ValueObject {
         }
     }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public Currency getCurrency() {
-        return currency;
-    }
-
     public String getCurrencyCode() {
         return currency.getCurrencyCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        Money money = (Money) o;
-        return Objects.equals(amount, money.amount) &&
-                Objects.equals(currency, money.currency);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(amount, currency);
-    }
-
-    @Override
-    public String toString() {
-        return amount.toPlainString() + " " + currency.getCurrencyCode();
     }
 }

@@ -2,103 +2,207 @@ package com.faturaocr.domain.user.entity;
 
 import com.faturaocr.domain.common.entity.BaseEntity;
 import com.faturaocr.domain.user.valueobject.Email;
-import com.faturaocr.domain.user.valueobject.UserRole;
+import com.faturaocr.domain.user.valueobject.Role;
+import com.faturaocr.domain.audit.annotation.AuditExclude;
+import lombok.Getter;
 
-import java.util.Objects;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * User domain entity representing a system user.
+ * User domain entity.
  */
+@Getter
 public class User extends BaseEntity {
 
-    private String firstName;
-    private String lastName;
+    private UUID companyId;
     private Email email;
+    @AuditExclude
     private String passwordHash;
-    private UserRole role;
+    private String fullName;
+    private String phone;
+    private String avatarUrl;
+    private Role role;
+    private boolean isActive;
+    private boolean emailVerified;
+    private LocalDateTime emailVerifiedAt;
+    private LocalDateTime lastLoginAt;
+    @AuditExclude
+    private int failedLoginAttempts;
+    @AuditExclude
+    private LocalDateTime lockedUntil;
+    private LocalDateTime passwordChangedAt;
 
-    protected User() {
+    // Private constructor for builder pattern
+    private User() {
         super();
     }
 
-    private User(String firstName, String lastName, Email email, String passwordHash, UserRole role) {
-        super();
-        this.firstName = Objects.requireNonNull(firstName, "First name cannot be null");
-        this.lastName = Objects.requireNonNull(lastName, "Last name cannot be null");
-        this.email = Objects.requireNonNull(email, "Email cannot be null");
-        this.passwordHash = Objects.requireNonNull(passwordHash, "Password hash cannot be null");
-        this.role = Objects.requireNonNull(role, "Role cannot be null");
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public static User create(String firstName, String lastName, Email email,
-            String passwordHash, UserRole role) {
-        return new User(firstName, lastName, email, passwordHash, role);
+    // Domain methods
+    public boolean isLocked() {
+        return lockedUntil != null && LocalDateTime.now().isBefore(lockedUntil);
     }
 
-    public static User reconstitute(
-            UUID id,
-            String firstName,
-            String lastName,
-            Email email,
-            String passwordHash,
-            UserRole role,
-            java.time.LocalDateTime createdAt,
-            java.time.LocalDateTime updatedAt,
-            boolean isDeleted,
-            java.time.LocalDateTime deletedAt) {
-        User user = new User();
-        user.id = id;
-        user.firstName = firstName;
-        user.lastName = lastName;
-        user.email = email;
-        user.passwordHash = passwordHash;
-        user.role = role;
-        user.createdAt = createdAt;
-        user.updatedAt = updatedAt;
-        user.isDeleted = isDeleted;
-        user.deletedAt = deletedAt;
-        return user;
-    }
-
-    public void updateProfile(String firstName, String lastName) {
-        this.firstName = Objects.requireNonNull(firstName);
-        this.lastName = Objects.requireNonNull(lastName);
+    public void incrementFailedLoginAttempts() {
+        this.failedLoginAttempts++;
         markAsUpdated();
     }
 
-    public void changeEmail(Email newEmail) {
-        this.email = Objects.requireNonNull(newEmail);
+    public void resetFailedLoginAttempts() {
+        this.failedLoginAttempts = 0;
+        this.lockedUntil = null;
         markAsUpdated();
     }
 
-    public void changePassword(String newPasswordHash) {
-        this.passwordHash = Objects.requireNonNull(newPasswordHash);
+    public void lock(int durationMinutes) {
+        this.lockedUntil = LocalDateTime.now().plusMinutes(durationMinutes);
         markAsUpdated();
     }
 
-    public String getFullName() {
-        return firstName + " " + lastName;
+    public void recordSuccessfulLogin() {
+        this.lastLoginAt = LocalDateTime.now();
+        resetFailedLoginAttempts();
     }
 
-    // Getters
-    public String getFirstName() {
-        return firstName;
+    public void updatePassword(String newPasswordHash) {
+        this.passwordHash = newPasswordHash;
+        this.passwordChangedAt = LocalDateTime.now();
+        markAsUpdated();
     }
 
-    public String getLastName() {
-        return lastName;
+    public void verifyEmail() {
+        this.emailVerified = true;
+        this.emailVerifiedAt = LocalDateTime.now();
+        markAsUpdated();
     }
 
-    public Email getEmail() {
-        return email;
+    public void deactivate() {
+        this.isActive = false;
+        markAsUpdated();
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public void activate() {
+        this.isActive = true;
+        markAsUpdated();
     }
 
-    public UserRole getRole() {
-        return role;
+    public void updateDetails(String fullName, String phone, String avatarUrl) {
+        this.fullName = fullName;
+        this.phone = phone;
+        this.avatarUrl = avatarUrl;
+        markAsUpdated();
+    }
+
+    public void changeRole(Role newRole) {
+        this.role = newRole;
+        markAsUpdated();
+    }
+
+    // Getters and helper methods for specific needs like validation/logic can
+    // remain if needed,
+    // but standard getters are covered by @Getter.
+    // However, getEmailValue() is a convenience method, so we keep it.
+
+    public String getEmailValue() {
+        return email.getValue();
+    }
+
+    // Builder
+    public static class Builder {
+        private final User user = new User();
+
+        public Builder id(UUID id) {
+            user.id = id;
+            return this;
+        }
+
+        public Builder companyId(UUID companyId) {
+            user.companyId = companyId;
+            return this;
+        }
+
+        public Builder email(String email) {
+            user.email = Email.of(email);
+            return this;
+        }
+
+        public Builder email(Email email) {
+            user.email = email;
+            return this;
+        }
+
+        public Builder passwordHash(String passwordHash) {
+            user.passwordHash = passwordHash;
+            return this;
+        }
+
+        public Builder fullName(String fullName) {
+            user.fullName = fullName;
+            return this;
+        }
+
+        public Builder phone(String phone) {
+            user.phone = phone;
+            return this;
+        }
+
+        public Builder avatarUrl(String avatarUrl) {
+            user.avatarUrl = avatarUrl;
+            return this;
+        }
+
+        public Builder role(Role role) {
+            user.role = role;
+            return this;
+        }
+
+        public Builder isActive(boolean isActive) {
+            user.isActive = isActive;
+            return this;
+        }
+
+        public Builder emailVerified(boolean emailVerified) {
+            user.emailVerified = emailVerified;
+            return this;
+        }
+
+        public Builder failedLoginAttempts(int attempts) {
+            user.failedLoginAttempts = attempts;
+            return this;
+        }
+
+        public Builder lockedUntil(LocalDateTime lockedUntil) {
+            user.lockedUntil = lockedUntil;
+            return this;
+        }
+
+        public Builder lastLoginAt(LocalDateTime lastLoginAt) {
+            user.lastLoginAt = lastLoginAt;
+            return this;
+        }
+
+        public User build() {
+            // Validation
+            if (user.companyId == null) {
+                throw new IllegalStateException("Company ID is required");
+            }
+            if (user.email == null) {
+                throw new IllegalStateException("Email is required");
+            }
+            if (user.passwordHash == null) {
+                throw new IllegalStateException("Password hash is required");
+            }
+            if (user.fullName == null || user.fullName.isBlank()) {
+                throw new IllegalStateException("Full name is required");
+            }
+            if (user.role == null) {
+                user.role = Role.ACCOUNTANT; // Default role
+            }
+            return user;
+        }
     }
 }

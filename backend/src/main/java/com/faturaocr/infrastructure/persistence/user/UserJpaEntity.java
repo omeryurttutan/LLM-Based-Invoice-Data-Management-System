@@ -2,87 +2,63 @@ package com.faturaocr.infrastructure.persistence.user;
 
 import com.faturaocr.infrastructure.persistence.common.BaseJpaEntity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
- * JPA entity for User persistence.
- * Separate from domain entity to keep domain layer pure.
+ * JPA entity for users table.
  */
 @Entity
 @Table(name = "users")
+@lombok.Getter
+@lombok.Setter
 public class UserJpaEntity extends BaseJpaEntity {
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @Column(name = "company_id", nullable = false)
+    private UUID companyId;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
-
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Column(name = "role", nullable = false)
-    private UserJpaRole role;
+    @Enumerated(EnumType.STRING)
+    private RoleJpa role;
 
-    protected UserJpaEntity() {
-        super();
-    }
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 
-    // Getters and setters
-    public String getFirstName() {
-        return firstName;
-    }
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
 
-    public String getLastName() {
-        return lastName;
-    }
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts = 0;
 
-    public String getEmail() {
-        return email;
-    }
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public UserJpaRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserJpaRole role) {
-        this.role = role;
-    }
-
-    /**
-     * JPA-specific role enum (mirrors domain UserRole).
-     */
-    public enum UserJpaRole {
-        ADMIN,
-        USER,
-        VIEWER
+    public enum RoleJpa {
+        ADMIN, MANAGER, ACCOUNTANT, INTERN
     }
 }

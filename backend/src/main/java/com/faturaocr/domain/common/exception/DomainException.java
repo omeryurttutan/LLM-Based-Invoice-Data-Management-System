@@ -1,8 +1,11 @@
 package com.faturaocr.domain.common.exception;
 
+import lombok.Getter;
+
 /**
  * Base exception for all domain-level exceptions.
  */
+@Getter
 public class DomainException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -22,9 +25,5 @@ public class DomainException extends RuntimeException {
     public DomainException(String errorCode, String message, Throwable cause) {
         super(message, cause);
         this.errorCode = errorCode;
-    }
-
-    public String getErrorCode() {
-        return errorCode;
     }
 }

@@ -6,23 +6,29 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * Value Object representing an email address.
+ * Email value object with validation.
  */
 public final class Email implements ValueObject {
 
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 
     private final String value;
 
     private Email(String value) {
-        this.value = value;
+        this.value = value.toLowerCase().trim();
     }
 
     public static Email of(String value) {
-        Objects.requireNonNull(value, "Email cannot be null");
-        String trimmed = value.trim().toLowerCase();
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        String trimmed = value.toLowerCase().trim();
         if (!EMAIL_PATTERN.matcher(trimmed).matches()) {
             throw new IllegalArgumentException("Invalid email format: " + value);
+        }
+        if (trimmed.length() > 255) {
+            throw new IllegalArgumentException("Email too long (max 255 characters)");
         }
         return new Email(trimmed);
     }
