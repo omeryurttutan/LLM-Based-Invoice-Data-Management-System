@@ -1,0 +1,12 @@
+{
+    "invoice_number": "0000000",
+    "invoice_date": "2030-06-15",
+    "supplier_name": "Format Hatası A.Ş.",
+    "supplier_tax_number": "123",
+    "buyer_tax_number": "abc",
+    "total_amount": 100.00,
+    "subtotal": 85.00,
+    "tax_amount": 15.00,
+    "currency": "JPY",
+    "items": []
+}

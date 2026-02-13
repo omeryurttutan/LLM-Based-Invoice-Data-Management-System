@@ -112,19 +112,32 @@ services:
       - "8001:8000"
     environment:
       PYTHONUNBUFFERED: 1
-      ENVIRONMENT: development
+      APP_NAME: "Fatura OCR Extraction Service"
+      LOG_LEVEL: info
+      ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:8080"
+      SPRING_BOOT_URL: "http://backend:8080"
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
       RABBITMQ_USER: ${RABBITMQ_USER:-fatura_mq}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-mq_secret_2026}
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      RABBITMQ_EXTRACTION_QUEUE: invoice.extraction.queue
+      RABBITMQ_RESULT_EXCHANGE: invoice.extraction.result
+      RABBITMQ_RESULT_ROUTING_KEY: extraction.result
+      INVOICE_FILE_STORAGE_PATH: /data/invoices
     depends_on:
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health/live" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     volumes:
       - ./extraction-service:/app
+      - invoice-files:/data/invoices
     networks:
       - fatura-network
 
@@ -132,6 +145,7 @@ volumes:
   postgres_data:
   redis_data:
   rabbitmq_data:
+  invoice-files:
 
 
 networks:

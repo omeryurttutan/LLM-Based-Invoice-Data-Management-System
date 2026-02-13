@@ -1,0 +1,19 @@
+{
+    "invoice_number": null,
+    "invoice_date": null,
+    "supplier_name": "Test Supplier",
+    "total_amount": 500.00,
+    "subtotal": 420.00,
+    "tax_amount": 80.00,
+    "currency": "TRY",
+    "items": [
+        {
+            "description": "Ürün A",
+            "quantity": 2,
+            "unit_price": 210.00,
+            "line_total": 420.00,
+            "tax_rate": 20,
+            "tax_amount": 80.00
+        }
+    ]
+}

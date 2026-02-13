@@ -1,0 +1,3 @@
+Here is the extracted invoice data:
+{"invoice_number": "FTR-2024-001234", "invoice_date": "invalid-date", items: broken_json
+Some extra text after the JSON.

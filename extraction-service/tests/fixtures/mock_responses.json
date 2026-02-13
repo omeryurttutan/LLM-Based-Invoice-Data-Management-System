@@ -1,0 +1,14 @@
+{
+    "valid_invoice": {
+        "text": "```json\n{\n  \"invoice_number\": \"FAT-2024-001\",\n  \"invoice_date\": \"2024-01-15\",\n  \"due_date\": \"2024-01-30\",\n  \"supplier_name\": \"Tech Solutions Ltd.\",\n  \"supplier_tax_number\": \"1234567890\",\n  \"supplier_address\": \"Istanbul, Turkey\",\n  \"buyer_name\": \"My Company Inc.\",\n  \"buyer_tax_number\": \"9876543210\",\n  \"items\": [\n    {\n      \"description\": \"Server Maintenance\",\n      \"quantity\": 1.0,\n      \"unit\": \"Month\",\n      \"unit_price\": 1000.00,\n      \"tax_rate\": 20.0,\n      \"tax_amount\": 200.00,\n      \"line_total\": 1200.00\n    }\n  ],\n  \"subtotal\": 1000.00,\n  \"tax_amount\": 200.00,\n  \"total_amount\": 1200.00,\n  \"currency\": \"TRY\",\n  \"notes\": \"Thank you for your business\"\n}\n```"
+    },
+    "turkish_format": {
+        "text": "{\n  \"invoice_number\": \"TR-999\",\n  \"invoice_date\": \"15.01.2024\",\n  \"supplier_name\": \"Örnek Tedarikçi\",\n  \"supplier_tax_number\": \"1111111111\",\n  \"subtotal\": \"1.000,00\",\n  \"tax_amount\": \"234,56\",\n  \"total_amount\": \"1.234,56\",\n  \"currency\": \"TL\"\n}"
+    },
+    "malformed_json": {
+        "text": "Here is the invoice data:\n{\n  \"invoice_number\": \"INV-123\",\n  \"total_amount\": 500.00\n"
+    },
+    "markdown_messy": {
+        "text": "Sure, here is the JSON:\n\n```json\n{\n  \"invoice_number\": \"CLEAN-123\",\n  \"invoice_date\": \"2024-02-01\",\n  \"supplier_name\": \"Clean Co.\",\n  \"supplier_tax_number\": \"2222222222\",\n  \"subtotal\": 80.00,\n  \"tax_amount\": 20.00,\n  \"total_amount\": 100.00\n}\n```\n\nHope this helps!"
+    }
+}

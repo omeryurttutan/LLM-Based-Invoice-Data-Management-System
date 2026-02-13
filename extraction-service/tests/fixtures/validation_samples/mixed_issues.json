@@ -1,0 +1,20 @@
+{
+    "invoice_number": "FAT-MIX-001",
+    "invoice_date": "2024-08-20",
+    "due_date": "2024-07-01",
+    "supplier_name": "Karışık Sorun Ltd.",
+    "total_amount": 1500.00,
+    "subtotal": 1000.00,
+    "tax_amount": 200.00,
+    "currency": "TRY",
+    "items": [
+        {
+            "description": "Ürün A",
+            "quantity": 5,
+            "unit_price": 200.00,
+            "line_total": 1000.00,
+            "tax_rate": 25,
+            "tax_amount": 200.00
+        }
+    ]
+}
