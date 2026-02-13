@@ -1,0 +1,16 @@
+{
+    "invoice_number": "PRT-2024-007",
+    "invoice_date": "2024-06-01",
+    "due_date": null,
+    "supplier_name": "Kısmi Fatura Şirketi",
+    "supplier_tax_number": null,
+    "supplier_address": null,
+    "buyer_name": null,
+    "buyer_tax_number": null,
+    "items": [],
+    "subtotal": null,
+    "tax_amount": null,
+    "total_amount": 750.00,
+    "currency": "TRY",
+    "notes": null
+}

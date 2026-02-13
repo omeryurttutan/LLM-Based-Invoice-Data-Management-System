@@ -1,4 +1,3 @@
-import os
 import base64
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import time
@@ -28,14 +27,18 @@ class OpenAIProvider(BaseLLMProvider):
             logger.warning("openai_api_key_missing", message="OPENAI_API_KEY is not set.")
             
         self.client = OpenAI(api_key=self.api_key)
-        self.model_name = os.getenv("OPENAI_MODEL", "gpt-4o") # Defaulting to 4o as 5.2 placeholder logic
+        self.model_name = settings.OPENAI_MODEL
         
     @property
     def provider_name(self) -> str:
         return "GPT"
 
+    def is_available(self) -> bool:
+        """Check if the OpenAI provider is configured and available."""
+        return self.api_key is not None and len(self.api_key) > 0
+
     @retry(
-        stop=stop_after_attempt(3),
+        stop=stop_after_attempt(settings.OPENAI_MAX_RETRIES + 1),
         wait=wait_exponential(multiplier=1, min=2, max=10),
         retry=retry_if_exception_type((APIConnectionError, RateLimitError, APITimeoutError, APIError)),
         reraise=True
@@ -72,9 +75,9 @@ class OpenAIProvider(BaseLLMProvider):
                         ]
                     }
                 ],
-                temperature=0.1,
-                max_tokens=4096,
-                timeout=30
+                temperature=settings.OPENAI_TEMPERATURE,
+                max_tokens=settings.OPENAI_MAX_TOKENS,
+                timeout=settings.OPENAI_TIMEOUT
             )
             
             duration = (time.time() - start_time) * 1000

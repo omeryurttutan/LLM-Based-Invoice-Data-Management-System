@@ -283,7 +283,7 @@ If new indexes are needed, create a Flyway migration: `V{next_number}__phase_23_
 
 When this phase is complete, create a result file at:
 
-**`docs/OMER/step_results/faz_23.0_result.md`**
+**`docs/FURKAN/step_results/faz_23.0_result.md`**
 
 The result file must contain:
 

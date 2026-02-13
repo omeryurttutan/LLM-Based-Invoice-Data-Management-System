@@ -315,7 +315,7 @@ Update GitHub Actions:
 ## RESULT FILE
 
 After completing this phase, create a result file at:
-`docs/OMER/step_results/faz_36a_result.md`
+`docs/FURKAN/step_results/faz_36a_result.md`
 
 The result file must include:
 

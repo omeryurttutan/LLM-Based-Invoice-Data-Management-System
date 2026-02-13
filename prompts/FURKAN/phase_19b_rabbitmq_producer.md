@@ -359,7 +359,7 @@ Add/update:
 ## RESULT FILE REQUIREMENTS
 
 After completing this phase, create:
-`docs/OMER/step_results/faz_19_b_result.md`
+`docs/FURKAN/step_results/faz_19_b_result.md`
 
 Include:
 1. Execution status and timing

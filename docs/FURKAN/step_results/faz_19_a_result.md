@@ -63,7 +63,10 @@ The consumer runs as a **Daemon Thread** started by `app/main.py` during applica
 | FileNotFoundError | FILE_NOT_FOUND | File path does not exist on shared volume |
 | PermissionError/IOError | FILE_READ_ERROR | Error reading file |
 | AllProvidersFailedError | ALL_PROVIDERS_FAILED | All LLM fallback attempts failed |
+| LLMTimeoutError | TIMEOUT | All providers timed out |
+| LLMRateLimitError | RATE_LIMIT | All providers rate limited |
 | XMLParserError | XML_PARSE_ERROR | XML parsing failed |
+| NotEInvoiceError | NOT_EINVOICE | XML is not a UBL-TR e-Invoice |
 | (Any Other) | INTERNAL_ERROR | Unexpected exception |
 
 All errors result in a `FAILED` status message published to the result exchange, followed by an Ack (allowing Spring Boot to handle retries based on the failure message). Malformed JSON messages are Nack'ed (dead-lettered).
@@ -91,16 +94,18 @@ All errors result in a `FAILED` status message published to the result exchange,
 
 ## Test Results
 
-### Unit Tests (11 passed)
+### Unit Tests (13 passed)
 - ✅ `test_message_models.py`: 4 tests passed
   - Valid ExtractionRequest parsing
   - Missing fields validation
   - ExtractionResultMessage COMPLETED status
   - ExtractionResultMessage FAILED status
-- ✅ `test_connection_manager.py`: 3 tests passed
+- ✅ `test_connection_manager.py`: 5 tests passed
   - Connection success
+  - Reconnect with exponential backoff
   - Channel reuse
-  - Connection parameters
+  - Backoff calculation with max cap
+  - Connection parameters include vhost
 - ✅ `test_consumer_logic.py`: 4 tests passed
   - Successful message processing
   - File not found error handling

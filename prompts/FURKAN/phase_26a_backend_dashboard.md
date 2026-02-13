@@ -286,7 +286,7 @@ The response includes overall summary counts, source type breakdown, and confide
 
 ## RESULT FILE
 
-**`docs/OMER/step_results/faz_26.0_result.md`**
+**`docs/FURKAN/step_results/faz_26.0_result.md`**
 
 Include: execution summary, completed tasks checklist (all 6 endpoints, isolation, filtering, caching, indexes, tests), files created/modified, API documentation (URL + params + response schema + example for each endpoint), query performance observations, database changes, test results, issues encountered, next steps for Phase 26-B.
 

@@ -23,8 +23,8 @@ class ProviderHealthManager:
         # Simple in-memory tracking. For multi-process/instance, would need redis/db.
         # Given this is a graduation project, in-memory is acceptable.
         
-        self.window_minutes = 10
-        self.unhealthy_threshold = 5
+        self.window_minutes = settings.LLM_HEALTH_WINDOW_MINUTES
+        self.unhealthy_threshold = settings.LLM_HEALTH_UNHEALTHY_THRESHOLD
         self.degraded_threshold = 2
         
     def get_health(self, provider_name: str) -> ProviderHealth:

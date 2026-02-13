@@ -397,7 +397,7 @@ Update the GitHub Actions workflow (Phase 1) to:
 ## RESULT FILE
 
 After completing this phase, create a result file at:
-`docs/OMER/step_results/faz_35a_result.md`
+`docs/FURKAN/step_results/faz_35a_result.md`
 
 The result file must include:
 
