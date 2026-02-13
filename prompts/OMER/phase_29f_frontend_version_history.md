@@ -278,7 +278,7 @@ When a notification about an invoice is clicked, navigate to invoice detail → 
 ## RESULT FILE REQUIREMENTS
 
 After completing this phase, create:
-`docs/FURKAN/step_results/faz_29_f_result.md`
+`docs/OMER/step_results/faz_29_f_result.md`
 
 Include:
 1. Execution status and timing

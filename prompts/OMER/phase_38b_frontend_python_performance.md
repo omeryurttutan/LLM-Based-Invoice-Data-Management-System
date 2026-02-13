@@ -367,7 +367,7 @@ Create a comprehensive performance baseline document for the graduation report:
 ## RESULT FILE
 
 After completing this phase, create a result file at:
-`docs/FURKAN/step_results/faz_38b_result.md`
+`docs/OMER/step_results/faz_38b_result.md`
 
 The result file must include:
 

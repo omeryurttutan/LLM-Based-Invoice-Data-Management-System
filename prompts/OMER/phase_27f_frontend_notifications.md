@@ -343,7 +343,7 @@ Format timestamps as Turkish relative time:
 ## RESULT FILE REQUIREMENTS
 
 After completing this phase, create:
-`docs/FURKAN/step_results/faz_27_f_result.md`
+`docs/OMER/step_results/faz_27_f_result.md`
 
 Include:
 1. Execution status and timing
