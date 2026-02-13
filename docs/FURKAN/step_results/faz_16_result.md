@@ -4,6 +4,7 @@
 - **Overall Status**: ✅ Success
 - **Date**: 2026-02-13
 - **Estimated Duration**: 3 gün → **Tamamlanma**: 1 gün + doğrulama düzeltmeleri
+- **Doğrulama Revizyonu**: 2026-02-13 — Eksik ayarlar, prompt parametresi ve test kapsamı düzeltildi
 
 ## 2. Completed Tasks
 - [x] **OpenAI Provider**: `OpenAIProvider` sınıfı — `data:image/jpeg;base64` formatında multimodal istek, `gpt-4o` varsayılan model
@@ -15,7 +16,7 @@
 - [x] **ExtractionResponse Güncelleme**: `fallback_attempts` alanı eklendi
 - [x] **API Endpoints**: `GET /providers`, `GET /providers/health`, `POST /providers/{name}/test`
 - [x] **ExtractionService Güncelleme**: `FallbackChain` üzerinden çalışıyor (tek provider yerine)
-- [x] **Konfigürasyon**: `LLM_CHAIN_ORDER`, `LLM_FALLBACK_DELAY_SECONDS`, `LLM_CHAIN_ENABLED` settings.py'de tanımlı
+- [x] **Konfigürasyon**: `LLM_CHAIN_ORDER`, `LLM_FALLBACK_DELAY_SECONDS`, `LLM_CHAIN_ENABLED` + provider-specific ayarlar (`OPENAI_MODEL/TIMEOUT/MAX_RETRIES/TEMPERATURE/MAX_TOKENS`, `ANTHROPIC_*`) + health tracking (`LLM_HEALTH_WINDOW_MINUTES`, `LLM_HEALTH_UNHEALTHY_THRESHOLD`) settings.py'de tanımlı
 - [x] **Dependencies**: `openai>=1.10.0` ve `anthropic>=0.18.0` requirements.txt'ye eklendi
 - [x] **Test Dosyaları**: Unit testler (provider, fallback chain, health, prompt) ve integration test oluşturuldu
 - [x] **Mock Response Fixtures**: OpenAI ve Anthropic için valid/markdown/malformed fixture dosyaları oluşturuldu
@@ -30,9 +31,9 @@
 | `app/services/llm/fallback_chain.py` | Fallback chain manager + AllProvidersFailedError |
 | `app/services/llm/provider_health.py` | Provider health tracking (singleton) |
 | `app/models/provider_status.py` | HealthStatus enum + ProviderHealth model |
-| `tests/unit/test_openai_provider.py` | OpenAI provider unit testleri (3 test) |
-| `tests/unit/test_anthropic_provider.py` | Anthropic provider unit testleri (2 test) |
-| `tests/unit/test_fallback_chain.py` | Fallback chain unit testleri (4 test) |
+| `tests/unit/test_openai_provider.py` | OpenAI provider unit testleri (9 test) |
+| `tests/unit/test_anthropic_provider.py` | Anthropic provider unit testleri (9 test) |
+| `tests/unit/test_fallback_chain.py` | Fallback chain unit testleri (10 test) |
 | `tests/unit/test_provider_health.py` | Provider health unit testleri (9 test) |
 | `tests/unit/test_prompt_adaptation.py` | Prompt adaptation unit testleri (9 test) |
 | `tests/integration/test_fallback_flow.py` | Integration test — end-to-end fallback |
@@ -43,9 +44,10 @@
 | Dosya | Değişiklik |
 |-------|-----------|
 | `requirements.txt` | `openai` ve `anthropic` SDK'ları eklendi |
-| `app/config/settings.py` | `LLM_CHAIN_ORDER`, `LLM_FALLBACK_DELAY_SECONDS`, `LLM_CHAIN_ENABLED` eklendi |
+| `app/config/settings.py` | `OPENAI_MODEL/TIMEOUT/MAX_RETRIES/TEMPERATURE/MAX_TOKENS`, `ANTHROPIC_*`, `LLM_HEALTH_WINDOW_MINUTES`, `LLM_HEALTH_UNHEALTHY_THRESHOLD` eklendi, provider'lar merkezi settings üzerinden okur |
 | `app/models/extraction.py` | `fallback_attempts` alanı eklendi |
-| `app/services/extraction/extraction_service.py` | `FallbackChain` kullanacak şekilde güncellendi |
+| `app/services/extraction/extraction_service.py` | `FallbackChain` + `PromptManager.get_prompt()` ile prompt üretimi |
+| `app/services/llm/provider_health.py` | `settings.LLM_HEALTH_WINDOW_MINUTES` / `LLM_HEALTH_UNHEALTHY_THRESHOLD` kullanır |
 | `app/api/routes/extraction.py` | Provider endpoints eklendi + `import time` hatası düzeltildi |
 
 ## 4. Provider Implementation Summary
@@ -94,13 +96,13 @@ Request → GEMINI (retry x3) → başarılı? → return
 
 | Test Dosyası | Test Sayısı | Açıklama |
 |-------------|-------------|----------|
-| `test_openai_provider.py` | 3 | Success, auth error, timeout |
-| `test_anthropic_provider.py` | 2 | Success, auth error |
-| `test_fallback_chain.py` | 4 | First provider success, fallback, all fail, auth skip |
+| `test_openai_provider.py` | 9 | Success, auth/timeout/rate-limit/server/connection error, provider name, is_available |
+| `test_anthropic_provider.py` | 9 | Success, auth/timeout/rate-limit/server/connection error, provider name, is_available |
+| `test_fallback_chain.py` | 10 | First/second/third fallback, all fail, auth skip, parse error, chain disabled, chain order, inter-provider delay, attempt details |
 | `test_provider_health.py` | 9 | Initial state, thresholds, window expiry, independence |
 | `test_prompt_adaptation.py` | 9 | JSON schema, Turkish instructions, format rules |
-| `test_fallback_flow.py` | 1 | End-to-end integration with mocked chain |
-| **Toplam** | **28** | **Mock provider'lar ile çalışır** |
+| `test_fallback_flow.py` | 1 | End-to-end integration with mocked chain + PromptManager |
+| **Toplam** | **47** | **Tümü geçiyor ✅** |
 
 > **Not**: Testler Docker container içinde `pytest` ile çalıştırılmalıdır.
 
@@ -149,6 +151,11 @@ Request → GEMINI (retry x3) → başarılı? → return
 | `test_provider_health.py` eksik | 9 unit test ile oluşturuldu |
 | `test_prompt_adaptation.py` eksik | 9 unit test ile oluşturuldu |
 | Mock response fixture dosyaları eksik | OpenAI ve Anthropic için 6 fixture dosyası oluşturuldu |
+| `settings.py` provider ayarları eksik (OPENAI_MODEL, ANTHROPIC_MODEL vb.) | 12 yeni konfigürasyon değişkeni eklendi, provider'lar `os.getenv()` yerine `settings.*` kullanır |
+| `extraction_service.py` prompt parametresi eksik | `generate_with_fallback(image_data)` → `generate_with_fallback(image_data, prompt)` düzeltildi |
+| `provider_health.py` hardcoded eşikler | `settings.LLM_HEALTH_WINDOW_MINUTES` ve `LLM_HEALTH_UNHEALTHY_THRESHOLD` kullanır |
+| OpenAI/Anthropic test kapsamı yetersiz | Rate limit, server error, connection error, provider name, is_available testleri eklendi |
+| Fallback chain test kapsamı yetersiz | Chain disabled, custom order, parse error, inter-provider delay, attempt details testleri eklendi |
 
 ## 11. Configuration
 
@@ -162,10 +169,20 @@ ANTHROPIC_API_KEY=...
 LLM_CHAIN_ORDER=GEMINI,GPT,CLAUDE
 LLM_FALLBACK_DELAY_SECONDS=2
 LLM_CHAIN_ENABLED=true
+LLM_HEALTH_WINDOW_MINUTES=10
+LLM_HEALTH_UNHEALTHY_THRESHOLD=5
 
-# Provider-specific (os.getenv ile okunur)
+# Provider-specific (settings.py üzerinden okunur)
 OPENAI_MODEL=gpt-4o
+OPENAI_TIMEOUT=30
+OPENAI_MAX_RETRIES=2
+OPENAI_TEMPERATURE=0.1
+OPENAI_MAX_TOKENS=4096
 ANTHROPIC_MODEL=claude-3-haiku-20240307
+ANTHROPIC_TIMEOUT=30
+ANTHROPIC_MAX_RETRIES=2
+ANTHROPIC_TEMPERATURE=0.1
+ANTHROPIC_MAX_TOKENS=4096
 ```
 
 ## 12. Next Steps

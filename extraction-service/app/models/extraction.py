@@ -11,6 +11,7 @@ class ExtractionResponse(BaseModel):
     data: InvoiceData
     provider: str = Field(..., description="LLM provider used")
     processing_time_ms: float = Field(..., description="Processing time in ms")
+    prompt_version: Optional[str] = Field(None, description="Prompt version used for extraction")
     confidence_score: Optional[float] = Field(None, description="Confidence score (0-100)")
     suggested_status: Optional[str] = Field(None, description="Suggested status")
     validation_result: Optional[ValidationResult] = Field(None, description="Detailed validation result")

@@ -2,7 +2,6 @@ import google.generativeai as genai
 from google.api_core import exceptions
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import time
-import os
 from typing import Optional
 
 from app.config.settings import settings
@@ -29,13 +28,12 @@ class GeminiProvider(BaseLLMProvider):
         
         genai.configure(api_key=self.api_key)
         
-        # Determine model name (allow override via env var, default to gemini-2.0-flash)
-        # Fallback to gemini-1.5-flash if 2.0 is not yet available in the region/sdk
-        self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+        # Determine model name from settings
+        self.model_name = settings.GEMINI_MODEL
         
         self.generation_config = {
-            "temperature": 0.1,
-            "max_output_tokens": 4096,
+            "temperature": settings.GEMINI_TEMPERATURE,
+            "max_output_tokens": settings.GEMINI_MAX_OUTPUT_TOKENS,
             "response_mime_type": "application/json",
         }
         
@@ -50,6 +48,10 @@ class GeminiProvider(BaseLLMProvider):
     @property
     def provider_name(self) -> str:
         return "GEMINI"
+
+    def is_available(self) -> bool:
+        """Check if the Gemini provider is configured and available."""
+        return self.api_key is not None and len(self.api_key) > 0
 
     @retry(
         stop=stop_after_attempt(3),
@@ -88,7 +90,7 @@ class GeminiProvider(BaseLLMProvider):
             
             response = model.generate_content(
                 contents,
-                request_options={"timeout": 30} # 30s timeout
+                request_options={"timeout": settings.GEMINI_TIMEOUT}
             )
             
             duration = (time.time() - start_time) * 1000

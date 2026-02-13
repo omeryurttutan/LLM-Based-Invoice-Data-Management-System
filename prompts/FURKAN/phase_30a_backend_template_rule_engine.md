@@ -333,7 +333,7 @@ Add the following to application.yml (or environment variables):
 ## RESULT FILE
 
 After completing this phase, create a result file at:
-`docs/OMER/step_results/faz_30.0_result.md`
+`docs/FURKAN/step_results/faz_30.0_result.md`
 
 The result file must include:
 

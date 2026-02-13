@@ -10,13 +10,31 @@ class Settings(BaseSettings):
     
     # LLM API Keys
     GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-2.0-flash"
+    GEMINI_TIMEOUT: int = 30
+    GEMINI_MAX_RETRIES: int = 2
+    GEMINI_TEMPERATURE: float = 0.1
+    GEMINI_MAX_OUTPUT_TOKENS: int = 4096
     OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o"
+    OPENAI_TIMEOUT: int = 30
+    OPENAI_MAX_RETRIES: int = 2
+    OPENAI_TEMPERATURE: float = 0.1
+    OPENAI_MAX_TOKENS: int = 4096
     ANTHROPIC_API_KEY: Optional[str] = None
+    ANTHROPIC_MODEL: str = "claude-3-haiku-20240307"
+    ANTHROPIC_TIMEOUT: int = 30
+    ANTHROPIC_MAX_RETRIES: int = 2
+    ANTHROPIC_TEMPERATURE: float = 0.1
+    ANTHROPIC_MAX_TOKENS: int = 4096
 
     # LLM Fallback Chain
     LLM_CHAIN_ORDER: str = "GEMINI,GPT,CLAUDE"
     LLM_FALLBACK_DELAY_SECONDS: int = 2
     LLM_CHAIN_ENABLED: bool = True
+    LLM_DEFAULT_PROVIDER: str = "GEMINI"
+    LLM_HEALTH_WINDOW_MINUTES: int = 10
+    LLM_HEALTH_UNHEALTHY_THRESHOLD: int = 5
 
     
     # Service URLs

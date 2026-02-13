@@ -1,4 +1,3 @@
-import os
 import base64
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import time
@@ -27,14 +26,18 @@ class AnthropicProvider(BaseLLMProvider):
             logger.warning("anthropic_api_key_missing", message="ANTHROPIC_API_KEY is not set.")
             
         self.client = Anthropic(api_key=self.api_key)
-        self.model_name = os.getenv("ANTHROPIC_MODEL", "claude-3-haiku-20240307") 
+        self.model_name = settings.ANTHROPIC_MODEL
         
     @property
     def provider_name(self) -> str:
         return "CLAUDE"
 
+    def is_available(self) -> bool:
+        """Check if the Anthropic provider is configured and available."""
+        return self.api_key is not None and len(self.api_key) > 0
+
     @retry(
-        stop=stop_after_attempt(3),
+        stop=stop_after_attempt(settings.ANTHROPIC_MAX_RETRIES + 1),
         wait=wait_exponential(multiplier=1, min=2, max=10),
         retry=retry_if_exception_type((APIConnectionError, RateLimitError, APITimeoutError, APIError)),
         reraise=True
@@ -54,8 +57,8 @@ class AnthropicProvider(BaseLLMProvider):
             # User message contains content blocks
             response = self.client.messages.create(
                 model=self.model_name,
-                max_tokens=4096,
-                temperature=0.1,
+                max_tokens=settings.ANTHROPIC_MAX_TOKENS,
+                temperature=settings.ANTHROPIC_TEMPERATURE,
                 system="You are a helpful assistant. Output strict JSON.",
                 messages=[
                     {
@@ -76,7 +79,7 @@ class AnthropicProvider(BaseLLMProvider):
                         ],
                     }
                 ],
-                timeout=30
+                timeout=settings.ANTHROPIC_TIMEOUT
             )
             
             duration = (time.time() - start_time) * 1000

@@ -57,3 +57,8 @@ class BaseLLMProvider(ABC):
     def provider_name(self) -> str:
         """Return the unique identifier for this provider (e.g., 'GEMINI')."""
         pass
+
+    @abstractmethod
+    def is_available(self) -> bool:
+        """Check if the provider is available and properly configured."""
+        pass
