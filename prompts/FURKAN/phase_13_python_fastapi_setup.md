@@ -19,8 +19,6 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 
 ### Phase Assignment
 - **Assigned To**: FURKAN (AI/LLM Developer)
-- **Estimated Duration**: 2 days
-
 ---
 
 ## OBJECTIVE

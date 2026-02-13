@@ -1,0 +1,26 @@
+{
+    "invoice_number": "FTR-2024-001234",
+    "invoice_date": "2024-03-15",
+    "due_date": "2024-04-15",
+    "supplier_name": "ABC Teknoloji Ltd. Şti.",
+    "supplier_tax_number": "1234567890",
+    "supplier_address": "İstanbul, Türkiye",
+    "buyer_name": "XYZ Holding A.Ş.",
+    "buyer_tax_number": "9876543210",
+    "items": [
+        {
+            "description": "Yazılım Lisansı",
+            "quantity": 1,
+            "unit": "Adet",
+            "unit_price": 5000.00,
+            "tax_rate": 20,
+            "tax_amount": 1000.00,
+            "line_total": 6000.00
+        }
+    ],
+    "subtotal": 5000.00,
+    "tax_amount": 1000.00,
+    "total_amount": 6000.00,
+    "currency": "TRY",
+    "notes": null
+}
