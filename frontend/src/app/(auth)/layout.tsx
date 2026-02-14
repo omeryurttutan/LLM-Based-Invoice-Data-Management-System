@@ -1,29 +1,30 @@
-import { Briefcase } from "lucide-react"
+import { Metadata } from 'next';
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export const metadata: Metadata = {
+  title: 'Kimlik Doğrulama | Fatura OCR',
+  description: 'Fatura OCR sistemine giriş yapın veya kayıt olun',
+};
+
+interface AuthLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center">
-            <div className="flex items-center gap-2 font-bold text-2xl mb-2">
-                <Briefcase className="h-8 w-8 text-primary" />
-                <span>Fatura OCR</span>
-            </div>
-            <p className="text-center text-sm text-muted-foreground">
-                Veri Yönetim Sistemi
-            </p>
-        </div>
-        
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted relative flex items-center justify-center">
+      {/* Optional: Add logo or branding */}
+      <div className="absolute top-6 left-6">
+        <h1 className="text-xl font-bold text-primary">Fatura OCR</h1>
+      </div>
+      
+      <div className="w-full max-w-md p-4">
         {children}
-
-        <div className="text-center text-xs text-muted-foreground mt-8">
-             &copy; 2026 Fatura OCR Sistemi
-        </div>
+      </div>
+      
+      {/* Optional: Footer */}
+      <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-muted-foreground">
+        © 2025 Fatura OCR ve Veri Yönetim Sistemi
       </div>
     </div>
-  )
+  );
 }
