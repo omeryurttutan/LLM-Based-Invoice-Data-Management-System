@@ -1,0 +1,35 @@
+{
+    "invoice_number": "FAT-2024-001234",
+    "invoice_date": "2024-11-15",
+    "due_date": "2024-12-15",
+    "supplier_name": "ABC Teknoloji A.Ş.",
+    "supplier_tax_number": "1234567890",
+    "supplier_address": "Atatürk Mah. Cumhuriyet Cad. No:42 Kadıköy/İstanbul",
+    "buyer_name": "XYZ Danışmanlık Ltd. Şti.",
+    "buyer_tax_number": "9876543210",
+    "notes": "30 gün vadeli ödeme",
+    "subtotal": 1000.00,
+    "tax_amount": 200.00,
+    "total_amount": 1200.00,
+    "currency": "TRY",
+    "items": [
+        {
+            "description": "Yazılım Lisansı - Yıllık",
+            "quantity": 2,
+            "unit": "Adet",
+            "unit_price": 400.00,
+            "tax_rate": 20,
+            "tax_amount": 160.00,
+            "line_total": 800.00
+        },
+        {
+            "description": "Teknik Destek - Aylık",
+            "quantity": 1,
+            "unit": "Adet",
+            "unit_price": 200.00,
+            "tax_rate": 20,
+            "tax_amount": 40.00,
+            "line_total": 200.00
+        }
+    ]
+}

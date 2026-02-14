@@ -1,0 +1,123 @@
+package com.faturaocr.infrastructure.persistence.user;
+
+import com.faturaocr.domain.user.entity.User;
+import com.faturaocr.domain.user.port.UserRepository;
+import com.faturaocr.domain.user.valueobject.Email;
+import com.faturaocr.domain.user.valueobject.Role;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+import java.util.UUID;
+
+/**
+ * Adapter implementing UserRepository port.
+ */
+@Component
+@RequiredArgsConstructor
+public class UserRepositoryAdapter implements UserRepository {
+
+    private final UserJpaRepository jpaRepository;
+
+    @Override
+    public User save(User user) {
+        UserJpaEntity entity = toJpaEntity(user);
+        UserJpaEntity saved = jpaRepository.save(entity);
+        return toDomainEntity(saved);
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        return jpaRepository.findById(id).map(this::toDomainEntity);
+    }
+
+    @Override
+    public Optional<User> findByEmail(Email email) {
+        return jpaRepository.findByEmail(email.getValue()).map(this::toDomainEntity);
+    }
+
+    @Override
+    public Optional<User> findByEmailAndCompanyId(Email email, UUID companyId) {
+        return jpaRepository.findByEmailAndCompanyId(email.getValue(), companyId)
+                .map(this::toDomainEntity);
+    }
+
+    @Override
+    public boolean existsByEmail(Email email) {
+        return jpaRepository.existsByEmail(email.getValue());
+    }
+
+    @Override
+    public boolean existsByEmailAndCompanyId(Email email, UUID companyId) {
+        return jpaRepository.existsByEmailAndCompanyId(email.getValue(), companyId);
+    }
+
+    @Override
+    public Page<User> findAllByCompanyId(UUID companyId, Pageable pageable) {
+        return jpaRepository.findAllByCompanyId(companyId, pageable)
+                .map(this::toDomainEntity);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public long countByCompanyIdAndRole(UUID companyId, Role role) {
+        return jpaRepository.countByCompanyIdAndRole(companyId, UserJpaEntity.RoleJpa.valueOf(role.name()));
+    }
+
+    // Mapping methods
+    private UserJpaEntity toJpaEntity(User user) {
+        UserJpaEntity entity = new UserJpaEntity();
+        if (user.getId() != null) {
+            entity.setId(user.getId());
+        }
+        entity.setCompanyId(user.getCompanyId());
+        entity.setEmail(user.getEmailValue());
+        entity.setPasswordHash(user.getPasswordHash());
+        entity.setFullName(user.getFullName());
+        entity.setPhone(user.getPhone());
+        entity.setAvatarUrl(user.getAvatarUrl());
+        entity.setRole(UserJpaEntity.RoleJpa.valueOf(user.getRole().name()));
+        entity.setActive(user.isActive());
+        entity.setEmailVerified(user.isEmailVerified());
+        entity.setEmailVerifiedAt(user.getEmailVerifiedAt());
+        entity.setLastLoginAt(user.getLastLoginAt());
+        entity.setFailedLoginAttempts(user.getFailedLoginAttempts());
+        entity.setLockedUntil(user.getLockedUntil());
+        entity.setPasswordChangedAt(user.getPasswordChangedAt());
+
+        // Handling base entity fields if needed (createdAt, updatedAt, isDeleted)
+        // Assuming base entity handles them or passed through if manually setting
+        // But BaseJpaEntity handles auditing. If we want to preserve dates from domain,
+        // we might need to set them.
+        // However, usually we rely on JPA auditing for modification dates.
+        // Let's assume JPA handles it.
+        entity.setDeleted(user.isDeleted());
+
+        return entity;
+    }
+
+    private User toDomainEntity(UserJpaEntity entity) {
+        return User.builder()
+                .id(entity.getId())
+                .companyId(entity.getCompanyId())
+                .email(entity.getEmail())
+                .passwordHash(entity.getPasswordHash())
+                .fullName(entity.getFullName())
+                .phone(entity.getPhone())
+                .avatarUrl(entity.getAvatarUrl())
+                .role(Role.valueOf(entity.getRole().name()))
+                .isActive(entity.isActive())
+                .emailVerified(entity.isEmailVerified())
+                .failedLoginAttempts(entity.getFailedLoginAttempts())
+                .lockedUntil(entity.getLockedUntil())
+                .lastLoginAt(entity.getLastLoginAt())
+                .build();
+    }
+}

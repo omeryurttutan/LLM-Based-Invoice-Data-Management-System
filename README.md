@@ -19,6 +19,7 @@ Bu projede fatura analizi için klasik OCR pipeline'ı yerine:
 LLM tabanlı veri çıkarım servisi kullanılmıştır.
 
 Bu sayede:
+
 - Farklı fatura formatlarına otomatik adaptasyon
 - Çok daha düşük geliştirme maliyeti
 - Daha yüksek doğruluk oranı
@@ -35,8 +36,6 @@ Hibrit mimari yaklaşımı:
 - **Next.js 14 PWA** → Web + Mobil uyumlu kullanıcı arayüzü
 - **PostgreSQL + Redis + RabbitMQ**
 - Docker container'ları ile ayrık deploy edilebilir servisler
-
-
 
 ---
 
@@ -58,25 +57,27 @@ Hibrit mimari yaklaşımı:
 
 ## 🧩 Teknoloji Yığını
 
-| Katman | Teknolojiler |
-|--------|---------------|
-| Backend | Java 17, Spring Boot 3, Spring Security, JPA, PostgreSQL |
-| LLM Servisi | Python 3.11, FastAPI, Gemini, GPT-5.2, Claude |
-| Frontend | Next.js 14, React 19, TypeScript, Tailwind, Shadcn |
-| Messaging | RabbitMQ |
-| Cache | Redis |
-| DevOps | Docker, GitHub Actions |
+| Katman      | Teknolojiler                                             |
+| ----------- | -------------------------------------------------------- |
+| Backend     | Java 17, Spring Boot 3, Spring Security, JPA, PostgreSQL |
+| LLM Servisi | Python 3.11, FastAPI, Gemini, GPT-5.2, Claude            |
+| Frontend    | Next.js 14, React 19, TypeScript, Tailwind, Shadcn       |
+| Messaging   | RabbitMQ                                                 |
+| Cache       | Redis                                                    |
+| DevOps      | Docker, GitHub Actions                                   |
 
 ---
 
 ## 🧠 Neden LLM Tabanlı Yaklaşım?
 
 Geleneksel OCR sistemlerinde:
+
 - Yüzlerce satır regex
 - Sürekli format bakımı
 - Karmaşık doğrulama katmanları
 
 Bu projede:
+
 - Tek API çağrısı
 - JSON schema validation
 - Prompt optimizasyonu ile sürekli gelişim
