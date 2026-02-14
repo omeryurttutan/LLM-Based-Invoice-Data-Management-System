@@ -22,6 +22,7 @@ public class Invoice {
     private UUID categoryId;
     private UUID createdByUserId;
     private UUID verifiedByUserId;
+    private String correlationId;
 
     // Identification
     private String invoiceNumber;

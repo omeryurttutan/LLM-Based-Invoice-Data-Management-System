@@ -1,17 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
+
 import { usePathname } from "next/navigation"
 import { Briefcase, Menu } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
+
 import { navItems } from "@/components/layout/nav-config"
 import { SidebarNavItem } from "@/components/layout/sidebar-nav-item"
-import { cn } from "@/lib/utils"
+
 
 export function MobileSidebar() {
   const [open, setOpen] = useState(false)

@@ -1,0 +1,15 @@
+{
+    "message_id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+    "invoice_id": 789,
+    "company_id": 3,
+    "user_id": 30,
+    "file_path": "/data/invoices/fatura-scan.jpg",
+    "file_name": "fatura-scan.jpg",
+    "file_type": "image/jpeg",
+    "file_size": 1048576,
+    "priority": "NORMAL",
+    "attempt": 1,
+    "max_attempts": 3,
+    "timestamp": "2026-01-15T12:00:00Z",
+    "correlation_id": "e5f6a7b8-c9d0-1234-efab-345678901234"
+}

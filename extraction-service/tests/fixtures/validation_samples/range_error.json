@@ -1,0 +1,20 @@
+{
+    "invoice_number": "FAT-NEG-001",
+    "invoice_date": "2024-09-10",
+    "supplier_name": "Negatif Değer Ltd.",
+    "supplier_tax_number": "9999999999",
+    "total_amount": -500.00,
+    "subtotal": -420.00,
+    "tax_amount": -80.00,
+    "currency": "TRY",
+    "items": [
+        {
+            "description": "Negatif Ürün",
+            "quantity": -2,
+            "unit_price": 0,
+            "line_total": 0,
+            "tax_rate": 20,
+            "tax_amount": 0
+        }
+    ]
+}

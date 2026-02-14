@@ -1,20 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
+
 import { usePathname } from "next/navigation"
 import { 
-  Briefcase, 
-  Building2, 
-  ChevronLeft, 
-  FileText, 
-  FolderOpen, 
-  LayoutDashboard, 
-  ScrollText, 
-  Settings, 
-  Upload, 
-  UserCircle, 
-  Users 
+  Briefcase,
+  ChevronLeft
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"

@@ -1,62 +1,7 @@
-# Fatura OCR ve Veri Yönetim Sistemi
-
-![CI Pipeline](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg)
-![Backend](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg?branch=main&event=push&label=Backend)
-
-## Proje Hakkında
-
-Fatura verilerinin OCR ve LLM teknolojileri kullanılarak otomatik işlenmesini sağlayan, muhasebe süreçlerini hızlandıran modern bir web uygulamasıdır.
-
-## Teknoloji Stack'i
-
-- **Backend**: Spring Boot 3.2 (Java 17)
-- **Frontend**: Next.js 14 (TypeScript)
-- **Extraction**: FastAPI (Python 3.11)
-- **Data**: PostgreSQL 15, Redis 7
-- **Queue**: RabbitMQ 3
-
-## Geliştirme Ortamı Kurulumu
-
-### Gereksinimler
-
-- Java 17
-- Node.js 20+
-- Python 3.11+
-- Docker & Docker Compose
-
-### Hızlı Başlangıç (Docker ile)
-
-1. `.env.example` dosyasını `.env` olarak kopyalayın
-2. `docker-compose up -d --build` komutunu çalıştırın
-3. Servislerin başlamasını bekleyin
-
-### Servis URL Tablosu
-
-Aşağıdaki host portları, mevcut diğer projelerle çakışmayı önlemek için özel olarak ayarlanmıştır.
-
-| Servis             | Lokal URL              | Docker Internal |
-| ------------------ | ---------------------- | --------------- |
-| Backend            | http://localhost:8082  | 8080            |
-| Frontend           | http://localhost:3001  | 3000            |
-| Extraction Service | http://localhost:8001  | 8000            |
-| PostgreSQL         | localhost:5436         | 5432            |
-| Redis              | localhost:6380         | 6379            |
-| RabbitMQ (AMQP)    | localhost:5673         | 5672            |
-| RabbitMQ UI        | http://localhost:15673 | 15672           |
-
-## Proje Yapısı
-
-- `backend/`: Spring Boot uygulaması
-- `frontend/`: Next.js web arayüzü
-- `extraction-service/`: Python tabanlı OCR/LLM servisi
-- `docs/`: Proje dokümantasyonu
-
-## Ekip
-
-- Muhammed Furkan Akdağ (AI/LLM)
-- Ömer Talha Yurttutan (Web)
-
 # 🧾 Fatura OCR ve Veri Yönetim Sistemi
+
+[![CI Pipeline](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg)](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml)
+[![Backend](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg?branch=main&event=push&label=Backend)](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml)
 
 LLM tabanlı görüntü analizi ile fatura verilerini otomatik çıkaran, kurumsal ölçekte tasarlanmış modern bir muhasebe otomasyon sistemi.
 
@@ -68,12 +13,12 @@ Sistem; fatura görsellerini (PDF, JPEG, PNG) ve GİB e-Fatura XML dosyalarını
 
 ## 🚀 Temel Yaklaşım
 
-> Görüntüyü OCR’a çevir, regex ile parçala, düzelt, doğrula… ❌  
+> Görüntüyü OCR’a çevir, regex ile parçala, düzelt, doğrula… ❌
 > Görüntüyü LLM’e gönder, yapılandırılmış JSON al… ✅
 
 Bu projede fatura analizi için klasik OCR pipeline'ı yerine:
 
-**Gemini 3 Flash → GPT-5.2 → Claude Haiku 4.5** fallback zincirine sahip  
+**Gemini 3 Flash → GPT-5.2 → Claude Haiku 4.5** fallback zincirine sahip
 LLM tabanlı veri çıkarım servisi kullanılmıştır.
 
 Bu sayede:
@@ -155,22 +100,43 @@ Bu projede:
 
 ## 📦 Deployment
 
-Tüm servisler Docker container'ları içinde çalışır.  
-CI/CD GitHub Actions ile otomatikleştirilmiştir.
+### Gereksinimler
 
-- Frontend: Vercel
-- Backend & LLM Service: Dockerized deployment
+- Java 17
+- Node.js 20+
+- Python 3.11+
+- Docker & Docker Compose
+
+### Hızlı Başlangıç (Docker ile)
+
+1. `.env.example` dosyasını `.env` olarak kopyalayın
+2. `docker-compose up -d --build` komutunu çalıştırın
+3. Servislerin başlamasını bekleyin
+
+### Servis URL Tablosu
+
+Aşağıdaki host portları, mevcut diğer projelerle çakışmayı önlemek için özel olarak ayarlanmıştır.
+
+| Servis             | Lokal URL              | Docker Internal |
+| ------------------ | ---------------------- | --------------- |
+| Backend            | http://localhost:8082  | 8080            |
+| Frontend           | http://localhost:3001  | 3000            |
+| Extraction Service | http://localhost:8001  | 8000            |
+| PostgreSQL         | localhost:5436         | 5432            |
+| Redis              | localhost:6380         | 6379            |
+| RabbitMQ (AMQP)    | localhost:5673         | 5672            |
+| RabbitMQ UI        | http://localhost:15673 | 15672           |
 
 ---
 
 ## 🎯 Proje Hedefi
 
-Muhasebe ofislerinde saatler süren manuel fatura girişini saniyelere indiren,  
+Muhasebe ofislerinde saatler süren manuel fatura girişini saniyelere indiren,
 ölçeklenebilir ve kurumsal düzeyde bir otomasyon altyapısı sunmak.
 
 ---
 
 ## 👨‍💻 Geliştiriciler
 
-- Muhammed Furkan Akdağ
-- Ömer Talha Yurttutan
+- Muhammed Furkan Akdağ (AI/LLM)
+- Ömer Talha Yurttutan (Web)

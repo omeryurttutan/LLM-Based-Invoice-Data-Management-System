@@ -1,0 +1,32 @@
+Sure, here is the extracted invoice data:
+
+```json
+{
+  "invoice_number": "MRK-2024-042",
+  "invoice_date": "2024-03-10",
+  "due_date": null,
+  "supplier_name": "Markdown Çözüm A.Ş.",
+  "supplier_tax_number": "5555555555",
+  "supplier_address": "Ankara, Türkiye",
+  "buyer_name": null,
+  "buyer_tax_number": null,
+  "items": [
+    {
+      "description": "Danışmanlık Hizmeti",
+      "quantity": 1.0,
+      "unit": "Adet",
+      "unit_price": 2500.00,
+      "tax_rate": 20.0,
+      "tax_amount": 500.00,
+      "line_total": 3000.00
+    }
+  ],
+  "subtotal": 2500.00,
+  "tax_amount": 500.00,
+  "total_amount": 3000.00,
+  "currency": "TRY",
+  "notes": null
+}
+```
+
+I hope this helps! Let me know if you need anything else.

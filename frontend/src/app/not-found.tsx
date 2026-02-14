@@ -13,7 +13,7 @@ export default function NotFound() {
         Aradığınız sayfa mevcut değil veya taşınmış olabilir. Lütfen adresi kontrol edin veya ana sayfaya dönün.
       </p>
       <Button asChild>
-        <Link href="/">Dashboard'a Dön</Link>
+        <Link href="/">Dashboard&apos;a Dön</Link>
       </Button>
     </div>
   )
