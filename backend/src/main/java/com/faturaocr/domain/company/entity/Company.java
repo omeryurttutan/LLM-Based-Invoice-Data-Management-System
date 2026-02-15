@@ -1,6 +1,7 @@
 package com.faturaocr.domain.company.entity;
 
 import com.faturaocr.domain.common.entity.BaseEntity;
+import com.faturaocr.domain.audit.annotation.AuditMask;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
