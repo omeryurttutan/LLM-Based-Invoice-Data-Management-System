@@ -145,6 +145,11 @@ public class TestDataBuilder {
             return this;
         }
 
+        public CompanyBuilder withEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
         public Company build() {
             return Company.builder()
                     .id(id)
@@ -189,6 +194,11 @@ public class TestDataBuilder {
 
         public UserBuilder emailVerified(boolean emailVerified) {
             this.emailVerified = emailVerified;
+            return this;
+        }
+
+        public UserBuilder withPasswordHash(String passwordHash) {
+            this.passwordHash = passwordHash;
             return this;
         }
 

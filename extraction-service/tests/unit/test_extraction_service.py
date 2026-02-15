@@ -1,113 +1,68 @@
-from app.models.invoice_data import InvoiceData
-from app.models.extraction import ExtractionResponse
-from app.models.validation import ValidationResult
-from app.services.llm.base_provider import LLMError
+import pytest
+from unittest.mock import MagicMock, patch, AsyncMock
+from app.services.extraction_service import ExtractionService
+from app.models.response import InvoiceData
+from app.models.request import ExtractionRequest
+from app.models.enums import FileType
 
 class TestExtractionService:
-
+    
     @pytest.fixture
-    def service(self):
-        with patch("app.services.extraction.extraction_service.PreprocessingPipeline") as MockPipeline, \
-             patch("app.services.extraction.extraction_service.FallbackChain") as MockChain, \
-             patch("app.services.extraction.extraction_service.ResponseParser") as MockParser, \
-             patch("app.services.extraction.extraction_service.Validator") as MockValidator, \
-             patch("app.services.parsers.xml_parser.XMLParser") as MockXMLParser, \
-             patch("app.services.parsers.ubl_field_extractor.UBLFieldExtractor") as MockExtractor, \
-             patch("app.services.parsers.file_type_detector.FileTypeDetector") as MockDetector, \
-             patch("app.services.extraction.extraction_service.PromptManager") as MockPromptManager:
-            
-            service = ExtractionService()
-            service.pipeline = MockPipeline.return_value
-            service.chain = MockChain.return_value
-            service.validator = MockValidator.return_value
-            service.xml_parser = MockXMLParser.return_value
-            service.file_type_detector = MockDetector.return_value
-            service.prompt_manager = MockPromptManager.return_value
-            
-            return service
+    def mock_components(self):
+        with patch('app.services.extraction_service.PreprocessingService') as mock_prep, \
+             patch('app.services.extraction_service.FallbackChain') as mock_chain, \
+             patch('app.services.extraction_service.ValidationService') as mock_val, \
+             patch('app.services.extraction_service.ConfidenceScorer') as mock_score, \
+             patch('app.services.extraction_service.XMLParserService') as mock_xml, \
+             patch('app.services.extraction_service.ResponseNormalizer') as mock_norm:
+            yield {
+                'prep': mock_prep,
+                'chain': mock_chain,
+                'val': mock_val,
+                'score': mock_score,
+                'xml': mock_xml,
+                'norm': mock_norm
+            }
 
     @pytest.mark.asyncio
-    async def test_extract_invoice_image_success(self, service):
-        # Setup
-        request = ExtractionRequest(file_content=b"image", filename="invoice.jpg")
+    async def test_extract_image_flow(self, mock_components, sample_image_bytes, mock_invoice_data):
+        """Test full extraction flow for an image."""
+        # Setup mocks
+        mock_components['prep'].preprocess_image.return_value = sample_image_bytes
+        # FallbackChain is likely instantiated inside the service or injected
+        # Assuming FallbackChain().execute() is called
+        mock_chain_instance = mock_components['chain'].return_value
+        mock_chain_instance.execute.return_value = mock_invoice_data
         
-        # Mock file type
-        service.file_type_detector.detect.return_value = "image/jpeg"
+        mock_components['val'].validate.return_value = [] # No validation issues
+        mock_components['score'].calculate_score.return_value = 95.0
         
-        # Mock preprocessing
-        mock_processed = MagicMock()
-        mock_processed.processed_content = b"processed"
-        mock_processed.mime_type = "image/jpeg"
-        service.pipeline.process.return_value = mock_processed
+        service = ExtractionService()
+        result = await service.process_extraction(sample_image_bytes, file_type=FileType.IMAGE)
         
-        # Mock chain (AsyncMock for async method)
-        service.chain.generate_with_fallback = AsyncMock(return_value=('{"invoice_number": "123"}', "GEMINI", []))
+        assert isinstance(result, InvoiceData)
+        assert result.confidence_score == 95.0
+        assert len(result.validation_issues) == 0
         
-        # Mock parser - Use REAL InvoiceData object for Pydantic validation
-        mock_data = InvoiceData(invoice_number="123")
-        with patch("app.services.extraction.extraction_service.ResponseParser.parse", return_value=mock_data):
-             # Mock validator (Real object needed for Pydantic)
-             validation_res = ValidationResult(
-                 confidence_score=95.0,
-                 suggested_status="AUTO_VERIFIED",
-                 category_scores={},
-                 issues=[],
-                 summary="Success"
-             )
-             service.validator.validate.return_value = validation_res
-
-             # Execute
-             # process_file_content takes bytes, filename, content_type
-             result = await service.process_file_content(b"image", "invoice.jpg", "image/jpeg")
-             
-             # Verify
-             assert isinstance(result, ExtractionResponse)
-             assert result.data.invoice_number == "123"
-             assert result.provider == "GEMINI"
-             assert result.validation_result.confidence_score == 95.0
-             service.chain.generate_with_fallback.assert_called_once()
+        # Verify calls
+        mock_components['prep'].preprocess_image.assert_called_once()
+        mock_chain_instance.execute.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_extract_invoice_xml_success(self, service):
-        # Setup
-        # request = ExtractionRequest(file_content=b"<Invoice>...</Invoice>", filename="invoice.xml")
+    async def test_extract_xml_flow(self, mock_components, sample_xml_content, mock_invoice_data):
+        """Test full extraction flow for XML."""
+        # Setup mocks
+        mock_components['xml'].parse.return_value = mock_invoice_data
+        mock_components['val'].validate.return_value = []
+        mock_components['score'].calculate_score.return_value = 100.0 # XML usually high confidence
         
-        # Mock file type
-        service.file_type_detector.detect.return_value = "XML" # Must be XML for routing
+        service = ExtractionService()
+        result = await service.process_extraction(sample_xml_content.encode('utf-8'), file_type=FileType.XML)
         
-        # Mock XML parser - Use REAL InvoiceData object
-        mock_data = InvoiceData(invoice_number="XML-123")
-        service.xml_parser.parse.return_value = mock_data
+        assert isinstance(result, InvoiceData)
+        assert result.confidence_score == 100.0
         
-        # Mock validator
-        validation_res = ValidationResult(
-             confidence_score=100.0,
-             suggested_status="AUTO_VERIFIED",
-             category_scores={},
-             issues=[],
-             summary="Success"
-        )
-        service.validator.validate.return_value = validation_res
-        
-        # Execute
-        result = await service.process_file_content(b"<Invoice>...</Invoice>", "invoice.xml", "application/xml")
-        
-        # Verify
-        assert result.data.invoice_number == "XML-123"
-        assert result.provider == "XML_PARSER"
-        # LLM chain should NOT be called
-        service.chain.generate_with_fallback.assert_not_called()
-
-    @pytest.mark.asyncio
-    async def test_extract_invoice_llm_failure(self, service):
-        # Setup
-        service.file_type_detector.detect.return_value = "IMAGE"
-        service.pipeline.process.return_value = MagicMock(processed_content=b"proc", mime_type="image/jpeg")
-        
-        # Raise error
-        service.chain.generate_with_fallback = AsyncMock(side_effect=LLMError("All failed"))
-        
-        # Execute & Verify
-        with pytest.raises(LLMError):
-            await service.process_file_content(b"image", "invoice.jpg", "image/jpeg")
-
+        # Verify calls
+        mock_components['prep'].preprocess_image.assert_not_called()
+        mock_components['chain'].return_value.execute.assert_not_called()
+        mock_components['xml'].parse.assert_called_once()

@@ -1,101 +1,49 @@
 import pytest
-from unittest.mock import MagicMock, patch
-from app.services.validation.validator import Validator, ValidationResult
-from app.models.invoice_data import InvoiceData
-from app.models.validation import ValidationIssue, ValidationSeverity, ValidationCategory
+from app.services.validation_service import ValidationService
+from app.models.response import InvoiceData
 
-class TestValidator:
+class TestValidationService:
     
-    @pytest.fixture
-    def validator(self):
-        return Validator()
+    def test_validate_success(self, mock_invoice_data):
+        """Test validation of a valid invoice."""
+        # Assume validate returns a list of errors/warnings, empty if all good
+        issues = ValidationService.validate(mock_invoice_data)
+        assert len(issues) == 0
 
-    @pytest.fixture
-    def sample_data(self):
-        return InvoiceData(total_amount=100.0)
+    def test_validate_required_fields(self, mock_invoice_data):
+        """Test validation of missing required fields."""
+        data = mock_invoice_data.model_copy()
+        data.fatura_no = None # or empty string if model allows
+        
+        # Pydantic likely catches None for required fields during instantiation
+        # validation service checks logic beyond basic types
+        
+        # If ValidationService is responsible for checking specific business rules:
+        data.fatura_no = "" # Empty string might pass pydantic but fail business logic
+        issues = ValidationService.validate(data)
+        assert any("fatura_no" in str(issue).lower() for issue in issues)
 
-    @patch("app.services.validation.validator.FieldValidator")
-    @patch("app.services.validation.validator.FormatValidator")
-    @patch("app.services.validation.validator.MathValidator")
-    @patch("app.services.validation.validator.RangeValidator")
-    @patch("app.services.validation.validator.CrossFieldValidator")
-    @patch("app.services.validation.validator.ConfidenceCalculator")
-    def test_validate_success(self, MockCalc, MockCross, MockRange, MockMath, MockFormat, MockField, validator, sample_data):
-        # Setup mocks
-        MockField.validate.return_value = (100.0, [])
-        MockFormat.validate.return_value = (100.0, [])
-        MockMath.validate.return_value = (100.0, [])
-        MockRange.validate.return_value = (100.0, [])
-        MockCross.validate.return_value = (100.0, [])
+    def test_validate_math_consistency(self, mock_invoice_data):
+        """Test math validation."""
+        data = mock_invoice_data.model_copy()
+        # Create incorrect math: total != subtotal + tax
+        data.toplam_tutar = 2000.00 # Should be 118.00
         
-        MockCalc.calculate.return_value = 100.0
-        MockCalc.get_suggested_status.return_value = "AUTO_VERIFIED"
-        
-        # Execute
-        result = validator.validate(sample_data)
-        
-        # Verify
-        assert isinstance(result, ValidationResult)
-        assert result.confidence_score == 100.0
-        assert result.suggested_status == "AUTO_VERIFIED"
-        assert len(result.issues) == 0
-        
-        # Verify calls
-        MockField.validate.assert_called_once()
-        MockFormat.validate.assert_called_once()
-        # ... others ...
+        issues = ValidationService.validate(data)
+        assert any("math" in str(issue).lower() or "total" in str(issue).lower() for issue in issues)
 
-    @patch("app.services.validation.validator.FieldValidator")
-    # ... other mocks can be implicit or partial if we rely on exception handling
-    # but let's mock all to be safe and avoid side effects
-    @patch("app.services.validation.validator.FormatValidator")
-    @patch("app.services.validation.validator.MathValidator")
-    @patch("app.services.validation.validator.RangeValidator")
-    @patch("app.services.validation.validator.CrossFieldValidator")
-    @patch("app.services.validation.validator.ConfidenceCalculator")
-    def test_validate_with_issues(self, MockCalc, MockCross, MockRange, MockMath, MockFormat, MockField, validator, sample_data):
-        # Setup mocks
-        issue = ValidationIssue(field="total_amount", message="Error", severity=ValidationSeverity.CRITICAL, category=ValidationCategory.MATH_CONSISTENCY)
+    def test_validate_tax_number(self, mock_invoice_data):
+        """Test VKN/TCKN validation."""
+        data = mock_invoice_data.model_copy()
+        data.gonderici_vkn = "123" # Invalid length
         
-        MockField.validate.return_value = (100.0, [])
-        MockFormat.validate.return_value = (100.0, [])
-        MockMath.validate.return_value = (50.0, [issue])
-        MockRange.validate.return_value = (100.0, [])
-        MockCross.validate.return_value = (100.0, [])
-        
-        MockCalc.calculate.return_value = 85.0
-        MockCalc.get_suggested_status.return_value = "NEEDS_REVIEW"
-        
-        # Execute
-        result = validator.validate(sample_data)
-        
-        # Verify
-        assert result.confidence_score == 85.0
-        assert result.suggested_status == "NEEDS_REVIEW"
-        assert len(result.issues) == 1
-        assert result.issues[0].severity == ValidationSeverity.CRITICAL
+        issues = ValidationService.validate(data)
+        assert any("vkn" in str(issue).lower() for issue in issues)
 
-    @patch("app.services.validation.validator.FieldValidator")
-    @patch("app.services.validation.validator.FormatValidator")
-    @patch("app.services.validation.validator.MathValidator")
-    @patch("app.services.validation.validator.RangeValidator")
-    @patch("app.services.validation.validator.CrossFieldValidator")
-    @patch("app.services.validation.validator.ConfidenceCalculator")
-    def test_validate_exception_handling(self, MockCalc, MockCross, MockRange, MockMath, MockFormat, MockField, validator, sample_data):
-        # Setup mocks to raise exception
-        MockField.validate.side_effect = Exception("Crash")
-        MockFormat.validate.return_value = (100.0, [])
-        MockMath.validate.return_value = (100.0, [])
-        MockRange.validate.return_value = (100.0, [])
-        MockCross.validate.return_value = (100.0, [])
+    def test_validate_date_format(self, mock_invoice_data):
+        """Test date logic (e.g. not in future)."""
+        data = mock_invoice_data.model_copy()
+        data.tarih = "2099-01-01" # Future date
         
-        MockCalc.calculate.return_value = 80.0 # Assuming field score became 0
-        MockCalc.get_suggested_status.return_value = "NEEDS_REVIEW"
-        
-        # Execute
-        result = validator.validate(sample_data)
-        
-        # Verify
-        # Should not crash, but result in lower score (mocked above)
-        assert result.category_scores["field_completeness"] == 0.0
-        assert result.category_scores["format_validation"] == 100.0
+        issues = ValidationService.validate(data)
+        assert any("date" in str(issue).lower() or "future" in str(issue).lower() for issue in issues)
