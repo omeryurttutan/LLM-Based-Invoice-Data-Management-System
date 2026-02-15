@@ -111,6 +111,7 @@ class ExportServiceTest {
     @Test
     void exportInvoices_ShouldUseCorrectExporter_WhenFormatProvided() throws IOException {
         // Arrange
+        @SuppressWarnings("unchecked")
         Specification<InvoiceJpaEntity> spec = (Specification<InvoiceJpaEntity>) mock(Specification.class);
         OutputStream outputStream = mock(OutputStream.class);
 

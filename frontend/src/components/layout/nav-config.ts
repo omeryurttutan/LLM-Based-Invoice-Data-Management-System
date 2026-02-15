@@ -1,13 +1,14 @@
-import { 
-  Building2, 
-  FileText, 
-  FolderOpen, 
-  LayoutDashboard, 
-  ScrollText, 
-  Settings, 
-  Upload, 
-  UserCircle, 
-  Users 
+import {
+  Building2,
+  FileText,
+  FolderOpen,
+  LayoutDashboard,
+  ScrollText,
+  Settings,
+  Upload,
+  UserCircle,
+  Users,
+  Bell
 } from "lucide-react"
 
 export interface NavItem {
@@ -25,12 +26,13 @@ export const navItems: NavItem[] = [
   { title: "Faturalar", href: "/invoices", icon: FileText, section: "main" },
   { title: "Fatura Yükle", href: "/invoices/upload", icon: Upload, section: "main" },
   { title: "Kategoriler", href: "/categories", icon: FolderOpen, section: "main" },
-  
+  { title: "Bildirimler", href: "/notifications", icon: Bell, section: "main" },
+
   // Management
   { title: "Kullanıcılar", href: "/users", icon: Users, section: "management", roles: ["ADMIN"] },
   { title: "Şirket", href: "/company", icon: Building2, section: "management", roles: ["ADMIN", "MANAGER"] },
   { title: "Denetim Logu", href: "/audit-logs", icon: ScrollText, section: "management", roles: ["ADMIN", "MANAGER"] },
-  
+
   // Other
   { title: "Profil", href: "/profile", icon: UserCircle, section: "other" },
   { title: "Ayarlar", href: "/settings", icon: Settings, section: "other" },

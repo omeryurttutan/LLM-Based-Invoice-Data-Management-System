@@ -57,6 +57,7 @@ public class InvoiceMapper {
         invoice.setDeletedAt(entity.getDeletedAt());
         invoice.setCreatedAt(entity.getCreatedAt());
         invoice.setUpdatedAt(entity.getUpdatedAt());
+        invoice.setExtractionCorrections(entity.getExtractionCorrections());
 
         if (entity.getItems() != null) {
             List<InvoiceItem> items = entity.getItems().stream()
@@ -141,8 +142,7 @@ public class InvoiceMapper {
         entity.setDeletedAt(domain.getDeletedAt());
         entity.setCreatedAt(domain.getCreatedAt());
         entity.setUpdatedAt(domain.getUpdatedAt());
-
-        // Items handling
+        entity.setExtractionCorrections(domain.getExtractionCorrections());
         if (domain.getItems() != null) {
             for (InvoiceItem item : domain.getItems()) {
                 InvoiceItemJpaEntity itemEntity = toJpa(item);

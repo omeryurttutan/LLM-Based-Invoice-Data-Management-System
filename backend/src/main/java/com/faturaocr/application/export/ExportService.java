@@ -80,7 +80,8 @@ public class ExportService {
 
                 // Create a layout iterable/stream.
                 // We must use final/effectively final variable in lambda
-                Specification<InvoiceJpaEntity> effectiveSpec = finalSpec;
+                final Specification<InvoiceJpaEntity> effectiveSpec = finalSpec != null ? finalSpec
+                                : Specification.where(null);
                 boolean finalIncludeItems = includeItems;
                 Iterable<List<InvoiceExportData>> dataProvider = () -> new InvoicePageIterator(
                                 invoiceRepository,

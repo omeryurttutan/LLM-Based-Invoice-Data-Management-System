@@ -57,8 +57,9 @@ public class NetsisInvoiceExporter implements InvoiceExporter {
 
                 for (java.util.Map.Entry<String, List<InvoiceExportData>> entry : groupedInvoices.entrySet()) {
                     List<InvoiceExportData> invoiceRows = entry.getValue();
-                    if (invoiceRows.isEmpty())
+                    if (invoiceRows.isEmpty()) {
                         continue;
+                    }
 
                     InvoiceExportData header = invoiceRows.get(0);
                     writeInvoice(writer, header, invoiceRows);

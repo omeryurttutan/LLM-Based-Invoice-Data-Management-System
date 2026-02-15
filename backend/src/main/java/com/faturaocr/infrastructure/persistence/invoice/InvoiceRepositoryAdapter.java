@@ -25,6 +25,7 @@ public class InvoiceRepositoryAdapter implements InvoiceRepository {
     @Override
     public Invoice save(Invoice invoice) {
         InvoiceJpaEntity entity = invoiceMapper.toJpa(invoice);
+        @SuppressWarnings("null")
         InvoiceJpaEntity savedEntity = invoiceJpaRepository.save(entity);
         return invoiceMapper.toDomain(savedEntity);
     }

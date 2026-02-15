@@ -171,7 +171,9 @@ export interface ValidationIssue {
 
 export interface ExtractionCorrection {
   field: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   originalValue: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   correctedValue: any;
 }
 
@@ -181,20 +183,20 @@ export interface ValidationResult {
 }
 
 export interface InvoiceData {
-    invoiceNumber: string;
-    invoiceDate: string;
-    dueDate?: string;
-    supplierName: string;
-    supplierTaxNumber?: string;
-    supplierAddress?: string;
-    buyerName?: string;
-    buyerTaxNumber?: string;
-    items: InvoiceItem[];
-    subtotal: number;
-    taxAmount: number;
-    totalAmount: number;
-    currency: Currency;
-    notes?: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate?: string;
+  supplierName: string;
+  supplierTaxNumber?: string;
+  supplierAddress?: string;
+  buyerName?: string;
+  buyerTaxNumber?: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  taxAmount: number;
+  totalAmount: number;
+  currency: Currency;
+  notes?: string;
 }
 
 

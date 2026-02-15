@@ -6,5 +6,6 @@ public enum InvoiceStatus {
     VERIFIED,
     REJECTED,
     QUEUED,
-    FAILED
+    FAILED,
+    REVIEW_REQUIRED
 }

@@ -4,7 +4,7 @@ import com.faturaocr.application.export.InvoiceExporter;
 import com.faturaocr.application.export.dto.InvoiceExportData;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
 import com.faturaocr.application.export.ExportFormat;
-import com.faturaocr.application.export.ExportFormat;
+
 import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -98,8 +98,9 @@ public class CsvInvoiceExporter implements InvoiceExporter {
     }
 
     private String translateStatus(com.faturaocr.domain.invoice.valueobject.InvoiceStatus status) {
-        if (status == null)
+        if (status == null) {
             return "";
+        }
         return switch (status) {
             case PENDING -> "Beklemede";
             case VERIFIED -> "Onaylandı";
@@ -111,8 +112,9 @@ public class CsvInvoiceExporter implements InvoiceExporter {
     }
 
     private String translateSource(SourceType source) {
-        if (source == null)
+        if (source == null) {
             return "";
+        }
         return switch (source) {
             case LLM -> "LLM Çıkarım";
             case E_INVOICE -> "e-Fatura";

@@ -1,6 +1,9 @@
 package com.faturaocr.application.auth.service;
 
-import com.faturaocr.application.auth.dto.*;
+import com.faturaocr.application.auth.dto.AuthResponse;
+import com.faturaocr.application.auth.dto.LoginCommand;
+import com.faturaocr.application.auth.dto.RefreshTokenCommand;
+import com.faturaocr.application.auth.dto.RegisterCommand;
 import com.faturaocr.application.common.service.ApplicationService;
 import com.faturaocr.domain.audit.entity.AuditLog;
 import com.faturaocr.domain.audit.port.AuditLogRepository;
@@ -25,7 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ApplicationService
 public class AuthenticationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -56,7 +59,7 @@ public class AuthenticationService {
      * Register a new user.
      */
     public AuthResponse register(RegisterCommand command) {
-        logger.info("Registering new user with email: {}", command.email());
+        LOGGER.info("Registering new user with email: {}", command.email());
 
         Email email = Email.of(command.email());
 
@@ -77,7 +80,7 @@ public class AuthenticationService {
                 .build();
 
         User savedUser = userRepository.save(user);
-        logger.info("User registered successfully with ID: {}", savedUser.getId());
+        LOGGER.info("User registered successfully with ID: {}", savedUser.getId());
 
         // Generate tokens
         return generateAuthResponse(savedUser);
@@ -87,26 +90,26 @@ public class AuthenticationService {
      * Authenticate user and return tokens.
      */
     public AuthResponse login(LoginCommand command) {
-        logger.info("Login attempt for email: {}", command.email());
+        LOGGER.info("Login attempt for email: {}", command.email());
 
         Email email = Email.of(command.email());
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    logger.warn("Login failed: user not found for email: {}", command.email());
+                    LOGGER.warn("Login failed: user not found for email: {}", command.email());
                     return new DomainException("AUTH_INVALID_CREDENTIALS", "Invalid email or password");
                 });
 
         // Check if account is locked
         if (user.isLocked()) {
-            logger.warn("Login failed: account is locked for email: {}", command.email());
+            LOGGER.warn("Login failed: account is locked for email: {}", command.email());
             throw new DomainException("AUTH_ACCOUNT_LOCKED",
                     "Account is locked due to too many failed attempts. Please try again later.");
         }
 
         // Check if account is active
         if (!user.isActive()) {
-            logger.warn("Login failed: account is inactive for email: {}", command.email());
+            LOGGER.warn("Login failed: account is inactive for email: {}", command.email());
             throw new DomainException("AUTH_ACCOUNT_INACTIVE", "Account is inactive");
         }
 
@@ -123,7 +126,7 @@ public class AuthenticationService {
         // Audit: login event
         saveAuditLog(user, AuditActionType.LOGIN, "User logged in successfully");
 
-        logger.info("User logged in successfully: {}", user.getId());
+        LOGGER.info("User logged in successfully: {}", user.getId());
 
         return generateAuthResponse(user);
     }
@@ -132,7 +135,7 @@ public class AuthenticationService {
      * Refresh access token using refresh token.
      */
     public AuthResponse refresh(RefreshTokenCommand command) {
-        logger.debug("Token refresh requested");
+        LOGGER.debug("Token refresh requested");
 
         // Validate refresh token
         if (!refreshTokenService.validateRefreshToken(command.refreshToken())) {
@@ -152,7 +155,7 @@ public class AuthenticationService {
         // Revoke old refresh token and generate new tokens
         refreshTokenService.revokeRefreshToken(command.refreshToken());
 
-        logger.info("Token refreshed for user: {}", user.getId());
+        LOGGER.info("Token refreshed for user: {}", user.getId());
 
         return generateAuthResponse(user);
     }
@@ -161,13 +164,13 @@ public class AuthenticationService {
      * Logout user by revoking refresh token.
      */
     public void logout(String refreshToken) {
-        logger.debug("Logout requested");
+        LOGGER.debug("Logout requested");
         // Extract user info before revoking token
         String userId = null;
         try {
             userId = refreshTokenService.getUserIdFromToken(refreshToken);
         } catch (Exception e) {
-            logger.debug("Could not extract user from refresh token for audit: {}", e.getMessage());
+            LOGGER.debug("Could not extract user from refresh token for audit: {}", e.getMessage());
         }
         refreshTokenService.revokeRefreshToken(refreshToken);
 
@@ -179,10 +182,10 @@ public class AuthenticationService {
                     saveAuditLog(user, AuditActionType.LOGOUT, "User logged out");
                 }
             } catch (Exception e) {
-                logger.warn("Failed to save logout audit log: {}", e.getMessage());
+                LOGGER.warn("Failed to save logout audit log: {}", e.getMessage());
             }
         }
-        logger.info("User logged out successfully");
+        LOGGER.info("User logged out successfully");
     }
 
     /**
@@ -193,7 +196,7 @@ public class AuthenticationService {
 
         if (user.getFailedLoginAttempts() >= maxLoginAttempts) {
             user.lock(lockDurationMinutes);
-            logger.warn("Account locked due to {} failed attempts: {}",
+            LOGGER.warn("Account locked due to {} failed attempts: {}",
                     maxLoginAttempts, user.getEmailValue());
         }
 
@@ -237,7 +240,7 @@ public class AuthenticationService {
                     .build();
             auditLogRepository.save(auditLog);
         } catch (Exception e) {
-            logger.warn("Failed to save audit log for {}: {}", action, e.getMessage());
+            LOGGER.warn("Failed to save audit log for {}: {}", action, e.getMessage());
         }
     }
 }

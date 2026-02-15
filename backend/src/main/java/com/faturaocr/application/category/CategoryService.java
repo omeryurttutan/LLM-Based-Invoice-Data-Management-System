@@ -14,7 +14,6 @@ import com.faturaocr.domain.invoice.port.InvoiceRepository;
 import com.faturaocr.domain.audit.annotation.Auditable;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;

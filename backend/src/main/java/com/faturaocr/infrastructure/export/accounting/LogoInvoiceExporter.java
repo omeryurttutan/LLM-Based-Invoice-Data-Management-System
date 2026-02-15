@@ -58,8 +58,9 @@ public class LogoInvoiceExporter implements InvoiceExporter {
 
                 for (java.util.Map.Entry<String, List<InvoiceExportData>> entry : groupedInvoices.entrySet()) {
                     List<InvoiceExportData> invoiceRows = entry.getValue();
-                    if (invoiceRows.isEmpty())
+                    if (invoiceRows.isEmpty()) {
                         continue;
+                    }
 
                     // Use the first row for header data
                     InvoiceExportData header = invoiceRows.get(0);

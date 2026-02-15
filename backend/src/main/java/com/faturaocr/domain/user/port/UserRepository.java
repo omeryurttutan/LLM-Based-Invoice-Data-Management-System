@@ -29,6 +29,8 @@ public interface UserRepository {
 
     Page<User> findAllByCompanyId(UUID companyId, Pageable pageable);
 
+    java.util.List<User> findAllByCompanyId(UUID companyId);
+
     void deleteById(UUID id);
 
     long countByCompanyIdAndRole(UUID companyId, Role role);

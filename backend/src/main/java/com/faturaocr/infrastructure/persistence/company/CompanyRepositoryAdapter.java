@@ -21,6 +21,7 @@ public class CompanyRepositoryAdapter implements CompanyRepository {
     @Override
     public Company save(Company company) {
         CompanyJpaEntity entity = mapper.toJpaEntity(company);
+        @SuppressWarnings("null")
         CompanyJpaEntity savedEntity = jpaRepository.save(entity);
         return mapper.toDomain(savedEntity);
     }

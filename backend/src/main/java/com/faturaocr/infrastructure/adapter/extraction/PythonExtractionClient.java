@@ -9,21 +9,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.nio.file.Path;
-import java.time.Duration;
 
 @Component
 public class PythonExtractionClient {
 
     private final RestClient restClient;
-    private final String extractionServiceUrl;
-    private final long timeoutSeconds;
 
     public PythonExtractionClient(
             RestClient.Builder restClientBuilder,
             @Value("${upload.extraction-service-url:http://extraction-service:8000}") String extractionServiceUrl,
             @Value("${upload.extraction-timeout-seconds:90}") long timeoutSeconds) {
-        this.extractionServiceUrl = extractionServiceUrl;
-        this.timeoutSeconds = timeoutSeconds;
         this.restClient = restClientBuilder
                 .baseUrl(extractionServiceUrl)
                 .build();

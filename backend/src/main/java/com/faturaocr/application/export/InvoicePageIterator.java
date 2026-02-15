@@ -38,7 +38,7 @@ public class InvoicePageIterator implements Iterator<List<InvoiceExportData>> {
     private boolean hasNext = true;
 
     public InvoicePageIterator(InvoiceJpaRepository repository, InvoiceMapper mapper,
-            Specification<InvoiceJpaEntity> spec, boolean includeItems,
+            @SuppressWarnings("null") Specification<InvoiceJpaEntity> spec, boolean includeItems,
             UserJpaRepository userRepository, CategoryJpaRepository categoryRepository) {
         this.repository = repository;
         this.mapper = mapper;
@@ -76,9 +76,11 @@ public class InvoicePageIterator implements Iterator<List<InvoiceExportData>> {
                 .collect(Collectors.toSet());
 
         // Fetch dictionaries
+        @SuppressWarnings("null")
         Map<UUID, String> userNames = userRepository.findAllById(userIds).stream()
                 .collect(Collectors.toMap(UserJpaEntity::getId, UserJpaEntity::getFullName));
 
+        @SuppressWarnings("null")
         Map<UUID, String> categoryNames = categoryRepository.findAllById(categoryIds).stream()
                 .collect(Collectors.toMap(CategoryJpaEntity::getId, CategoryJpaEntity::getName));
 

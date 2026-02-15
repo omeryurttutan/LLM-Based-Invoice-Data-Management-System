@@ -4,6 +4,7 @@ import com.faturaocr.domain.common.entity.BaseEntity;
 import com.faturaocr.domain.user.valueobject.Email;
 import com.faturaocr.domain.user.valueobject.Role;
 import com.faturaocr.domain.audit.annotation.AuditExclude;
+import com.faturaocr.domain.audit.annotation.AuditMask;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -16,10 +17,13 @@ import java.util.UUID;
 public class User extends BaseEntity {
 
     private UUID companyId;
+    @AuditMask(AuditMask.MaskType.EMAIL)
     private Email email;
     @AuditExclude
     private String passwordHash;
+    @AuditMask(AuditMask.MaskType.PARTIAL)
     private String fullName;
+    @AuditMask(AuditMask.MaskType.PHONE)
     private String phone;
     private String avatarUrl;
     private Role role;
@@ -99,6 +103,12 @@ public class User extends BaseEntity {
 
     public void changeRole(Role newRole) {
         this.role = newRole;
+        markAsUpdated();
+    }
+
+    public void updateForAnonymization(String newEmail, String newPasswordHash) {
+        this.email = Email.of(newEmail);
+        this.passwordHash = newPasswordHash;
         markAsUpdated();
     }
 

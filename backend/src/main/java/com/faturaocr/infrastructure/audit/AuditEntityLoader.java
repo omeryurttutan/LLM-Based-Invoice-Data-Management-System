@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuditEntityLoader {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuditEntityLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuditEntityLoader.class);
 
     private final InvoiceRepository invoiceRepository;
     private final CompanyRepository companyRepository;
@@ -42,12 +42,12 @@ public class AuditEntityLoader {
                 case "USER" -> userRepository.findById(entityId).orElse(null);
                 case "CATEGORY" -> categoryRepository.findById(entityId).orElse(null);
                 default -> {
-                    logger.warn("Unknown entity type for audit loading: {}", entityType);
+                    LOGGER.warn("Unknown entity type for audit loading: {}", entityType);
                     yield null;
                 }
             };
         } catch (Exception e) {
-            logger.warn("Failed to load entity for audit (type={}, id={}): {}",
+            LOGGER.warn("Failed to load entity for audit (type={}, id={}): {}",
                     entityType, entityId, e.getMessage());
             return null;
         }

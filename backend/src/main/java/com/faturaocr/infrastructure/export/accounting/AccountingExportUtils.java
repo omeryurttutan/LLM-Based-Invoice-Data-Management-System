@@ -17,14 +17,16 @@ public class AccountingExportUtils {
     private static final Charset WINDOWS_1254 = Charset.forName("windows-1254");
 
     public String formatDate(LocalDate date, String pattern) {
-        if (date == null)
+        if (date == null) {
             return "";
+        }
         return date.format(DateTimeFormatter.ofPattern(pattern));
     }
 
     public String formatNumber(BigDecimal number, boolean useDotDecimal) {
-        if (number == null)
+        if (number == null) {
             return "0";
+        }
 
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(TURKISH_LOCALE);
         if (useDotDecimal) {
@@ -40,8 +42,9 @@ public class AccountingExportUtils {
     }
 
     public String sanitizeText(String text, int maxLength) {
-        if (text == null)
+        if (text == null) {
             return "";
+        }
         String sanitized = text.trim();
         if (sanitized.length() > maxLength) {
             return sanitized.substring(0, maxLength);
@@ -50,8 +53,9 @@ public class AccountingExportUtils {
     }
 
     public String translateCurrency(String currencyCode) {
-        if (currencyCode == null)
+        if (currencyCode == null) {
             return "TL";
+        }
         switch (currencyCode.toUpperCase()) {
             case "USD":
                 return "USD";
@@ -65,8 +69,9 @@ public class AccountingExportUtils {
     }
 
     public String translateCurrencyForLogo(String currencyCode) {
-        if (currencyCode == null)
+        if (currencyCode == null) {
             return "0"; // TL
+        }
         switch (currencyCode.toUpperCase()) {
             case "USD":
                 return "1";

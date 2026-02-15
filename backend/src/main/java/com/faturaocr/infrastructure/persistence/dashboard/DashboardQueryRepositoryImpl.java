@@ -1,27 +1,35 @@
 package com.faturaocr.infrastructure.persistence.dashboard;
 
-import com.faturaocr.application.dashboard.dto.*;
+import com.faturaocr.application.dashboard.dto.CategoryDistributionResponse;
+import com.faturaocr.application.dashboard.dto.DashboardStatsResponse;
+import com.faturaocr.application.dashboard.dto.ExtractionPerformanceResponse;
+import com.faturaocr.application.dashboard.dto.MonthlyTrendResponse;
+import com.faturaocr.application.dashboard.dto.PendingActionsResponse;
+import com.faturaocr.application.dashboard.dto.StatusTimelineResponse;
+import com.faturaocr.application.dashboard.dto.TopSuppliersResponse;
 import com.faturaocr.domain.invoice.valueobject.Currency;
-import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
-import com.faturaocr.domain.invoice.valueobject.LlmProvider;
-import com.faturaocr.domain.invoice.valueobject.SourceType;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("null")
 public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
 
     private final JdbcTemplate jdbcTemplate;
@@ -46,22 +54,7 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
         }
 
         // Summary Statistics (Counts and Amounts)
-        String summarySql = String.format(
-                """
-                        SELECT
-                            COUNT(*) as total_count,
-                            COALESCE(SUM(CASE WHEN currency = ? THEN total_amount ELSE 0 END), 0) as total_amount,
-                            COALESCE(AVG(CASE WHEN currency = ? THEN total_amount END), 0) as average_amount,
-                            COUNT(CASE WHEN status = 'PENDING' THEN 1 END) as pending_count,
-                            COALESCE(SUM(CASE WHEN status = 'PENDING' AND currency = ? THEN total_amount ELSE 0 END), 0) as pending_amount,
-                            COUNT(CASE WHEN status = 'VERIFIED' THEN 1 END) as verified_count,
-                            COALESCE(SUM(CASE WHEN status = 'VERIFIED' AND currency = ? THEN total_amount ELSE 0 END), 0) as verified_amount,
-                            COUNT(CASE WHEN status = 'REJECTED' THEN 1 END) as rejected_count,
-                            COUNT(CASE WHEN status = 'PROCESSING' THEN 1 END) as processing_count
-                        FROM invoices
-                        %s
-                        """,
-                baseWhere);
+        String summarySql = String.format(DashboardSqlConstants.SUMMARY_SQL, baseWhere);
 
         List<Object> summaryParams = new ArrayList<>();
         // Add currency params 4 times for the CASE WHEN currency checks
@@ -73,26 +66,11 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
         summaryParams.addAll(params);
 
         DashboardStatsResponse.Summary summary = jdbcTemplate.queryForObject(summarySql,
-                (rs, rowNum) -> DashboardStatsResponse.Summary.builder()
-                        .totalInvoices(rs.getInt("total_count"))
-                        .totalAmount(rs.getBigDecimal("total_amount"))
-                        .averageAmount(rs.getBigDecimal("average_amount"))
-                        .pendingCount(rs.getInt("pending_count"))
-                        .pendingAmount(rs.getBigDecimal("pending_amount"))
-                        .verifiedCount(rs.getInt("verified_count"))
-                        .verifiedAmount(rs.getBigDecimal("verified_amount"))
-                        .rejectedCount(rs.getInt("rejected_count"))
-                        .processingCount(rs.getInt("processing_count"))
-                        .build(),
+                DashboardRowMappers.summaryMapper(),
                 summaryParams.toArray());
 
         // Source Breakdown
-        String sourceSql = String.format("""
-                SELECT source_type, COUNT(*) as count
-                FROM invoices
-                %s
-                GROUP BY source_type
-                """, baseWhere);
+        String sourceSql = String.format(DashboardSqlConstants.SOURCE_SQL, baseWhere);
 
         Map<String, DashboardStatsResponse.SourceStats> sourceStats = new HashMap<>();
         List<Map<String, Object>> sourceRows = jdbcTemplate.queryForList(sourceSql, params.toArray());
@@ -118,23 +96,10 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
         // them
         List<Object> confidenceParams = new ArrayList<>(params);
 
-        String confidenceSql = String.format("""
-                SELECT
-                    COALESCE(AVG(confidence_score), 0) as avg_score,
-                    COUNT(CASE WHEN confidence_score >= 90 THEN 1 END) as high_conf,
-                    COUNT(CASE WHEN confidence_score >= 70 AND confidence_score < 90 THEN 1 END) as medium_conf,
-                    COUNT(CASE WHEN confidence_score < 70 THEN 1 END) as low_conf
-                FROM invoices
-                %s AND source_type = 'LLM'
-                """, baseWhere);
+        String confidenceSql = String.format(DashboardSqlConstants.CONFIDENCE_SQL, baseWhere);
 
         DashboardStatsResponse.ConfidenceStats confidenceStats = jdbcTemplate.queryForObject(confidenceSql,
-                (rs, rowNum) -> DashboardStatsResponse.ConfidenceStats.builder()
-                        .averageScore(rs.getBigDecimal("avg_score"))
-                        .highConfidence(rs.getInt("high_conf"))
-                        .mediumConfidence(rs.getInt("medium_conf"))
-                        .lowConfidence(rs.getInt("low_conf"))
-                        .build(),
+                DashboardRowMappers.confidenceStatsMapper(),
                 confidenceParams.toArray());
 
         long duration = System.currentTimeMillis() - startTime;
@@ -159,17 +124,7 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
             LocalDate dateTo, Currency currency) {
         long startTime = System.currentTimeMillis();
 
-        String sql = """
-                SELECT
-                    i.category_id,
-                    c.name as category_name,
-                    c.color as category_color,
-                    COUNT(*) as invoice_count,
-                    SUM(i.total_amount) as total_amount
-                FROM invoices i
-                LEFT JOIN categories c ON i.category_id = c.id
-                WHERE i.company_id = ? AND i.is_deleted = false AND i.currency = ?
-                """;
+        String sql = DashboardSqlConstants.CATEGORY_DISTRIBUTION_SQL;
 
         List<Object> params = new ArrayList<>();
         params.add(companyId);
@@ -186,19 +141,8 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
 
         sql += " GROUP BY i.category_id, c.name, c.color ORDER BY total_amount DESC";
 
-        List<CategoryDistributionResponse> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            String catName = rs.getString("category_name");
-            String catColor = rs.getString("category_color");
-            UUID catId = rs.getObject("category_id", UUID.class);
-
-            return CategoryDistributionResponse.builder()
-                    .categoryId(catId)
-                    .categoryName(catName != null ? catName : "Kategorisiz")
-                    .categoryColor(catColor != null ? catColor : "#9CA3AF")
-                    .invoiceCount(rs.getInt("invoice_count"))
-                    .totalAmount(rs.getBigDecimal("total_amount"))
-                    .build();
-        }, params.toArray());
+        List<CategoryDistributionResponse> results = jdbcTemplate.query(sql,
+                DashboardRowMappers.categoryDistributionMapper(), params.toArray());
 
         // Calculate percentages and aggregate "Others" if needed
         // For simplicity in this iteration, we calculate percentages in Java
@@ -254,19 +198,7 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
         LocalDate endDate = LocalDate.now().withDayOfMonth(1);
         LocalDate startDate = endDate.minusMonths(months - 1);
 
-        String sql = """
-                SELECT
-                    TO_CHAR(invoice_date, 'YYYY-MM') as month_key,
-                    COUNT(*) as invoice_count,
-                    SUM(total_amount) as total_amount,
-                    SUM(CASE WHEN status = 'VERIFIED' THEN total_amount ELSE 0 END) as verified_amount,
-                    AVG(total_amount) as average_amount
-                FROM invoices
-                WHERE company_id = ? AND is_deleted = false AND currency = ?
-                AND invoice_date >= ?
-                GROUP BY TO_CHAR(invoice_date, 'YYYY-MM')
-                ORDER BY month_key DESC
-                """;
+        String sql = DashboardSqlConstants.MONTHLY_TREND_SQL;
 
         List<Object> params = new ArrayList<>();
         params.add(companyId);
@@ -322,15 +254,7 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
             int limit) {
         long startTime = System.currentTimeMillis();
 
-        String sql = """
-                SELECT
-                    supplier_name,
-                    supplier_tax_number,
-                    COUNT(*) as invoice_count,
-                    SUM(total_amount) as total_amount
-                FROM invoices
-                WHERE company_id = ? AND is_deleted = false AND currency = ?
-                """;
+        String sql = DashboardSqlConstants.TOP_SUPPLIERS_SQL;
 
         List<Object> params = new ArrayList<>();
         params.add(companyId);
@@ -348,12 +272,7 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
         sql += " GROUP BY supplier_name, supplier_tax_number ORDER BY total_amount DESC";
 
         List<TopSuppliersResponse.SupplierStats> allSuppliers = jdbcTemplate.query(sql,
-                (rs, rowNum) -> TopSuppliersResponse.SupplierStats.builder()
-                        .supplierName(rs.getString("supplier_name"))
-                        .supplierTaxNumber(rs.getString("supplier_tax_number"))
-                        .invoiceCount(rs.getInt("invoice_count"))
-                        .totalAmount(rs.getBigDecimal("total_amount"))
-                        .build(),
+                DashboardRowMappers.supplierStatsMapper(),
                 params.toArray());
 
         BigDecimal totalAll = allSuppliers.stream()
@@ -401,45 +320,17 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
         long startTime = System.currentTimeMillis();
 
         // Count all pending
-        String countSql = "SELECT COUNT(*) FROM invoices WHERE company_id = ? AND is_deleted = false AND status = 'PENDING'";
+        String countSql = DashboardSqlConstants.PENDING_ACTIONS_COUNT_SQL;
         Integer totalPending = jdbcTemplate.queryForObject(countSql, Integer.class, companyId);
-        if (totalPending == null)
+        if (totalPending == null) {
             totalPending = 0;
+        }
 
         // Get top pending (low confidence first, then oldest)
-        String sql = """
-                SELECT
-                    id, invoice_number, supplier_name, total_amount, currency,
-                    source_type, confidence_score, created_at
-                FROM invoices
-                WHERE company_id = ? AND is_deleted = false AND status = 'PENDING'
-                ORDER BY
-                    CASE WHEN confidence_score IS NULL THEN 1 ELSE 0 END,
-                    confidence_score ASC,
-                    created_at ASC
-                LIMIT ?
-                """;
+        String sql = DashboardSqlConstants.PENDING_ACTIONS_SQL;
 
-        List<PendingActionsResponse.PendingInvoice> invoices = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            java.sql.Timestamp ts = rs.getTimestamp("created_at");
-            LocalDateTime createdAt = ts != null ? ts.toLocalDateTime() : null;
-            long daysPending = 0;
-            if (createdAt != null) {
-                daysPending = java.time.temporal.ChronoUnit.DAYS.between(createdAt, LocalDateTime.now());
-            }
-
-            return PendingActionsResponse.PendingInvoice.builder()
-                    .id(rs.getObject("id", UUID.class))
-                    .invoiceNumber(rs.getString("invoice_number"))
-                    .supplierName(rs.getString("supplier_name"))
-                    .totalAmount(rs.getBigDecimal("total_amount"))
-                    .currency(Currency.valueOf(rs.getString("currency")))
-                    .sourceType(SourceType.valueOf(rs.getString("source_type")))
-                    .confidenceScore(rs.getBigDecimal("confidence_score"))
-                    .createdAt(createdAt)
-                    .daysPending(daysPending)
-                    .build();
-        }, companyId, limit);
+        List<PendingActionsResponse.PendingInvoice> invoices = jdbcTemplate.query(sql,
+                DashboardRowMappers.pendingInvoiceMapper(), companyId, limit);
 
         long duration = System.currentTimeMillis() - startTime;
         if (duration > 300) {
@@ -464,9 +355,12 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
 
         String sql = """
                 SELECT d::date as date_key,
-                    (SELECT COUNT(*) FROM invoices WHERE company_id = ? AND is_deleted = false AND DATE(created_at) = d::date) as created_count,
-                    (SELECT COUNT(*) FROM invoices WHERE company_id = ? AND is_deleted = false AND DATE(verified_at) = d::date) as verified_count,
-                    (SELECT COUNT(*) FROM invoices WHERE company_id = ? AND is_deleted = false AND DATE(rejected_at) = d::date) as rejected_count
+                    (SELECT COUNT(*) FROM invoices WHERE company_id = ? AND is_deleted = false
+                        AND DATE(created_at) = d::date) as created_count,
+                    (SELECT COUNT(*) FROM invoices WHERE company_id = ? AND is_deleted = false
+                        AND DATE(verified_at) = d::date) as verified_count,
+                    (SELECT COUNT(*) FROM invoices WHERE company_id = ? AND is_deleted = false
+                        AND DATE(rejected_at) = d::date) as rejected_count
                 FROM generate_series(?, ?, '1 day'::interval) d
                 ORDER BY d DESC
                 """;
@@ -476,9 +370,9 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
         // For portability, let's do Java-side filling instead of complex SQL with
         // generate_series
 
-        String createdSql = "SELECT DATE(created_at) as d, COUNT(*) as c FROM invoices WHERE company_id = ? AND is_deleted = false AND created_at >= ? GROUP BY DATE(created_at)";
-        String verifiedSql = "SELECT DATE(verified_at) as d, COUNT(*) as c FROM invoices WHERE company_id = ? AND is_deleted = false AND verified_at >= ? GROUP BY DATE(verified_at)";
-        String rejectedSql = "SELECT DATE(rejected_at) as d, COUNT(*) as c FROM invoices WHERE company_id = ? AND is_deleted = false AND rejected_at >= ? GROUP BY DATE(rejected_at)";
+        String createdSql = DashboardSqlConstants.STATUS_TIMELINE_CREATED_SQL;
+        String verifiedSql = DashboardSqlConstants.STATUS_TIMELINE_VERIFIED_SQL;
+        String rejectedSql = DashboardSqlConstants.STATUS_TIMELINE_REJECTED_SQL;
 
         LocalDateTime startDateTime = startDate.atStartOfDay();
 
@@ -530,32 +424,10 @@ public class DashboardQueryRepositoryImpl implements DashboardQueryRepository {
         }
 
         // Provider Stats
-        String providerSql = String.format("""
-                SELECT
-                    llm_provider,
-                    COUNT(*) as attempts,
-                    COUNT(CASE WHEN status != 'FAILED' THEN 1 END) as success_count,
-                    COUNT(CASE WHEN status = 'FAILED' THEN 1 END) as failure_count,
-                    AVG(confidence_score) as avg_confidence
-                FROM invoices
-                %s
-                GROUP BY llm_provider
-                """, baseWhere);
+        String providerSql = String.format(DashboardSqlConstants.EXTRACTION_PERFORMANCE_SQL, baseWhere);
 
         List<ExtractionPerformanceResponse.ProviderStats> providerStats = jdbcTemplate.query(providerSql,
-                (rs, rowNum) -> {
-                    String providerStr = rs.getString("llm_provider");
-                    LlmProvider provider = providerStr != null ? LlmProvider.valueOf(providerStr) : null;
-
-                    return ExtractionPerformanceResponse.ProviderStats.builder()
-                            .provider(provider)
-                            .attempts(rs.getInt("attempts"))
-                            .successCount(rs.getInt("success_count"))
-                            .failureCount(rs.getInt("failure_count"))
-                            .averageConfidence(rs.getBigDecimal("avg_confidence"))
-                            .fallbackCount(0) // Need specific data for this
-                            .build();
-                }, params.toArray());
+                DashboardRowMappers.providerStatsMapper(), params.toArray());
 
         int totalExtractions = providerStats.stream().mapToInt(ExtractionPerformanceResponse.ProviderStats::getAttempts)
                 .sum();

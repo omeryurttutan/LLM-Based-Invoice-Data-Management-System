@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -43,14 +44,14 @@ export function TopSuppliersChart({
 
   const chartData = data
     ? [
-        ...data.suppliers,
-        {
-          supplierName: "Diğer",
-          totalAmount: data.othersAmount,
-          invoiceCount: data.othersCount,
-          percentage: 0, // calculate if needed or show different tooltip
-        },
-      ].filter((item) => item.totalAmount > 0)
+      ...data.suppliers,
+      {
+        supplierName: "Diğer",
+        totalAmount: data.othersAmount,
+        invoiceCount: data.othersCount,
+        percentage: 0, // calculate if needed or show different tooltip
+      },
+    ].filter((item) => item.totalAmount > 0)
     : [];
 
   const formatCurrency = (amount: number) => {
@@ -61,10 +62,16 @@ export function TopSuppliersChart({
     }).format(amount);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tooltipFormatter = (value: any) => {
+    return [formatCurrency(value), "Toplam Tutar"] as [string, string];
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleBarClick = (entry: any) => {
-      if (entry && entry.supplierName && entry.supplierName !== "Diğer") {
-          router.push(`/invoices?supplierName=${entry.supplierName}`);
-      }
+    if (entry && entry.supplierName && entry.supplierName !== "Diğer") {
+      router.push(`/invoices?supplierName=${entry.supplierName}`);
+    }
   };
 
   return (
@@ -83,10 +90,10 @@ export function TopSuppliersChart({
               left: 40,
               bottom: 5,
             }}
-            onClick={(data) => {
-                if (data && data.activePayload) {
-                    handleBarClick(data.activePayload[0].payload);
-                }
+            onClick={(data: any) => {
+              if (data && data.activePayload) {
+                handleBarClick(data.activePayload[0].payload);
+              }
             }}
             className="cursor-pointer"
 
@@ -103,17 +110,14 @@ export function TopSuppliersChart({
               }
             />
             <Tooltip
-              formatter={(value: number, name: string, props: any) => [
-                formatCurrency(value),
-                "Toplam Tutar",
-              ]}
+              formatter={tooltipFormatter}
               labelFormatter={(label) => label}
               contentStyle={{ borderRadius: "8px" }}
             />
             <Bar dataKey="totalAmount" radius={[0, 4, 4, 0]}>
-                {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.supplierName === "Diğer" ? "#9ca3af" : "#f59e0b"} />
-                ))}
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.supplierName === "Diğer" ? "#9ca3af" : "#f59e0b"} />
+              ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>

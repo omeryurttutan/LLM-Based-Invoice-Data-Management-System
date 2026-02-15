@@ -22,10 +22,12 @@ public interface InvoiceJpaRepository
 
         Page<InvoiceJpaEntity> findAllByCompanyIdAndIsDeletedFalse(UUID companyId, Pageable pageable);
 
-        Page<InvoiceJpaEntity> findAllByCompanyIdAndStatusAndIsDeletedFalse(UUID companyId, InvoiceStatus status,
-                        Pageable pageable);
+        Page<InvoiceJpaEntity> findAllByCompanyIdAndStatusAndIsDeletedFalse(
+                        UUID companyId, InvoiceStatus status, Pageable pageable);
 
-        @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM InvoiceJpaEntity i WHERE i.invoiceNumber = :invoiceNumber AND i.companyId = :companyId AND i.isDeleted = false")
+        @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END " +
+                        "FROM InvoiceJpaEntity i " +
+                        "WHERE i.invoiceNumber = :invoiceNumber AND i.companyId = :companyId AND i.isDeleted = false")
         boolean existsByInvoiceNumberAndCompanyId(String invoiceNumber, UUID companyId);
 
         long countByCompanyIdAndIsDeletedFalse(UUID companyId);
@@ -62,20 +64,27 @@ public interface InvoiceJpaRepository
 
         // ===== Filter Option Queries =====
 
-        @Query("SELECT DISTINCT i.supplierName FROM InvoiceJpaEntity i WHERE i.companyId = :companyId AND i.isDeleted = false AND (:search IS NULL OR LOWER(i.supplierName) LIKE LOWER(CONCAT('%', :search, '%'))) ORDER BY i.supplierName ASC")
+        @Query("SELECT DISTINCT i.supplierName FROM InvoiceJpaEntity i " +
+                        "WHERE i.companyId = :companyId AND i.isDeleted = false " +
+                        "AND (:search IS NULL OR LOWER(i.supplierName) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+                        "ORDER BY i.supplierName ASC")
         List<String> findDistinctSupplierNames(@Param("companyId") UUID companyId, @Param("search") String search,
                         Pageable pageable);
 
-        @Query("SELECT DISTINCT i.llmProvider FROM InvoiceJpaEntity i WHERE i.companyId = :companyId AND i.isDeleted = false AND i.llmProvider IS NOT NULL")
+        @Query("SELECT DISTINCT i.llmProvider FROM InvoiceJpaEntity i " +
+                        "WHERE i.companyId = :companyId AND i.isDeleted = false AND i.llmProvider IS NOT NULL")
         List<com.faturaocr.domain.invoice.valueobject.LlmProvider> findDistinctLlmProviders(
                         @Param("companyId") UUID companyId);
 
-        @Query("SELECT MIN(i.totalAmount), MAX(i.totalAmount) FROM InvoiceJpaEntity i WHERE i.companyId = :companyId AND i.isDeleted = false")
+        @Query("SELECT MIN(i.totalAmount), MAX(i.totalAmount) FROM InvoiceJpaEntity i " +
+                        "WHERE i.companyId = :companyId AND i.isDeleted = false")
         Object[] findMinMaxTotalAmount(@Param("companyId") UUID companyId);
 
-        @Query("SELECT MIN(i.invoiceDate), MAX(i.invoiceDate) FROM InvoiceJpaEntity i WHERE i.companyId = :companyId AND i.isDeleted = false")
+        @Query("SELECT MIN(i.invoiceDate), MAX(i.invoiceDate) FROM InvoiceJpaEntity i " +
+                        "WHERE i.companyId = :companyId AND i.isDeleted = false")
         Object[] findMinMaxInvoiceDate(@Param("companyId") UUID companyId);
 
-        @Query("SELECT MIN(i.confidenceScore), MAX(i.confidenceScore) FROM InvoiceJpaEntity i WHERE i.companyId = :companyId AND i.isDeleted = false")
+        @Query("SELECT MIN(i.confidenceScore), MAX(i.confidenceScore) FROM InvoiceJpaEntity i " +
+                        "WHERE i.companyId = :companyId AND i.isDeleted = false")
         Object[] findMinMaxConfidenceScore(@Param("companyId") UUID companyId);
 }

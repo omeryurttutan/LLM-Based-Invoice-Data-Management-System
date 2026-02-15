@@ -12,10 +12,9 @@ import com.faturaocr.infrastructure.adapter.extraction.dto.ExtractionResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -83,8 +82,9 @@ public class InvoiceUploadService {
     }
 
     private void updateInvoiceWithResult(Invoice invoice, ExtractionResult result) {
-        if (result == null)
+        if (result == null) {
             return;
+        }
 
         invoice.setConfidenceScore(result.getConfidenceScore());
 

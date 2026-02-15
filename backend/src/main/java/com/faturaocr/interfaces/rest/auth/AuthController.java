@@ -1,6 +1,9 @@
 package com.faturaocr.interfaces.rest.auth;
 
-import com.faturaocr.application.auth.dto.*;
+import com.faturaocr.application.auth.dto.AuthResponse;
+import com.faturaocr.application.auth.dto.LoginCommand;
+import com.faturaocr.application.auth.dto.RefreshTokenCommand;
+import com.faturaocr.application.auth.dto.RegisterCommand;
 import com.faturaocr.application.auth.service.AuthenticationService;
 import com.faturaocr.interfaces.rest.common.ApiResponse;
 import com.faturaocr.interfaces.rest.common.BaseController;
@@ -10,7 +13,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Authentication REST controller.

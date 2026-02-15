@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -50,13 +51,17 @@ export function MonthlyTrendChart({
     }).format(amount);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tooltipFormatter = (value: any) => formatCurrency(value);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleDotClick = (data: any) => {
     if (data && data.activePayload && data.activePayload.length > 0) {
-        const item = data.activePayload[0].payload as MonthlyTrend;
-        const date = parseISO(`${item.month}-01`);
-        const from = format(date, 'yyyy-MM-dd');
-        const to = format(endOfMonth(date), 'yyyy-MM-dd');
-        router.push(`/invoices?dateFrom=${from}&dateTo=${to}`);
+      const item = data.activePayload[0].payload as MonthlyTrend;
+      const date = parseISO(`${item.month}-01`);
+      const from = format(date, 'yyyy-MM-dd');
+      const to = format(endOfMonth(date), 'yyyy-MM-dd');
+      router.push(`/invoices?dateFrom=${from}&dateTo=${to}`);
     }
   };
 
@@ -92,7 +97,7 @@ export function MonthlyTrendChart({
               axisLine={false}
             />
             <Tooltip
-              formatter={(value: number) => formatCurrency(value)}
+              formatter={tooltipFormatter}
               contentStyle={{ borderRadius: "8px" }}
             />
             <Legend />

@@ -20,38 +20,57 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserRepositoryAdapter implements UserRepository {
 
+    @SuppressWarnings("null")
     private final UserJpaRepository jpaRepository;
 
     @Override
     public User save(User user) {
         UserJpaEntity entity = toJpaEntity(user);
         UserJpaEntity saved = jpaRepository.save(entity);
+        if (saved == null) {
+            throw new RuntimeException("Failed to save user: saved entity is null");
+        }
         return toDomainEntity(saved);
     }
 
     @Override
     public Optional<User> findById(UUID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return jpaRepository.findById(id).map(this::toDomainEntity);
     }
 
     @Override
     public Optional<User> findByEmail(Email email) {
+        if (email == null || email.getValue() == null) {
+            return Optional.empty();
+        }
         return jpaRepository.findByEmail(email.getValue()).map(this::toDomainEntity);
     }
 
     @Override
     public Optional<User> findByEmailAndCompanyId(Email email, UUID companyId) {
+        if (email == null || email.getValue() == null || companyId == null) {
+            return Optional.empty();
+        }
         return jpaRepository.findByEmailAndCompanyId(email.getValue(), companyId)
                 .map(this::toDomainEntity);
     }
 
     @Override
     public boolean existsByEmail(Email email) {
+        if (email == null || email.getValue() == null) {
+            return false;
+        }
         return jpaRepository.existsByEmail(email.getValue());
     }
 
     @Override
     public boolean existsByEmailAndCompanyId(Email email, UUID companyId) {
+        if (email == null || email.getValue() == null || companyId == null) {
+            return false;
+        }
         return jpaRepository.existsByEmailAndCompanyId(email.getValue(), companyId);
     }
 
@@ -62,8 +81,17 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public java.util.List<User> findAllByCompanyId(UUID companyId) {
+        return jpaRepository.findAllByCompanyId(companyId).stream()
+                .map(this::toDomainEntity)
+                .toList();
+    }
+
+    @Override
     public void deleteById(UUID id) {
-        jpaRepository.deleteById(id);
+        if (id != null) {
+            jpaRepository.deleteById(id);
+        }
     }
 
     @Override

@@ -56,3 +56,13 @@ export const useExtractionPerformance = (params?: { dateFrom?: string; dateTo?: 
     staleTime: 30000,
   });
 };
+
+export const useSystemStatus = (enabled: boolean = false) => {
+  return useQuery({
+    queryKey: ['admin-system-status'],
+    queryFn: () => dashboardService.getSystemStatus(),
+    staleTime: 10000, // Shorter stale time for system status
+    enabled,
+    retry: 1, // Don't retry too much if system is down
+  });
+};

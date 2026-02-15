@@ -10,8 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.validation.FieldError;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,13 +29,13 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-        private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
         @ExceptionHandler(EntityNotFoundException.class)
         public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
                         EntityNotFoundException ex, WebRequest request) {
 
-                logger.warn("Entity not found: {}", ex.getMessage());
+                LOGGER.warn("Entity not found: {}", ex.getMessage());
 
                 ErrorResponse error = new ErrorResponse(
                                 ex.getErrorCode(),
@@ -50,7 +49,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleDomainException(
                         DomainException ex, WebRequest request) {
 
-                logger.warn("Domain exception: {}", ex.getMessage());
+                LOGGER.warn("Domain exception: {}", ex.getMessage());
 
                 ErrorResponse error = new ErrorResponse(
                                 ex.getErrorCode(),
@@ -123,7 +122,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
                         IllegalArgumentException ex, WebRequest request) {
 
-                logger.warn("Illegal argument: {}", ex.getMessage());
+                LOGGER.warn("Illegal argument: {}", ex.getMessage());
 
                 ErrorResponse error = new ErrorResponse(
                                 "INVALID_ARGUMENT",
@@ -137,7 +136,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleAccessDeniedException(
                         org.springframework.security.access.AccessDeniedException ex, WebRequest request) {
 
-                logger.warn("Access denied: {}", ex.getMessage());
+                LOGGER.warn("Access denied: {}", ex.getMessage());
 
                 ErrorResponse error = new ErrorResponse(
                                 "ACCESS_DENIED",
@@ -151,7 +150,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ErrorResponse> handleAllUncaughtException(
                         Exception ex, WebRequest request) {
 
-                logger.error("Unexpected error occurred", ex);
+                LOGGER.error("Unexpected error occurred", ex);
 
                 ErrorResponse error = new ErrorResponse(
                                 "INTERNAL_ERROR",

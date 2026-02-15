@@ -1,8 +1,14 @@
 package com.faturaocr.infrastructure.persistence.user;
 
 import com.faturaocr.infrastructure.persistence.common.BaseJpaEntity;
+import com.faturaocr.infrastructure.security.encryption.EncryptedStringConverter;
+import jakarta.persistence.Convert;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -28,6 +34,7 @@ public class UserJpaEntity extends BaseJpaEntity {
     private String fullName;
 
     @Column(name = "phone")
+    @Convert(converter = EncryptedStringConverter.class)
     private String phone;
 
     @Column(name = "avatar_url")

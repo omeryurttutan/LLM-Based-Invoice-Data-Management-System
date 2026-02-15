@@ -24,5 +24,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
 
     Page<UserJpaEntity> findAllByCompanyId(UUID companyId, Pageable pageable);
 
+    java.util.List<UserJpaEntity> findAllByCompanyId(UUID companyId);
+
     long countByCompanyIdAndRole(UUID companyId, UserJpaEntity.RoleJpa role);
 }

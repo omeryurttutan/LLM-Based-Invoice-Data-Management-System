@@ -32,7 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuditAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuditAspect.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuditAspect.class);
 
     private final AuditLogRepository auditLogRepository;
     private final AuditEntityLoader entityLoader;
@@ -105,11 +105,11 @@ public class AuditAspect {
                     .build();
 
             auditLogRepository.save(auditLog);
-            logger.debug("Audit log saved: {} {} {} (entityId={})", action, entityType,
+            LOGGER.debug("Audit log saved: {} {} {} (entityId={})", action, entityType,
                     joinPoint.getSignature().getName(), entityId);
         } catch (Exception e) {
             // Don't let audit logging failures break the main operation
-            logger.error("Failed to save audit log for {} {}: {}",
+            LOGGER.error("Failed to save audit log for {} {}: {}",
                     action, entityType, e.getMessage(), e);
         }
 
@@ -161,7 +161,7 @@ public class AuditAspect {
         } catch (NoSuchMethodException e) {
             // Result doesn't have getId() — that's OK
         } catch (Exception e) {
-            logger.debug("Could not extract entity ID from result: {}", e.getMessage());
+            LOGGER.debug("Could not extract entity ID from result: {}", e.getMessage());
         }
         return null;
     }

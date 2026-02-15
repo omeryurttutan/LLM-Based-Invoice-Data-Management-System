@@ -20,8 +20,9 @@ public class SecurityExpressionService {
      */
     public boolean hasPermission(String permission) {
         AuthenticatedUser user = getCurrentUser();
-        if (user == null)
+        if (user == null) {
             return false;
+        }
 
         try {
             Permission perm = Permission.valueOf(permission);
@@ -79,16 +80,19 @@ public class SecurityExpressionService {
      */
     public boolean canManageUser(UUID targetUserId) {
         AuthenticatedUser user = getCurrentUser();
-        if (user == null)
+        if (user == null) {
             return false;
+        }
 
         Role role = Role.valueOf(user.role());
-        if (!role.canManageUsers())
+        if (!role.canManageUsers()) {
             return false;
+        }
 
         // Cannot demote/delete yourself
-        if (user.userId().equals(targetUserId))
+        if (user.userId().equals(targetUserId)) {
             return false;
+        }
 
         return true;
     }
@@ -98,8 +102,9 @@ public class SecurityExpressionService {
      */
     public boolean hasHigherPrivilegeThan(String targetRole) {
         AuthenticatedUser user = getCurrentUser();
-        if (user == null)
+        if (user == null) {
             return false;
+        }
 
         try {
             Role currentRole = Role.valueOf(user.role());
@@ -158,8 +163,9 @@ public class SecurityExpressionService {
      */
     public boolean isManagerOrHigher() {
         AuthenticatedUser user = getCurrentUser();
-        if (user == null)
+        if (user == null) {
             return false;
+        }
         String role = user.role();
         return "ADMIN".equals(role) || "MANAGER".equals(role);
     }

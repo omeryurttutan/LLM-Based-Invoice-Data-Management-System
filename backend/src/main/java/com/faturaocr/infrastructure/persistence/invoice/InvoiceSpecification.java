@@ -61,8 +61,9 @@ public class InvoiceSpecification {
                     predicates.add(cb.like(cb.lower(root.get("supplierName")), "%" + name.toLowerCase() + "%"));
                 }
             }
-            if (predicates.isEmpty())
+            if (predicates.isEmpty()) {
                 return null;
+            }
             return cb.or(predicates.toArray(new Predicate[0]));
         };
     }

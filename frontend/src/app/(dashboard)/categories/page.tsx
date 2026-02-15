@@ -84,7 +84,7 @@ export default function CategoriesPage() {
 
   const onSubmit = (values: CategoryFormValues) => {
     const request: CreateCategoryRequest = values;
-    
+
     if (editingCategory) {
       updateMutation.mutate({ id: editingCategory.id, data: request }, {
         onSuccess: () => {
@@ -120,7 +120,7 @@ export default function CategoriesPage() {
     }
   };
 
-  const filteredCategories = categories?.filter(c => 
+  const filteredCategories = categories?.filter(c =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -281,49 +281,49 @@ export default function CategoriesPage() {
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-               {/* Same fields as create form */}
-               <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kategori Adı</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Açıklama</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="color"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Renk</FormLabel>
-                        <FormControl>
-                          <div className="flex items-center gap-2">
-                            <Input type="color" className="w-12 h-10 p-1" {...field} />
-                            <Input {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              {/* Same fields as create form */}
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kategori Adı</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Açıklama</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Renk</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center gap-2">
+                        <Input type="color" className="w-12 h-10 p-1" {...field} />
+                        <Input {...field} />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
                 <Button type="submit" disabled={updateMutation.isPending}>
                   {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -341,7 +341,7 @@ export default function CategoriesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
             <AlertDialogDescription>
-              "{deletingCategory?.name}" kategorisini silmek üzeresiniz.
+              &quot;{deletingCategory?.name}&quot; kategorisini silmek üzeresiniz.
               {deletingCategory && deletingCategory.invoiceCount > 0 && (
                 <span className="block text-destructive font-bold mt-2">
                   DİKKAT: Bu kategoriye bağlı {deletingCategory.invoiceCount} fatura bulunmaktadır.

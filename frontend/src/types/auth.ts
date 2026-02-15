@@ -2,6 +2,7 @@
 
 // User role enum matching backend
 export type UserRole = 'ADMIN' | 'MANAGER' | 'ACCOUNTANT' | 'INTERN';
+export type Role = UserRole;
 
 // User entity
 export interface User {

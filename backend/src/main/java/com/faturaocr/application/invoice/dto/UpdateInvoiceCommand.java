@@ -1,6 +1,11 @@
 package com.faturaocr.application.invoice.dto;
 
-import lombok.*;
+import com.faturaocr.domain.invoice.valueobject.ExtractionCorrection;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +30,7 @@ public class UpdateInvoiceCommand {
     private UUID categoryId;
     private String notes;
     private List<UpdateInvoiceItemCommand> items;
+    private List<ExtractionCorrection> extractionCorrections;
 
     @Data
     @Builder

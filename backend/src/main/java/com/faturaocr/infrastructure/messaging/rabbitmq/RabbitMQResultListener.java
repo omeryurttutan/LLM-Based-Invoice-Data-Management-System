@@ -5,6 +5,11 @@ import com.faturaocr.domain.invoice.entity.InvoiceItem;
 import com.faturaocr.domain.invoice.event.ExtractionResultMessage;
 import com.faturaocr.domain.invoice.port.InvoiceRepository;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
+import com.faturaocr.domain.notification.enums.NotificationReferenceType;
+import com.faturaocr.domain.notification.enums.NotificationSeverity;
+import com.faturaocr.domain.rule.service.RuleEngine;
+import com.faturaocr.domain.rule.valueobject.TriggerPoint;
+import com.faturaocr.domain.template.service.SupplierTemplateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -13,9 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
+
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,10 @@ public class RabbitMQResultListener {
 
     private final InvoiceRepository invoiceRepository;
     private final RabbitMQProducerService producerService;
+    private final com.faturaocr.domain.notification.service.NotificationService notificationService;
+    private final com.faturaocr.application.batch.service.BatchJobTrackingService batchJobTrackingService;
+    private final SupplierTemplateService supplierTemplateService;
+    private final RuleEngine ruleEngine;
 
     @Value("${RABBITMQ_MAX_RETRIES:3}")
     private int maxRetries;
@@ -112,6 +120,20 @@ public class RabbitMQResultListener {
         invoice.setLlmProvider(message.getProvider());
         invoice.setProcessingDurationMs(message.getProcessingDurationMs());
 
+        // Apply Template Suggestions (Auto-Correction)
+        try {
+            supplierTemplateService.applyTemplateToInvoice(invoice);
+        } catch (Exception e) {
+            log.warn("Failed to apply template suggestions for invoice {}", invoice.getId(), e);
+        }
+
+        // Run Rule Engine (AFTER_EXTRACTION)
+        try {
+            ruleEngine.evaluateAndExecute(TriggerPoint.AFTER_EXTRACTION, invoice);
+        } catch (Exception e) {
+            log.error("Failed to execute rules for invoice {}", invoice.getId(), e);
+        }
+
         // Determine Status
         if ("AUTO_VERIFIED".equalsIgnoreCase(message.getSuggestedStatus()) &&
                 message.getConfidenceScore() != null &&
@@ -124,6 +146,56 @@ public class RabbitMQResultListener {
 
         invoiceRepository.save(invoice);
         log.info("Invoice {} updated with extraction results. New Status: {}", invoice.getId(), invoice.getStatus());
+
+        // Send Notification
+        java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+        metadata.put("invoiceId", invoice.getId());
+        metadata.put("invoiceNumber", invoice.getInvoiceNumber());
+        metadata.put("provider", invoice.getLlmProvider());
+        metadata.put("confidenceScore", invoice.getConfidenceScore());
+
+        com.faturaocr.domain.notification.enums.NotificationType type;
+        String title;
+        String messageStr;
+
+        if (InvoiceStatus.VERIFIED.equals(invoice.getStatus())) {
+            type = com.faturaocr.domain.notification.enums.NotificationType.HIGH_CONFIDENCE_AUTO_VERIFIED;
+            title = "Fatura otomatik doğrulandı";
+            messageStr = String.format("%s numaralı fatura yüksek güven skoru (%s) ile otomatik doğrulandı.",
+                    invoice.getInvoiceNumber(), invoice.getConfidenceScore());
+        } else if (invoice.getConfidenceScore() != null &&
+                invoice.getConfidenceScore().compareTo(BigDecimal.valueOf(70)) < 0) {
+            type = com.faturaocr.domain.notification.enums.NotificationType.LOW_CONFIDENCE;
+            title = "Düşük güven skoru";
+            messageStr = String.format(
+                    "%s numaralı fatura düşük güven skoru (%s) ile çıkarıldı. İncelemeniz gerekiyor.",
+                    invoice.getInvoiceNumber(), invoice.getConfidenceScore());
+        } else {
+            type = com.faturaocr.domain.notification.enums.NotificationType.EXTRACTION_COMPLETED;
+            title = "Veri çıkarımı tamamlandı";
+            messageStr = String.format("%s numaralı fatura için veri çıkarımı başarıyla tamamlandı.",
+                    invoice.getInvoiceNumber());
+        }
+
+        notificationService.notify(
+                invoice.getCreatedByUserId(), // Assuming user who created gets the notification
+                invoice.getCompanyId(),
+                type,
+                title,
+                messageStr,
+                NotificationSeverity.SUCCESS,
+                NotificationReferenceType.INVOICE,
+                invoice.getId(),
+                metadata);
+
+        // Update Batch Job if exists
+        if (invoice.getBatchId() != null) {
+            try {
+                batchJobTrackingService.incrementCompleted(invoice.getBatchId());
+            } catch (Exception e) {
+                log.warn("Failed to update batch job {} for invoice {}", invoice.getBatchId(), invoice.getId(), e);
+            }
+        }
     }
 
     private void handleFailedResult(Invoice invoice, ExtractionResultMessage message) {
@@ -152,5 +224,32 @@ public class RabbitMQResultListener {
         invoice.setNotes("Extraction failed: " + errorMessage);
         invoiceRepository.save(invoice);
         log.error("Invoice {} extraction failed. Error: {}", invoice.getId(), errorMessage);
+
+        // Notify failure
+        java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+        metadata.put("invoiceId", invoice.getId());
+        metadata.put("error", errorMessage);
+
+        notificationService.notify(
+                invoice.getCreatedByUserId(),
+                invoice.getCompanyId(),
+                com.faturaocr.domain.notification.enums.NotificationType.EXTRACTION_FAILED,
+                "Veri çıkarımı başarısız",
+                String.format("%s numaralı fatura için işlem başarısız oldu: %s",
+                        invoice.getInvoiceNumber() != null ? invoice.getInvoiceNumber() : "Bilinmeyen",
+                        errorMessage),
+                NotificationSeverity.ERROR,
+                NotificationReferenceType.INVOICE,
+                invoice.getId(),
+                metadata);
+
+        // Update Batch Job if exists
+        if (invoice.getBatchId() != null) {
+            try {
+                batchJobTrackingService.incrementFailed(invoice.getBatchId());
+            } catch (Exception e) {
+                log.warn("Failed to update batch job {} for invoice {}", invoice.getBatchId(), invoice.getId(), e);
+            }
+        }
     }
 }

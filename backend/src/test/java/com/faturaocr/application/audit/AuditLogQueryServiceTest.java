@@ -61,7 +61,7 @@ class AuditLogQueryServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        Page<AuditLog> page = new PageImpl<>(List.of(log));
+        Page<AuditLog> page = new PageImpl<AuditLog>(List.of(log));
         when(auditLogRepository.findAllByFilters(any(AuditLogFilter.class), any(Pageable.class)))
                 .thenReturn(page);
 
@@ -96,7 +96,7 @@ class AuditLogQueryServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        Page<AuditLog> page = new PageImpl<>(List.of(log));
+        Page<AuditLog> page = new PageImpl<AuditLog>(List.of(log));
         when(auditLogRepository.findAllByFilters(any(), any())).thenReturn(page);
 
         // Act
@@ -125,7 +125,7 @@ class AuditLogQueryServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        Page<AuditLog> page = new PageImpl<>(List.of(log));
+        Page<AuditLog> page = new PageImpl<AuditLog>(List.of(log));
         when(auditLogRepository.findByEntityTypeAndEntityId(eq("INVOICE"), eq(entityId), any()))
                 .thenReturn(page);
 
@@ -150,7 +150,7 @@ class AuditLogQueryServiceTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        Page<AuditLog> page = new PageImpl<>(List.of(log));
+        Page<AuditLog> page = new PageImpl<AuditLog>(List.of(log));
         when(auditLogRepository.findByUserId(eq(userId), any())).thenReturn(page);
 
         // Act

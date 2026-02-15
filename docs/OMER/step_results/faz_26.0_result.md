@@ -85,8 +85,17 @@ Implemented the Backend Dashboard API to provide aggregated statistics and metri
 
 ## Test Results
 
-- **Unit Tests:** Passed. Verified business logic for gap filling and DTO mapping.
-- **Integration Tests:** Passed. Verified API endpoints, security, and query execution.
+## Test Results
+
+- **Unit Tests (`DashboardServiceTest`):** Passed (7/7 tests). Verified business logic for all service methods:
+  - `getStats`
+  - `getCategoryDistribution`
+  - `getMonthlyTrend`
+  - `getTopSuppliers`
+  - `getPendingActions`
+  - `getStatusTimeline`
+  - `getExtractionPerformance`
+- **Integration Tests (`DashboardControllerIntegrationTest`):** Passed (7/7 tests). Verified API endpoints, security, and query execution for all endpoints.
 
 ## Next Steps
 

@@ -1,10 +1,13 @@
 package com.faturaocr.infrastructure.persistence.invoice;
 
 import com.faturaocr.domain.invoice.valueobject.Currency;
+import com.faturaocr.domain.invoice.valueobject.ExtractionCorrection;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
 import com.faturaocr.domain.invoice.valueobject.LlmProvider;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
 import com.faturaocr.infrastructure.persistence.common.BaseJpaEntity;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import org.hibernate.annotations.Type;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,12 +19,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.faturaocr.infrastructure.security.encryption.EncryptedStringConverter;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import jakarta.persistence.Convert;
 
 @Entity
 @Table(name = "invoices")
@@ -58,7 +68,11 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
     private String supplierName;
 
     @Column(name = "supplier_tax_number")
+    @Convert(converter = EncryptedStringConverter.class)
     private String supplierTaxNumber;
+
+    @Column(name = "supplier_tax_number_hash")
+    private String supplierTaxNumberHash;
 
     @Column(name = "supplier_tax_office")
     private String supplierTaxOffice;
@@ -136,6 +150,10 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
     @Column(name = "rejection_reason")
     private String rejectionReason;
 
+    @Type(JsonType.class)
+    @Column(name = "extraction_corrections", columnDefinition = "jsonb")
+    private List<ExtractionCorrection> extractionCorrections;
+
     @Column(name = "verified_at")
     private LocalDateTime verifiedAt;
 
@@ -153,5 +171,35 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
     public void removeItem(InvoiceItemJpaEntity item) {
         items.remove(item);
         item.setInvoice(null);
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void hashSensitiveFields() {
+        if (this.supplierTaxNumber != null) {
+            this.supplierTaxNumberHash = hashString(this.supplierTaxNumber);
+        }
+    }
+
+    private String hashString(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            return bytesToHex(encodedhash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not found", e);
+        }
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 }

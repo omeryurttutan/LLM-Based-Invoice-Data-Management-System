@@ -20,14 +20,21 @@ public class CategoryRepositoryAdapter implements CategoryRepository {
     @Override
     public Category save(Category category) {
         CategoryJpaEntity entity = categoryMapper.toJpa(category);
+        @SuppressWarnings("null")
         CategoryJpaEntity savedEntity = categoryJpaRepository.save(entity);
         return categoryMapper.toDomain(savedEntity);
     }
 
     @Override
     public Optional<Category> findById(UUID id) {
-        return categoryJpaRepository.findById(id)
-                .map(categoryMapper::toDomain);
+        @SuppressWarnings("null")
+        boolean exists = categoryJpaRepository.existsById(id);
+        if (!exists) {
+            return Optional.empty();
+        }
+        @SuppressWarnings("null")
+        Optional<CategoryJpaEntity> entity = categoryJpaRepository.findById(id);
+        return entity.map(categoryMapper::toDomain);
     }
 
     @Override

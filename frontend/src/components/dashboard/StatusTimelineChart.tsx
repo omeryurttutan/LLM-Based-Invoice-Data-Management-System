@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -38,10 +39,11 @@ export function StatusTimelineChart({ data, loading }: StatusTimelineChartProps)
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAreaClick = (data: any) => {
     if (data && data.activePayload) {
-        const dateStr = data.activePayload[0].payload.date;
-        router.push(`/invoices?dateFrom=${dateStr}&dateTo=${dateStr}`);
+      const dateStr = data.activePayload[0].payload.date;
+      router.push(`/invoices?dateFrom=${dateStr}&dateTo=${dateStr}`);
     }
   };
 
@@ -64,17 +66,17 @@ export function StatusTimelineChart({ data, loading }: StatusTimelineChartProps)
             className="cursor-pointer"
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis 
-                dataKey="date" 
-                tickFormatter={(value) => format(parseISO(value), 'dd MMM', { locale: tr })}
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
+            <XAxis
+              dataKey="date"
+              tickFormatter={(value) => format(parseISO(value), 'dd MMM', { locale: tr })}
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
             />
             <YAxis fontSize={12} tickLine={false} axisLine={false} />
-            <Tooltip 
-                labelFormatter={(value) => format(parseISO(value), 'dd MMMM yyyy', { locale: tr })}
-                contentStyle={{ borderRadius: "8px" }}
+            <Tooltip
+              labelFormatter={(value) => format(parseISO(value), 'dd MMMM yyyy', { locale: tr })}
+              contentStyle={{ borderRadius: "8px" }}
             />
             <Legend />
             <Area

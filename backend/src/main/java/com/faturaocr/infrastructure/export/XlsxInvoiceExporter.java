@@ -2,11 +2,19 @@ package com.faturaocr.infrastructure.export;
 
 import com.faturaocr.domain.invoice.valueobject.SourceType;
 import com.faturaocr.application.export.ExportFormat;
-import com.faturaocr.application.export.ExportFormat;
+
 import com.faturaocr.application.export.InvoiceExporter;
 import com.faturaocr.application.export.dto.InvoiceExportData;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -70,12 +78,15 @@ public class XlsxInvoiceExporter implements InvoiceExporter {
                     // If we use formulas, it's safer. But here we are calculating values.
                     // Let's just sum the values provided in the DTOs for now.
 
-                    if (data.getSubtotal() != null)
+                    if (data.getSubtotal() != null) {
                         totalSubtotal += data.getSubtotal().doubleValue();
-                    if (data.getTaxAmount() != null)
+                    }
+                    if (data.getTaxAmount() != null) {
                         totalTax += data.getTaxAmount().doubleValue();
-                    if (data.getTotalAmount() != null)
+                    }
+                    if (data.getTotalAmount() != null) {
                         totalAmount += data.getTotalAmount().doubleValue();
+                    }
 
                     fillRow(row, data, dateStyle, numberStyle, currencyStyle, evenRowStyle, rowNum);
                     rowNum++;
@@ -236,8 +247,9 @@ public class XlsxInvoiceExporter implements InvoiceExporter {
     }
 
     private String translateStatus(com.faturaocr.domain.invoice.valueobject.InvoiceStatus status) {
-        if (status == null)
+        if (status == null) {
             return "";
+        }
         return switch (status) {
             case PENDING -> "Beklemede";
             case VERIFIED -> "Onaylandı";
@@ -249,8 +261,9 @@ public class XlsxInvoiceExporter implements InvoiceExporter {
     }
 
     private String translateSource(SourceType source) {
-        if (source == null)
+        if (source == null) {
             return "";
+        }
         return switch (source) {
             case LLM -> "LLM Çıkarım";
             case E_INVOICE -> "e-Fatura";

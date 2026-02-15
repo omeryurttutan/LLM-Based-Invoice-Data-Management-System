@@ -1,4 +1,4 @@
-import api from './api';
+import { api } from './api';
 
 export interface DashboardStats {
   period: {
@@ -130,5 +130,38 @@ export const getStatusTimeline = async (params?: { days?: number }) => {
 
 export const getExtractionPerformance = async (params?: { dateFrom?: string; dateTo?: string }) => {
   const { data } = await api.get<ExtractionPerformance>('/dashboard/extraction-performance', { params });
+  return data;
+};
+
+export interface SystemStatus {
+  services: {
+    name: string;
+    status: "UP" | "DOWN" | "UNKNOWN";
+    message?: string;
+  }[];
+  resources: {
+    jvmHeapUsage: number;
+    jvmHeapMax: number;
+    dbActiveConnections: number;
+    dbMaxConnections: number;
+    diskUsage: number;
+    diskTotal: number;
+  };
+  llmCost: {
+    currentMonthCost: number;
+    monthlyLimit: number;
+    dailyCost: number;
+    dailyLimit: number;
+    byProvider: { provider: string; cost: number }[];
+  };
+  alerts: {
+    severity: "CRITICAL" | "HIGH" | "WARN" | "INFO";
+    message: string;
+    timestamp: string;
+  }[];
+}
+
+export const getSystemStatus = async () => {
+  const { data } = await api.get<SystemStatus>('/admin/system/status');
   return data;
 };

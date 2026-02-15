@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/header"
 import { Sidebar } from "@/components/layout/sidebar"
+import { WebSocketProvider } from "@/components/providers/websocket-provider"
 
 export default function DashboardLayout({
   children,
@@ -8,8 +9,9 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 md:flex-row md:bg-background">
+      <WebSocketProvider />
       <div className="hidden border-r bg-background md:block">
-         <Sidebar />
+        <Sidebar />
       </div>
       <div className="flex flex-col flex-1 min-h-screen">
         <Header />

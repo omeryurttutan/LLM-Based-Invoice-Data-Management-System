@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -59,12 +60,20 @@ export function CategoryDistributionChart({
     }).format(amount);
   };
 
-  const handlePieClick = (entry: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tooltipFormatter = (value: any, name: any, props: any) => {
+    return [
+      formatCurrency(value),
+      `${name} (${props?.payload?.percentage ?? 0}%)`,
+    ] as [string, string];
+  };
+
+  const handlePieClick = (entry: CategoryDistribution) => {
     if (entry && entry.categoryId) {
       router.push(`/invoices?categoryId=${entry.categoryId}`);
     } else {
-        // Handle uncategorized or "other" if needed, usually just list all
-        router.push(`/invoices`);
+      // Handle uncategorized or "other" if needed, usually just list all
+      router.push(`/invoices`);
     }
   };
 
@@ -93,10 +102,7 @@ export function CategoryDistributionChart({
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number, name: string, props: any) => [
-                formatCurrency(value),
-                `${name} (${props.payload.percentage}%)`,
-              ]}
+              formatter={tooltipFormatter}
             />
             <Legend />
           </PieChart>

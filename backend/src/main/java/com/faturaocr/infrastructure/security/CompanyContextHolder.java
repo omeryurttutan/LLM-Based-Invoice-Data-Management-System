@@ -9,21 +9,21 @@ import java.util.UUID;
  */
 public class CompanyContextHolder {
 
-    private static final ThreadLocal<UUID> currentCompanyId = new ThreadLocal<>();
+    private static final ThreadLocal<UUID> CURRENT_COMPANY_ID = new ThreadLocal<>();
 
     public static void setCompanyId(UUID companyId) {
-        currentCompanyId.set(companyId);
+        CURRENT_COMPANY_ID.set(companyId);
     }
 
     public static UUID getCompanyId() {
-        return currentCompanyId.get();
+        return CURRENT_COMPANY_ID.get();
     }
 
     public static void clear() {
-        currentCompanyId.remove();
+        CURRENT_COMPANY_ID.remove();
     }
 
     public static boolean hasCompanyContext() {
-        return currentCompanyId.get() != null;
+        return CURRENT_COMPANY_ID.get() != null;
     }
 }

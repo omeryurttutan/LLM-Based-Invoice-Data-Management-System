@@ -9,12 +9,13 @@ import com.faturaocr.application.invoice.dto.DuplicateCheckRequest;
 import com.faturaocr.application.invoice.dto.DuplicateCheckResult;
 import com.faturaocr.application.invoice.dto.FilterOptionsResponse;
 import com.faturaocr.application.invoice.dto.InvoiceDetailResponse;
-import com.faturaocr.application.invoice.dto.InvoiceItemResponse;
+
 import com.faturaocr.application.invoice.dto.InvoiceListResponse;
 import com.faturaocr.application.invoice.dto.InvoiceResponse;
 import com.faturaocr.application.invoice.dto.RejectInvoiceCommand;
 import com.faturaocr.application.invoice.dto.UpdateInvoiceCommand;
 import com.faturaocr.application.invoice.dto.VerifyInvoiceCommand;
+import com.faturaocr.application.invoice.service.InvoiceVersionService;
 import com.faturaocr.domain.audit.annotation.Auditable;
 import com.faturaocr.domain.audit.valueobject.AuditActionType;
 import com.faturaocr.domain.category.port.CategoryRepository;
@@ -26,6 +27,11 @@ import com.faturaocr.domain.invoice.valueobject.DuplicateConfidence;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
 import com.faturaocr.domain.invoice.valueobject.LlmProvider;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
+import com.faturaocr.domain.notification.enums.NotificationReferenceType;
+import com.faturaocr.domain.notification.enums.NotificationSeverity;
+import com.faturaocr.domain.template.service.SupplierTemplateService;
+import com.faturaocr.domain.rule.service.RuleEngine;
+import com.faturaocr.domain.rule.valueobject.TriggerPoint;
 import com.faturaocr.infrastructure.audit.AuditRequestContext;
 import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaEntity;
 import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaRepository;
@@ -59,7 +65,13 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final InvoiceJpaRepository invoiceJpaRepository;
     private final CategoryRepository categoryRepository;
+
     private final DuplicateDetectionService duplicateDetectionService;
+    private final InvoiceDTOMapper mapper;
+    private final com.faturaocr.domain.notification.service.NotificationService notificationService;
+    private final InvoiceVersionService versionService;
+    private final SupplierTemplateService supplierTemplateService;
+    private final RuleEngine ruleEngine;
 
     @Auditable(action = AuditActionType.CREATE, entityType = "INVOICE")
     public InvoiceResponse createInvoice(CreateInvoiceCommand command, boolean forceDuplicate) {
@@ -131,6 +143,9 @@ public class InvoiceService {
 
         invoice.calculateTotals();
 
+        // Run automation rules for manual creation
+        ruleEngine.evaluateAndExecute(TriggerPoint.ON_MANUAL_CREATE, invoice);
+
         Invoice savedInvoice = invoiceRepository.save(invoice);
         return InvoiceResponse.builder()
                 .id(savedInvoice.getId())
@@ -166,9 +181,9 @@ public class InvoiceService {
                     .and(InvoiceSpecification.hasCreatedByUser(filter.getCreatedByUserId()))
                     .and(InvoiceSpecification.hasCreatedDateRange(filter.getCreatedFrom(), filter.getCreatedTo()));
         }
-
-        return invoiceJpaRepository.findAll(spec, pageable)
-                .map(this::mapJpaToListResponse);
+        @SuppressWarnings("null")
+        Page<InvoiceJpaEntity> page = invoiceJpaRepository.findAll(spec, pageable);
+        return page.map(mapper::mapJpaToListResponse);
     }
 
     public Page<InvoiceListResponse> listInvoices(Pageable pageable) {
@@ -230,7 +245,7 @@ public class InvoiceService {
 
     public InvoiceDetailResponse getInvoiceById(UUID id) {
         Invoice invoice = getInvoiceOrThrow(id);
-        return mapToDetailResponse(invoice);
+        return mapper.mapToDetailResponse(invoice);
     }
 
     @Auditable(action = AuditActionType.UPDATE, entityType = "INVOICE")
@@ -242,6 +257,11 @@ public class InvoiceService {
             throw new BusinessException("INVOICE_NOT_EDITABLE",
                     "Cannot edit invoice with status: " + invoice.getStatus());
         }
+
+        // Create version snapshot before update
+        versionService.createSnapshot(invoice, invoice.getItems(),
+                com.faturaocr.domain.invoice.entity.InvoiceVersion.ChangeSource.MANUAL_EDIT,
+                "Manual invoice update");
 
         // Run duplicate check if invoice number changed, excluding self
         if (!invoice.getInvoiceNumber().equals(command.getInvoiceNumber())) {
@@ -269,6 +289,11 @@ public class InvoiceService {
         invoice.setCurrency(Currency.valueOf(command.getCurrency()));
         invoice.setExchangeRate(command.getExchangeRate());
         invoice.setNotes(command.getNotes());
+
+        // Update extraction corrections if provided
+        if (command.getExtractionCorrections() != null) {
+            invoice.setExtractionCorrections(command.getExtractionCorrections());
+        }
 
         if (command.getCategoryId() != null) {
             validateCategory(command.getCategoryId(), companyId);
@@ -315,6 +340,45 @@ public class InvoiceService {
         }
 
         invoiceRepository.save(invoice);
+
+        // Learn from verified invoice
+        supplierTemplateService.learnFromInvoice(invoice);
+
+        // Run automation rules after verification
+        ruleEngine.evaluateAndExecute(TriggerPoint.AFTER_VERIFICATION, invoice);
+
+        // Save again if rules modified something?
+        // ruleEngine modifies the entity object. But strict JPA might need save?
+        // If evaluateAndExecute is transactional and modifies the attached entity, it
+        // might flush automatically.
+        // But InvoiceService method is also transactional (by class or method?).
+        // @ApplicationService custom annotation likely has @Transactional?
+        // Let's assume explicit save is safer if rules modify it.
+        // Actually, if ruleEngine works on 'invoice' object and we are in transaction,
+        // dirty checking works.
+        // But let's add specific save if rules modified it?
+        // Or just let the transaction commit handle it.
+        // However, we just called save(invoice) above.
+        // Best to call rule execution BEFORE save, or save AGAIN.
+        // Let's call save again to be sure if changes happened.
+        invoiceRepository.save(invoice);
+
+        // Notify verification
+        java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+        metadata.put("invoiceId", invoice.getId());
+        metadata.put("invoiceNumber", invoice.getInvoiceNumber());
+
+        notificationService.notify(
+                invoice.getCreatedByUserId(),
+                invoice.getCompanyId(),
+                com.faturaocr.domain.notification.enums.NotificationType.INVOICE_VERIFIED,
+                "Fatura Doğrulandı",
+                String.format("%s numaralı fatura doğrulandı.", invoice.getInvoiceNumber()),
+                NotificationSeverity.SUCCESS,
+                NotificationReferenceType.INVOICE,
+                invoice.getId(),
+                metadata);
+
         return InvoiceResponse.builder().id(id).message("Invoice verified").build();
     }
 
@@ -333,6 +397,25 @@ public class InvoiceService {
         }
 
         invoiceRepository.save(invoice);
+
+        // Notify rejection
+        java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+        metadata.put("invoiceId", invoice.getId());
+        metadata.put("invoiceNumber", invoice.getInvoiceNumber());
+        metadata.put("reason", invoice.getRejectionReason());
+
+        notificationService.notify(
+                invoice.getCreatedByUserId(),
+                invoice.getCompanyId(),
+                com.faturaocr.domain.notification.enums.NotificationType.INVOICE_REJECTED,
+                "Fatura Reddedildi",
+                String.format("%s numaralı fatura reddedildi. Sebep: %s",
+                        invoice.getInvoiceNumber(), invoice.getRejectionReason()),
+                NotificationSeverity.WARNING,
+                NotificationReferenceType.INVOICE,
+                invoice.getId(),
+                metadata);
+
         return InvoiceResponse.builder().id(id).message("Invoice rejected").build();
     }
 
@@ -350,6 +433,90 @@ public class InvoiceService {
 
         invoiceRepository.save(invoice);
         return InvoiceResponse.builder().id(id).message("Invoice reopened").build();
+    }
+
+    @Auditable(action = AuditActionType.UPDATE, entityType = "INVOICE")
+    public InvoiceResponse revertInvoice(UUID id, Integer versionNumber) {
+        Invoice currentInvoice = getInvoiceOrThrow(id);
+
+        // snapshot current state before revert
+        versionService.createSnapshot(currentInvoice, currentInvoice.getItems(),
+                com.faturaocr.domain.invoice.entity.InvoiceVersion.ChangeSource.REVERT,
+                "Reverting to version " + versionNumber);
+
+        // Get reverted data
+        Invoice revertedData = versionService.revertToVersion(id, versionNumber);
+
+        // Apply changes to current entity
+        // We copy fields from revertedData to currentInvoice
+        // ID remains same. CompanyID remains same.
+        // User/Dates might need handling?
+        // CreatedAt should be original? Yes.
+        // UpdatedAt will change automatically.
+        // Status? Reverted to snapshot status.
+
+        currentInvoice.setInvoiceNumber(revertedData.getInvoiceNumber());
+        currentInvoice.setInvoiceDate(revertedData.getInvoiceDate());
+        currentInvoice.setDueDate(revertedData.getDueDate());
+        currentInvoice.setSupplierName(revertedData.getSupplierName());
+        currentInvoice.setSupplierTaxNumber(revertedData.getSupplierTaxNumber());
+        currentInvoice.setSupplierTaxOffice(revertedData.getSupplierTaxOffice());
+        currentInvoice.setSupplierAddress(revertedData.getSupplierAddress());
+        currentInvoice.setSupplierPhone(revertedData.getSupplierPhone());
+        currentInvoice.setSupplierEmail(revertedData.getSupplierEmail());
+        currentInvoice.setSubtotal(revertedData.getSubtotal());
+        currentInvoice.setTaxAmount(revertedData.getTaxAmount());
+        currentInvoice.setTotalAmount(revertedData.getTotalAmount());
+        currentInvoice.setCurrency(revertedData.getCurrency());
+        currentInvoice.setExchangeRate(revertedData.getExchangeRate());
+        currentInvoice.setStatus(revertedData.getStatus());
+        currentInvoice.setSourceType(revertedData.getSourceType());
+        currentInvoice.setLlmProvider(revertedData.getLlmProvider());
+        currentInvoice.setConfidenceScore(revertedData.getConfidenceScore());
+        currentInvoice.setNotes(revertedData.getNotes());
+        currentInvoice.setCategoryId(revertedData.getCategoryId());
+
+        // Handle items
+        // Clear existing items?
+        // Invoice entity has `items` list.
+        // We can't just set list because of JPA management (orphan removal etc).
+        // Best to clear and add.
+
+        // Create a temporary list of new items
+        List<InvoiceItem> newItems = new ArrayList<>();
+        if (revertedData.getItems() != null) {
+            for (InvoiceItem itemData : revertedData.getItems()) {
+                InvoiceItem newItem = new InvoiceItem();
+                // Copy item fields
+                newItem.setDescription(itemData.getDescription());
+                newItem.setQuantity(itemData.getQuantity());
+                newItem.setUnit(itemData.getUnit());
+                newItem.setUnitPrice(itemData.getUnitPrice());
+                newItem.setTaxRate(itemData.getTaxRate());
+                newItem.setSubtotal(itemData.getSubtotal());
+                newItem.setTaxAmount(itemData.getTaxAmount());
+                newItem.setTotalAmount(itemData.getTotalAmount());
+                newItem.setProductCode(itemData.getProductCode());
+                newItem.setBarcode(itemData.getBarcode());
+                newItem.setLineNumber(itemData.getLineNumber());
+                newItems.add(newItem);
+            }
+        }
+
+        // Remove all current items
+        currentInvoice.getItems().clear();
+
+        // Add all new items
+        for (InvoiceItem item : newItems) {
+            currentInvoice.addItem(item);
+        }
+
+        invoiceRepository.save(currentInvoice);
+
+        return InvoiceResponse.builder()
+                .id(id)
+                .message("Reverted to version " + versionNumber)
+                .build();
     }
 
     private Invoice getInvoiceOrThrow(UUID id) {
@@ -471,83 +638,4 @@ public class InvoiceService {
         }
     }
 
-    private InvoiceDetailResponse mapToDetailResponse(Invoice invoice) {
-        InvoiceDetailResponse response = new InvoiceDetailResponse();
-        response.setId(invoice.getId());
-        response.setInvoiceNumber(invoice.getInvoiceNumber());
-        response.setInvoiceDate(invoice.getInvoiceDate());
-        response.setDueDate(invoice.getDueDate());
-        response.setSupplierName(invoice.getSupplierName());
-        response.setSupplierTaxNumber(invoice.getSupplierTaxNumber());
-        response.setSupplierTaxOffice(invoice.getSupplierTaxOffice());
-        response.setSupplierAddress(invoice.getSupplierAddress());
-        response.setSupplierPhone(invoice.getSupplierPhone());
-        response.setSupplierEmail(invoice.getSupplierEmail());
-        response.setSubtotal(invoice.getSubtotal());
-        response.setTaxAmount(invoice.getTaxAmount());
-        response.setTotalAmount(invoice.getTotalAmount());
-        response.setCurrency(invoice.getCurrency());
-        response.setExchangeRate(invoice.getExchangeRate());
-        response.setStatus(invoice.getStatus());
-        response.setSourceType(invoice.getSourceType());
-        response.setLlmProvider(invoice.getLlmProvider());
-        response.setConfidenceScore(invoice.getConfidenceScore());
-        response.setCategoryId(invoice.getCategoryId());
-        response.setNotes(invoice.getNotes());
-        response.setRejectionReason(invoice.getRejectionReason());
-        response.setCreatedByUserId(invoice.getCreatedByUserId());
-        response.setVerifiedByUserId(invoice.getVerifiedByUserId());
-        response.setVerifiedAt(invoice.getVerifiedAt());
-        response.setRejectedAt(invoice.getRejectedAt());
-        response.setCreatedAt(invoice.getCreatedAt());
-        response.setUpdatedAt(invoice.getUpdatedAt());
-
-        if (invoice.getCategoryId() != null) {
-            categoryRepository.findById(invoice.getCategoryId()).ifPresent(c -> response.setCategoryName(c.getName()));
-        }
-
-        List<InvoiceItemResponse> itemResponses = invoice.getItems().stream().map(item -> {
-            InvoiceItemResponse itemResp = new InvoiceItemResponse();
-            itemResp.setId(item.getId());
-            itemResp.setLineNumber(item.getLineNumber());
-            itemResp.setDescription(item.getDescription());
-            itemResp.setQuantity(item.getQuantity());
-            itemResp.setUnit(item.getUnit());
-            itemResp.setUnitPrice(item.getUnitPrice());
-            itemResp.setTaxRate(item.getTaxRate());
-            itemResp.setTaxAmount(item.getTaxAmount());
-            itemResp.setSubtotal(item.getSubtotal());
-            itemResp.setTotalAmount(item.getTotalAmount());
-            itemResp.setProductCode(item.getProductCode());
-            itemResp.setBarcode(item.getBarcode());
-            return itemResp;
-        }).collect(Collectors.toList());
-        response.setItems(itemResponses);
-
-        return response;
-    }
-
-    private InvoiceListResponse mapJpaToListResponse(InvoiceJpaEntity invoice) {
-        InvoiceListResponse response = new InvoiceListResponse();
-        response.setId(invoice.getId());
-        response.setInvoiceNumber(invoice.getInvoiceNumber());
-        response.setInvoiceDate(invoice.getInvoiceDate());
-        response.setDueDate(invoice.getDueDate());
-        response.setSupplierName(invoice.getSupplierName());
-        response.setTotalAmount(invoice.getTotalAmount());
-        response.setCurrency(invoice.getCurrency());
-        response.setStatus(invoice.getStatus());
-        response.setSourceType(invoice.getSourceType());
-        if (invoice.getItems() != null) {
-            response.setItemCount(invoice.getItems().size());
-        } else {
-            response.setItemCount(0);
-        }
-        response.setCreatedAt(invoice.getCreatedAt());
-
-        if (invoice.getCategoryId() != null) {
-            categoryRepository.findById(invoice.getCategoryId()).ifPresent(c -> response.setCategoryName(c.getName()));
-        }
-        return response;
-    }
 }

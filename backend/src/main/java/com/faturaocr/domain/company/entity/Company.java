@@ -12,12 +12,15 @@ import java.util.UUID;
 public class Company extends BaseEntity {
 
     private String name;
+    @AuditMask(AuditMask.MaskType.PARTIAL)
     private String taxNumber;
     private String taxOffice;
+    @AuditMask(AuditMask.MaskType.FULL)
     private String address;
     private String city;
     private String district;
     private String postalCode;
+    @AuditMask(AuditMask.MaskType.PHONE)
     private String phone;
     private String email;
     private String website;

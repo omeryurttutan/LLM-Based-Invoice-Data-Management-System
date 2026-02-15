@@ -70,7 +70,11 @@ public class InvoiceBulkUploadService {
                 Invoice invoice = new Invoice();
                 invoice.setCompanyId(companyId);
                 invoice.setCreatedByUserId(userId);
-                invoice.setOriginalFileName(file.getOriginalFilename());
+                String originalFilename = file.getOriginalFilename();
+                String fileName = originalFilename != null ? originalFilename
+                        : "unknown_file_" + System.currentTimeMillis();
+                log.info("Processing file: {}, size: {}", fileName, file.getSize());
+                invoice.setOriginalFileName(fileName); // Set the determined filename
                 invoice.setOriginalFileType(file.getContentType());
                 invoice.setOriginalFileSize((int) file.getSize());
                 invoice.setStoredFilePath(storedPath);
@@ -116,7 +120,8 @@ public class InvoiceBulkUploadService {
                 && (contentType.equals("application/zip") || contentType.equals("application/x-zip-compressed"))) {
             return true;
         }
-        return file.getOriginalFilename() != null && file.getOriginalFilename().toLowerCase().endsWith(".zip");
+        String originalFilename = file.getOriginalFilename();
+        return originalFilename != null && originalFilename.toLowerCase().endsWith(".zip");
     }
 
     private List<MultipartFile> extractZip(MultipartFile zipFile) {
@@ -124,8 +129,9 @@ public class InvoiceBulkUploadService {
         try (ZipInputStream zis = new ZipInputStream(zipFile.getInputStream())) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
-                if (entry.isDirectory())
+                if (entry.isDirectory()) {
                     continue;
+                }
 
                 String filename = entry.getName();
                 // Simple security check for zip slip
@@ -164,14 +170,18 @@ public class InvoiceBulkUploadService {
 
     private String determineContentType(String filename) {
         String lower = filename.toLowerCase();
-        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg"))
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
             return "image/jpeg";
-        if (lower.endsWith(".png"))
+        }
+        if (lower.endsWith(".png")) {
             return "image/png";
-        if (lower.endsWith(".pdf"))
+        }
+        if (lower.endsWith(".pdf")) {
             return "application/pdf";
-        if (lower.endsWith(".xml"))
+        }
+        if (lower.endsWith(".xml")) {
             return "application/xml";
+        }
         return "application/octet-stream";
     }
 }

@@ -1,7 +1,10 @@
 package com.faturaocr.infrastructure.common.config;
 
 import com.faturaocr.infrastructure.audit.RequestIdFilter;
-import com.faturaocr.infrastructure.security.*;
+import com.faturaocr.infrastructure.security.CompanyContextFilter;
+import com.faturaocr.infrastructure.security.CustomAccessDeniedHandler;
+import com.faturaocr.infrastructure.security.CustomAuthenticationEntryPoint;
+import com.faturaocr.infrastructure.security.JwtAuthenticationFilter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

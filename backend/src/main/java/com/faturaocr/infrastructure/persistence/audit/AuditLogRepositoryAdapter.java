@@ -23,37 +23,40 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuditLogRepositoryAdapter implements AuditLogRepository {
 
-    private final AuditLogJpaRepository jpaRepository;
-    private final AuditLogMapper mapper;
+    private final AuditLogJpaRepository auditLogJpaRepository;
+    private final AuditLogMapper auditLogMapper;
 
     @Override
     public AuditLog save(AuditLog auditLog) {
-        AuditLogJpaEntity entity = mapper.toJpaEntity(auditLog);
-        AuditLogJpaEntity saved = jpaRepository.save(entity);
-        return mapper.toDomain(saved);
+        AuditLogJpaEntity entity = auditLogMapper.toJpaEntity(auditLog);
+        AuditLogJpaEntity savedEntity = auditLogJpaRepository.save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Failed to save audit log: saved entity is null");
+        }
+        return auditLogMapper.toDomain(savedEntity);
     }
 
     @Override
     public Page<AuditLog> findAllByFilters(AuditLogFilter filter, Pageable pageable) {
         Specification<AuditLogJpaEntity> spec = buildSpecification(filter);
-        return jpaRepository.findAll(spec, pageable).map(mapper::toDomain);
+        return auditLogJpaRepository.findAll(spec, pageable).map(auditLogMapper::toDomain);
     }
 
     @Override
     public Page<AuditLog> findByEntityTypeAndEntityId(String entityType, UUID entityId, Pageable pageable) {
-        return jpaRepository.findByEntityTypeAndEntityIdOrderByCreatedAtDesc(entityType, entityId, pageable)
-                .map(mapper::toDomain);
+        return auditLogJpaRepository.findByEntityTypeAndEntityIdOrderByCreatedAtDesc(entityType, entityId, pageable)
+                .map(auditLogMapper::toDomain);
     }
 
     @Override
     public Page<AuditLog> findByUserId(UUID userId, Pageable pageable) {
-        return jpaRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
-                .map(mapper::toDomain);
+        return auditLogJpaRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
+                .map(auditLogMapper::toDomain);
     }
 
     @Override
     public long countByActionTypeAndDateRange(AuditActionType actionType, LocalDateTime start, LocalDateTime end) {
-        return jpaRepository.countByActionTypeAndDateRange(actionType, start, end);
+        return auditLogJpaRepository.countByActionTypeAndDateRange(actionType, start, end);
     }
 
     private Specification<AuditLogJpaEntity> buildSpecification(AuditLogFilter filter) {
@@ -83,7 +86,9 @@ public class AuditLogRepositoryAdapter implements AuditLogRepository {
             }
 
             // Default ordering by createdAt desc
-            query.orderBy(criteriaBuilder.desc(root.get("createdAt")));
+            if (query != null) {
+                query.orderBy(criteriaBuilder.desc(root.get("createdAt")));
+            }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

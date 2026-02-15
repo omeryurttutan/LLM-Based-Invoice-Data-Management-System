@@ -6,6 +6,8 @@ import com.faturaocr.application.company.dto.UpdateCompanyCommand;
 import com.faturaocr.domain.audit.valueobject.AuditActionType;
 import com.faturaocr.domain.company.entity.Company;
 import com.faturaocr.domain.company.port.CompanyRepository;
+import com.faturaocr.domain.user.port.UserRepository;
+import com.faturaocr.domain.user.valueobject.Role;
 import com.faturaocr.domain.common.exception.EntityNotFoundException;
 import com.faturaocr.domain.common.exception.DomainException;
 import com.faturaocr.domain.audit.annotation.Auditable;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     @Auditable(action = AuditActionType.CREATE, entityType = "COMPANY")
@@ -90,7 +93,18 @@ public class CompanyService {
         if (!companyRepository.findById(id).isPresent()) {
             throw new EntityNotFoundException("Company", id);
         }
-        // TODO: Check for active users before deleting
+
+        // Check for ANY users before deleting
+        long count = 0;
+        for (Role role : Role.values()) {
+            count += userRepository.countByCompanyIdAndRole(id, role);
+        }
+
+        if (count > 0) {
+            throw new DomainException(
+                    "Cannot delete company with " + count + " users. Please deactivate or delete users first.");
+        }
+
         companyRepository.softDelete(id);
     }
 

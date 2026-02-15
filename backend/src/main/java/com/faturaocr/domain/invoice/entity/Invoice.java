@@ -1,6 +1,7 @@
 package com.faturaocr.domain.invoice.entity;
 
 import com.faturaocr.domain.invoice.valueobject.Currency;
+import com.faturaocr.domain.invoice.valueobject.ExtractionCorrection;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
 import com.faturaocr.domain.invoice.valueobject.LlmProvider;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
@@ -65,6 +66,8 @@ public class Invoice {
     // E-Invoice
     private String eInvoiceUuid;
     private String eInvoiceEttn;
+
+    private List<ExtractionCorrection> extractionCorrections;
 
     // Notes
     private String notes;

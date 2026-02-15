@@ -10,6 +10,7 @@ const mockInvoice: InvoiceDetail = {
   invoiceDate: '2023-10-27',
   supplierName: 'Test Supplier',
   currency: 'TRY',
+  exchangeRate: 1.0,
   status: 'PENDING',
   sourceType: 'LLM',
   items: [
@@ -55,24 +56,24 @@ jest.mock('@/services/invoice-service', () => ({
 describe('VerificationForm', () => {
   it('renders invoice details correctly', () => {
     render(<VerificationForm invoice={mockInvoice} />);
-    
+
     expect(screen.getByDisplayValue('INV-001')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Test Supplier')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('100')).toBeInTheDocument(); // Subtotal
+    expect(screen.getAllByDisplayValue('100').length).toBeGreaterThan(0); // Subtotal and/or Unit Price
   });
 
   it('renders action buttons for pending invoice', () => {
     render(<VerificationForm invoice={mockInvoice} />);
-    
-    expect(screen.getByText(/Onayla ve Kaydet/i)).toBeInTheDocument();
-    expect(screen.getByText(/Reddet/i)).toBeInTheDocument();
-    expect(screen.getByText(/Taslak Kaydet/i)).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: /Onayla ve Kaydet/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Reddet/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Taslak Kaydet/i })).toBeInTheDocument();
   });
 
   it('does not render action buttons for verified invoice', () => {
-    const verifiedInvoice = { ...mockInvoice, status: 'VERIFIED' asconst };
+    const verifiedInvoice = { ...mockInvoice, status: 'VERIFIED' as const };
     render(<VerificationForm invoice={verifiedInvoice} />);
-    
-    expect(screen.queryByText(/Onayla ve Kaydet/i)).not.toBeInTheDocument();
+
+    expect(screen.queryByRole('button', { name: /Onayla ve Kaydet/i })).not.toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 package com.faturaocr.interfaces.rest.invoice;
 
 import com.faturaocr.domain.invoice.port.FileStoragePort;
-import com.faturaocr.domain.invoice.port.InvoiceRepository;
+
 import com.faturaocr.infrastructure.adapter.extraction.PythonExtractionClient;
 import com.faturaocr.infrastructure.adapter.extraction.dto.ExtractionResult;
 import com.faturaocr.infrastructure.messaging.rabbitmq.RabbitMQProducerService;
@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,19 +46,19 @@ public class InvoiceUploadIntegrationTest {
         @Autowired
         private InvoiceJpaRepository invoiceJpaRepository;
 
-        @MockBean
+        @MockitoBean
         private FileStoragePort fileStoragePort;
 
-        @MockBean
+        @MockitoBean
         private PythonExtractionClient pythonExtractionClient;
 
-        @MockBean
+        @MockitoBean
         private RabbitMQProducerService rabbitMQProducerService;
 
-        @MockBean
+        @MockitoBean
         private com.faturaocr.infrastructure.messaging.rabbitmq.RabbitMQResultListener rabbitMQResultListener;
 
-        @MockBean
+        @MockitoBean
         private JwtTokenProvider jwtTokenProvider; // In case filters need it
 
         private final UUID userId = UUID.randomUUID();
@@ -98,6 +98,7 @@ public class InvoiceUploadIntegrationTest {
         }
 
         @Test
+        @SuppressWarnings("null")
         void shouldUploadSingleInvoiceSuccessfully() throws Exception {
                 MockMultipartFile file = new MockMultipartFile(
                                 "file",
@@ -107,7 +108,7 @@ public class InvoiceUploadIntegrationTest {
 
                 mockMvc.perform(multipart("/api/v1/invoices/upload")
                                 .file(file)
-                                .contentType(MediaType.MULTIPART_FORM_DATA))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)) // @SuppressWarnings("null")
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.originalFileName").value("invoice.pdf"))
                                 .andExpect(jsonPath("$.status").exists())
@@ -115,6 +116,7 @@ public class InvoiceUploadIntegrationTest {
         }
 
         @Test
+        @SuppressWarnings("null")
         void shouldBulkUploadInvoicesSuccessfully() throws Exception {
                 MockMultipartFile file1 = new MockMultipartFile(
                                 "files",
@@ -131,7 +133,7 @@ public class InvoiceUploadIntegrationTest {
                 mockMvc.perform(multipart("/api/v1/invoices/bulk-upload")
                                 .file(file1)
                                 .file(file2)
-                                .contentType(MediaType.MULTIPART_FORM_DATA))
+                                .contentType(MediaType.MULTIPART_FORM_DATA)) // @SuppressWarnings("null")
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.totalFiles").value(2))
                                 .andExpect(jsonPath("$.acceptedFiles").value(2))

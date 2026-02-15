@@ -7,6 +7,9 @@ import com.faturaocr.domain.invoice.entity.Invoice;
 import com.faturaocr.domain.invoice.port.InvoiceRepository;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
+import com.faturaocr.domain.notification.enums.NotificationReferenceType;
+import com.faturaocr.domain.notification.enums.NotificationType;
+import com.faturaocr.domain.notification.service.NotificationService;
 import com.faturaocr.infrastructure.security.AuthenticatedUser;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
 import com.faturaocr.application.common.exception.BusinessException;
@@ -41,6 +44,9 @@ class InvoiceServiceTest {
 
     @Mock
     private DuplicateDetectionService duplicateDetectionService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private InvoiceService invoiceService;
@@ -228,6 +234,16 @@ class InvoiceServiceTest {
             assertEquals(USER_ID, inv.getVerifiedByUserId());
             return true;
         }));
+
+        verify(notificationService).notify(
+                eq(USER_ID),
+                eq(COMPANY_ID),
+                eq(NotificationType.INVOICE_VERIFIED),
+                anyString(),
+                anyString(),
+                eq(NotificationReferenceType.INVOICE),
+                eq(invoiceId),
+                anyMap());
     }
 
     @Test
@@ -250,6 +266,16 @@ class InvoiceServiceTest {
             assertEquals("Wrong amount", inv.getRejectionReason());
             return true;
         }));
+
+        verify(notificationService).notify(
+                eq(USER_ID),
+                eq(COMPANY_ID),
+                eq(NotificationType.INVOICE_REJECTED),
+                anyString(),
+                anyString(),
+                eq(NotificationReferenceType.INVOICE),
+                eq(invoiceId),
+                anyMap());
     }
 
     @Test

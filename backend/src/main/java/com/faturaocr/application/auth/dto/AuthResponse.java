@@ -1,6 +1,5 @@
 package com.faturaocr.application.auth.dto;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
