@@ -60,7 +60,7 @@ class ExtractionService:
             return await self._process_xml(file_bytes, start_time)
         else:
             # 1. Preprocess (Image/PDF)
-            processed_image = self.preprocessing_pipeline.process(
+            processed_image = await self.preprocessing_pipeline.process(
                 file_bytes, 
                 filename=filename
             )
@@ -68,7 +68,9 @@ class ExtractionService:
             preprocess_duration = (time.time() - start_time) * 1000
             logger.info("preprocessing_completed", duration_ms=preprocess_duration)
             
-            return await self._process_image(processed_image.data, start_time)
+            # processed_image.image_data is base64 string, we need bytes for LLM
+            image_bytes_processed = base64.b64decode(processed_image.image_data)
+            return await self._process_image(image_bytes_processed, start_time)
 
     async def extract_from_base64(self, base64_string: str) -> ExtractionResponse:
         """
@@ -92,11 +94,13 @@ class ExtractionService:
         if file_type == "XML":
              return await self._process_xml(file_bytes, start_time)
         else:
-            processed_image = self.preprocessing_pipeline.process(
+            processed_image = await self.preprocessing_pipeline.process(
                 file_bytes,
                 filename="base64_upload.jpg" 
             )
-            return await self._process_image(processed_image.data, start_time)
+            # processed_image.image_data is base64 string
+            image_bytes_processed = base64.b64decode(processed_image.image_data)
+            return await self._process_image(image_bytes_processed, start_time)
 
     async def extract_xml(self, file: UploadFile) -> ExtractionResponse:
         """

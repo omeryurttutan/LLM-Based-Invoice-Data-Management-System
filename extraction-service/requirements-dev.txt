@@ -16,3 +16,9 @@ freezegun==1.4.0
 # Development
 black==24.1.1
 isort==5.13.2
+Faker==23.0.0
+
+# Integration Testing
+respx==0.20.2
+testcontainers[rabbitmq]==3.7.1
+aio-pika==9.4.0

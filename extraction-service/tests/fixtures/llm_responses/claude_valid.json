@@ -1,24 +1,19 @@
 {
-    "invoice_number": "GIB2024000000001",
-    "issue_date": "2024-01-15",
-    "supplier": {
-        "name": "Test Satıcı A.Ş.",
-        "tax_id": "1234567890",
-        "address": "İstanbul, Kadıköy"
-    },
-    "customer": {
-        "name": "Test Alıcı Ltd. Şti.",
-        "tax_id": "11111111111"
-    },
-    "line_items": [
-        {
-            "description": "Test Ürünü",
-            "quantity": 10,
-            "unit_price": 100.00,
-            "total_price": 1000.00
-        }
-    ],
-    "total_amount": 1200.00,
-    "tax_amount": 200.00,
-    "currency": "TRY"
+  "fatura_no": "GIB2024000000003",
+  "tarih": "03.01.2024",
+  "gonderici_vkn": "1234567890",
+  "gonderici_unvan": "Claude Tedarikçi A.Ş.",
+  "alici_vkn": "9876543210",
+  "alici_unvan": "Claude Müşteri Ltd.",
+  "vergi_toplam": 200.00,
+  "genel_toplam": 1200.00,
+  "para_birimi": "EUR",
+  "kalemler": [
+    {
+      "aciklama": "Claude Hizmeti",
+      "miktar": 2,
+      "birim_fiyat": 500.00,
+      "toplam_tutar": 1000.00
+    }
+  ]
 }

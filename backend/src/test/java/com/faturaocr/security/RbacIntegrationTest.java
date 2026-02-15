@@ -1,86 +1,83 @@
 package com.faturaocr.security;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
+import com.faturaocr.BaseIntegrationTest;
+import com.faturaocr.domain.company.entity.Company;
+import com.faturaocr.domain.user.entity.User;
+import com.faturaocr.domain.user.valueobject.Role;
+import com.faturaocr.testutil.TestDataSeeder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Integration tests for RBAC.
- */
-@SpringBootTest
-@AutoConfigureMockMvc
-@TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1",
-        "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.datasource.username=sa",
-        "spring.datasource.password=",
-        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
-        "spring.flyway.enabled=false",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
-class RbacIntegrationTest {
+class RbacIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private TestDataSeeder testDataSeeder;
 
-    @Nested
-    @DisplayName("URL Access Control Tests")
-    class UrlAccessControlTests {
+    private Company testCompany;
+    private String adminToken;
+    private String managerToken;
+    private String accountantToken;
+    private String internToken;
 
-        @Test
-        @DisplayName("Public endpoints are accessible without auth")
-        void publicEndpointsAccessible() throws Exception {
-            mockMvc.perform(get("/api/v1/health"))
-                    .andExpect(status().isOk());
-        }
+    @BeforeEach
+    void setUp() throws Exception {
+        testCompany = testDataSeeder.seedCompany("RBAC Test Company", "2222222222");
 
-        @Test
-        @DisplayName("Admin endpoints require ADMIN role")
-        @WithMockUser(username = "admin", roles = { "ADMIN" })
-        void adminEndpointsAccessibleByAdmin() throws Exception {
-            // Note: We don't have an actual admin endpoint implementation yet,
-            // but we can test the security configuration if we had one.
-            // For now, checks against a non-existent endpoint will return 404 which passes
-            // auth
-            // but to test 403 we'd need a real endpoint or a test controller.
-            // Since we updated SecurityConfig to protect /api/v1/admin/**
-            // We can rely on the fact that if we were forbidden, we'd get 403.
-        }
+        testDataSeeder.seedUser(testCompany.getId(), "admin@rbac.com", "Password123!", Role.ADMIN);
+        testDataSeeder.seedUser(testCompany.getId(), "manager@rbac.com", "Password123!", Role.MANAGER);
+        testDataSeeder.seedUser(testCompany.getId(), "accountant@rbac.com", "Password123!", Role.ACCOUNTANT);
+        testDataSeeder.seedUser(testCompany.getId(), "intern@rbac.com", "Password123!", Role.INTERN);
 
-        @Test
-        @DisplayName("Admin endpoints forbidden for non-admin")
-        @WithMockUser(username = "user", roles = { "USER" })
-        void adminEndpointsForbiddenForNonAdmin() throws Exception {
-            mockMvc.perform(get("/api/v1/admin/dashboard"))
-                    .andExpect(status().isForbidden());
-        }
+        adminToken = testDataSeeder.loginAndGetToken(mockMvc, "admin@rbac.com", "Password123!");
+        managerToken = testDataSeeder.loginAndGetToken(mockMvc, "manager@rbac.com", "Password123!");
+        accountantToken = testDataSeeder.loginAndGetToken(mockMvc, "accountant@rbac.com", "Password123!");
+        internToken = testDataSeeder.loginAndGetToken(mockMvc, "intern@rbac.com", "Password123!");
     }
 
-    @Nested
-    @DisplayName("Method Security Tests")
-    class MethodSecurityTests {
-        // These tests would ideally use a TestController or rely on existing
-        // controllers
-        // annotated with our custom annotations.
-        // Since we haven't implemented the controllers with these annotations yet
-        // (Phase 6/7),
-        // we can currently only verify the SecurityConfig load and basic URL
-        // protection.
+    @Test
+    void getInvoices_ShouldBeAccessibleByAllRoles() throws Exception {
+        mockMvc.perform(get("/api/v1/invoices")
+                .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
 
-        // However, we can verify that the Application Context loads with our
-        // SecurityConfig
-        @Test
-        void contextLoads() {
-            // verified by class level @SpringBootTest
-        }
+        mockMvc.perform(get("/api/v1/invoices")
+                .header("Authorization", "Bearer " + managerToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/invoices")
+                .header("Authorization", "Bearer " + accountantToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/invoices")
+                .header("Authorization", "Bearer " + internToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void adminUsers_ShouldOnlyBeAccessibleByAdmin() throws Exception {
+        // ADMIN -> OK
+        mockMvc.perform(get("/api/v1/admin/users")
+                .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+
+        // MANAGER -> Forbidden
+        mockMvc.perform(get("/api/v1/admin/users")
+                .header("Authorization", "Bearer " + managerToken))
+                .andExpect(status().isForbidden());
+
+        // ACCOUNTANT -> Forbidden
+        mockMvc.perform(get("/api/v1/admin/users")
+                .header("Authorization", "Bearer " + accountantToken))
+                .andExpect(status().isForbidden());
+
+        // INTERN -> Forbidden
+        mockMvc.perform(get("/api/v1/admin/users")
+                .header("Authorization", "Bearer " + internToken))
+                .andExpect(status().isForbidden());
     }
 }
