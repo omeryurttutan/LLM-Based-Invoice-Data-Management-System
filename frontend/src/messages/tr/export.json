@@ -1,0 +1,18 @@
+{
+    "title": "Dışa Aktar",
+    "format": "Format Seçin",
+    "formats": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)",
+        "logo": "Logo Muhasebe",
+        "mikro": "Mikro Yazılım",
+        "netsis": "Netsis",
+        "luca": "Luca"
+    },
+    "options": {
+        "all": "Tüm Faturalar",
+        "filtered": "Filtrelenmiş Sonuçlar",
+        "selected": "Seçili Faturalar ({count})"
+    },
+    "downloading": "Hazırlanıyor..."
+}

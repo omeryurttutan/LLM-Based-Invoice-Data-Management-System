@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     
     # Service URLs
     SPRING_BOOT_URL: str = "http://localhost:8080"
+    INTERNAL_API_KEY: str = "fatura-ocr-internal-secret-key-2026"
+    
     
     # Processing Settings
     MAX_FILE_SIZE_MB: int = 10

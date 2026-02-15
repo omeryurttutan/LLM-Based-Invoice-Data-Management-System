@@ -86,6 +86,13 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
     @Column(name = "supplier_email")
     private String supplierEmail;
 
+    @Column(name = "buyer_tax_number")
+    @Convert(converter = EncryptedStringConverter.class)
+    private String buyerTaxNumber;
+
+    @Column(name = "buyer_tax_number_hash")
+    private String buyerTaxNumberHash;
+
     @Column(name = "subtotal")
     private BigDecimal subtotal;
 
@@ -178,6 +185,9 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
     public void hashSensitiveFields() {
         if (this.supplierTaxNumber != null) {
             this.supplierTaxNumberHash = hashString(this.supplierTaxNumber);
+        }
+        if (this.buyerTaxNumber != null) {
+            this.buyerTaxNumberHash = hashString(this.buyerTaxNumber);
         }
     }
 

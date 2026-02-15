@@ -48,13 +48,7 @@ jwt:
   refresh-token:
     expiration: 604800000 # 7 days in milliseconds
 
-# Security Configuration
-security:
-  password:
-    bcrypt-strength: 12
-  brute-force:
-    max-attempts: 5
-    lock-duration-minutes: 30
+
 
 management:
   endpoints:
@@ -88,3 +82,53 @@ export:
     database-name: "MIKRO_DB"
   luca:
     firm-code: "100"
+
+app:
+  kvkk:
+    encryption:
+      enabled: true
+      key-env-variable: KVKK_ENCRYPTION_KEY
+    consent:
+      data-processing-required: true
+      current-version: "1.0"
+    strict-minimization: false
+    retention:
+      enabled: true
+      job-cron: "0 0 2 * * ?"
+      users-days: 30
+      invoices-days: 1825
+      companies-days: 1825
+      audit-logs-days: 3650
+      notifications-days: 90
+      rule-logs-days: 365
+    audit-masking:
+      enabled: true
+
+  security:
+    password:
+      bcrypt-strength: 12
+    login:
+      max-attempts: 5
+      lockout-duration-minutes: 15
+
+    rate-limit:
+      enabled: true
+      public-limit: 20
+      login-limit: 5
+      authenticated-limit: 100
+      upload-limit: 10
+      export-limit: 5
+      admin-limit: 50
+      window-seconds: 60
+
+    headers:
+      hsts-enabled: false
+      csp-enabled: true
+
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080}
+
+    internal-api-key: ${INTERNAL_API_KEY:fatura-ocr-internal-secret-key-2026}
+
+    request:
+      max-json-body-size: 1048576 # 1MB

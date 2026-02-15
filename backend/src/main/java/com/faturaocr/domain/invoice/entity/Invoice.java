@@ -1,5 +1,7 @@
 package com.faturaocr.domain.invoice.entity;
 
+import com.faturaocr.domain.audit.annotation.AuditMask;
+
 import com.faturaocr.domain.invoice.valueobject.Currency;
 import com.faturaocr.domain.invoice.valueobject.ExtractionCorrection;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
@@ -33,11 +35,19 @@ public class Invoice {
 
     // Supplier
     private String supplierName;
+    @AuditMask(AuditMask.MaskType.PARTIAL)
     private String supplierTaxNumber;
     private String supplierTaxOffice;
+    @AuditMask(AuditMask.MaskType.FULL)
     private String supplierAddress;
+    @AuditMask(AuditMask.MaskType.PHONE)
     private String supplierPhone;
+    @AuditMask(AuditMask.MaskType.EMAIL)
     private String supplierEmail;
+
+    // Buyer
+    @AuditMask(AuditMask.MaskType.PARTIAL)
+    private String buyerTaxNumber;
 
     // Financial
     private BigDecimal subtotal;

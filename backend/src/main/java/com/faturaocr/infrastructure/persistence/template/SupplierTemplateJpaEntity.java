@@ -1,5 +1,13 @@
 package com.faturaocr.infrastructure.persistence.template;
 
+import com.faturaocr.infrastructure.security.encryption.EncryptedStringConverter;
+import jakarta.persistence.Convert;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import com.faturaocr.domain.template.valueobject.LearnedData;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import org.hibernate.annotations.Type;
@@ -37,7 +45,11 @@ public class SupplierTemplateJpaEntity {
     private UUID companyId;
 
     @Column(name = "supplier_tax_number", nullable = false)
+    @Convert(converter = EncryptedStringConverter.class)
     private String supplierTaxNumber;
+
+    @Column(name = "supplier_tax_number_hash")
+    private String supplierTaxNumberHash;
 
     @Column(name = "supplier_name", nullable = false)
     private String supplierName;
@@ -65,4 +77,34 @@ public class SupplierTemplateJpaEntity {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    @PreUpdate
+    public void hashSensitiveFields() {
+        if (this.supplierTaxNumber != null) {
+            this.supplierTaxNumberHash = hashString(this.supplierTaxNumber);
+        }
+    }
+
+    private String hashString(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            return bytesToHex(encodedhash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not found", e);
+        }
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 }

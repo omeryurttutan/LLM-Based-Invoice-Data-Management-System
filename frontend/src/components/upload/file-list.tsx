@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UploadStatus, UploadStatusType } from "./upload-status";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export interface FileItem {
   id: string;
@@ -22,13 +23,14 @@ interface FileListProps {
 }
 
 export function FileList({ files, onRemove, onRetry, isUploading }: FileListProps) {
+  const t = useTranslations('invoices');
   if (files.length === 0) return null;
 
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Yükleme Listesi</h3>
-        <span className="text-sm text-muted-foreground">{files.length} dosya</span>
+        <h3 className="text-lg font-semibold">{t('upload.list.title')}</h3>
+        <span className="text-sm text-muted-foreground">{t('upload.list.count', { count: files.length })}</span>
       </div>
 
       <ScrollArea className="h-[300px] w-full rounded-md border p-4">
@@ -52,16 +54,16 @@ export function FileList({ files, onRemove, onRetry, isUploading }: FileListProp
                   </span>
                 </div>
 
-                <UploadStatus 
-                  status={item.status} 
-                  progress={item.progress} 
-                  message={item.message || item.error} 
+                <UploadStatus
+                  status={item.status}
+                  progress={item.progress}
+                  message={item.message || item.error}
                 />
               </div>
 
               <div className="flex flex-col gap-1">
                 {item.status === "COMPLETED" && item.resultId && (
-                  <Button variant="ghost" size="icon" asChild title="Görüntüle">
+                  <Button variant="ghost" size="icon" asChild title={t('upload.list.view')}>
                     <Link href={`/invoices/${item.resultId}`}>
                       <Eye className="w-4 h-4 text-blue-500" />
                     </Link>
@@ -73,7 +75,7 @@ export function FileList({ files, onRemove, onRetry, isUploading }: FileListProp
                     variant="ghost"
                     size="icon"
                     onClick={() => onRetry(item.id)}
-                    title="Tekrar Dene"
+                    title={t('upload.list.retry')}
                   >
                     <RefreshCw className="w-4 h-4 text-orange-500" />
                   </Button>
@@ -84,7 +86,7 @@ export function FileList({ files, onRemove, onRetry, isUploading }: FileListProp
                     variant="ghost"
                     size="icon"
                     onClick={() => onRemove(item.id)}
-                    title="Kaldır"
+                    title={t('upload.list.remove')}
                   >
                     <Trash2 className="w-4 h-4 text-red-500" />
                   </Button>

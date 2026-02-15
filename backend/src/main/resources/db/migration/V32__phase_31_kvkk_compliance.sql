@@ -6,14 +6,21 @@ ALTER TABLE companies ALTER COLUMN address TYPE VARCHAR(1000); -- Address can be
 ALTER TABLE companies ALTER COLUMN phone TYPE VARCHAR(500);
 
 ALTER TABLE invoices ALTER COLUMN supplier_tax_number TYPE VARCHAR(500);
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS buyer_tax_number VARCHAR(500);
+
+ALTER TABLE supplier_templates ALTER COLUMN supplier_tax_number TYPE VARCHAR(500);
 
 -- Add hash columns for searchable fields
 ALTER TABLE companies ADD COLUMN tax_number_hash VARCHAR(64);
 ALTER TABLE invoices ADD COLUMN supplier_tax_number_hash VARCHAR(64);
+ALTER TABLE invoices ADD COLUMN buyer_tax_number_hash VARCHAR(64);
+ALTER TABLE supplier_templates ADD COLUMN supplier_tax_number_hash VARCHAR(64);
 
 -- Add indexes for hash columns
 CREATE INDEX idx_companies_tax_number_hash ON companies(tax_number_hash);
 CREATE INDEX idx_invoices_supplier_tax_number_hash ON invoices(supplier_tax_number_hash);
+CREATE INDEX idx_invoices_buyer_tax_number_hash ON invoices(buyer_tax_number_hash);
+CREATE INDEX idx_supplier_templates_tax_hash ON supplier_templates(supplier_tax_number_hash);
 
 -- Create table for KVKK settings/metadata
 CREATE TABLE IF NOT EXISTS system_settings (
@@ -24,7 +31,8 @@ CREATE TABLE IF NOT EXISTS system_settings (
 );
 
 INSERT INTO system_settings (key, value, description)
-VALUES ('data_encrypted', 'false', 'Flag indicating if existing plain-text data has been migrated to encrypted form');
+VALUES ('data_encrypted', 'false', 'Flag indicating if existing plain-text data has been migrated to encrypted form')
+ON CONFLICT (key) DO NOTHING;
 
 -- Create user_consents table
 CREATE TABLE user_consents (

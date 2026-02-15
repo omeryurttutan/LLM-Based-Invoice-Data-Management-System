@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,8 @@ interface VerificationItemsProps {
 }
 
 export const VerificationItems: React.FC<VerificationItemsProps> = ({ readOnly = false }) => {
+  const t = useTranslations('invoices.verification');
+  const tForm = useTranslations('invoices.form');
   const { register, control, watch, setValue } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -26,45 +29,45 @@ export const VerificationItems: React.FC<VerificationItemsProps> = ({ readOnly =
         const quantity = parseFloat(item.quantity) || 0;
         const unitPrice = parseFloat(item.unitPrice) || 0;
         const taxRate = parseFloat(item.taxRate) || 0;
-        
+
         const calculatedLineTotal = quantity * unitPrice;
         const calculatedTaxAmount = calculatedLineTotal * (taxRate / 100);
-        
+
         // Only update if significantly different to avoid loops, 
         // but hook form setValue should handle this if we use shouldDirty: true/false appropriately.
         // Actually, better to just update if the value in form is different.
-        
+
         // We use toFixed(2) for display/storage consistency
         const currentLineTotal = parseFloat(item.subtotal) || 0;
         const currentTaxAmount = parseFloat(item.taxAmount) || 0;
 
         if (Math.abs(calculatedLineTotal - currentLineTotal) > 0.01) {
-            setValue(`items.${index}.subtotal`, parseFloat(calculatedLineTotal.toFixed(2)));
+          setValue(`items.${index}.subtotal`, parseFloat(calculatedLineTotal.toFixed(2)));
         }
         if (Math.abs(calculatedTaxAmount - currentTaxAmount) > 0.01) {
-            setValue(`items.${index}.taxAmount`, parseFloat(calculatedTaxAmount.toFixed(2)));
+          setValue(`items.${index}.taxAmount`, parseFloat(calculatedTaxAmount.toFixed(2)));
         }
       });
     }
   }, [items, setValue, readOnly]);
 
   return (
-    <FormSection 
-      title="Fatura Kalemleri" 
+    <FormSection
+      title="Fatura Kalemleri"
       rightElement={
         !readOnly && (
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="sm" 
-            onClick={() => append({ 
-              description: '', 
-              quantity: 1, 
-              unit: 'ADET', 
-              unitPrice: 0, 
-              taxRate: 20, 
-              taxAmount: 0, 
-              subtotal: 0 
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => append({
+              description: '',
+              quantity: 1,
+              unit: 'ADET',
+              unitPrice: 0,
+              taxRate: 20,
+              taxAmount: 0,
+              subtotal: 0
             })}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -91,66 +94,66 @@ export const VerificationItems: React.FC<VerificationItemsProps> = ({ readOnly =
             {fields.map((field, index) => (
               <TableRow key={field.id}>
                 <TableCell>
-                  <Input 
-                    {...register(`items.${index}.description`)} 
+                  <Input
+                    {...register(`items.${index}.description`)}
                     disabled={readOnly}
                     className="min-w-[150px]"
                   />
                 </TableCell>
                 <TableCell>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     step="0.01"
-                    {...register(`items.${index}.quantity`, { valueAsNumber: true })} 
+                    {...register(`items.${index}.quantity`, { valueAsNumber: true })}
                     disabled={readOnly}
                   />
                 </TableCell>
                 <TableCell>
-                  <Input 
-                    {...register(`items.${index}.unit`)} 
-                    disabled={readOnly} 
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input 
-                    type="number" 
-                    step="0.01"
-                    {...register(`items.${index}.unitPrice`, { valueAsNumber: true })} 
+                  <Input
+                    {...register(`items.${index}.unit`)}
                     disabled={readOnly}
                   />
                 </TableCell>
                 <TableCell>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...register(`items.${index}.unitPrice`, { valueAsNumber: true })}
+                    disabled={readOnly}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
                     step="1"
-                    {...register(`items.${index}.taxRate`, { valueAsNumber: true })} 
+                    {...register(`items.${index}.taxRate`, { valueAsNumber: true })}
                     disabled={readOnly}
                   />
                 </TableCell>
                 <TableCell>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     step="0.01"
-                    {...register(`items.${index}.taxAmount`, { valueAsNumber: true })} 
+                    {...register(`items.${index}.taxAmount`, { valueAsNumber: true })}
                     disabled={readOnly}
-                    // calculated but editable
+                  // calculated but editable
                   />
                 </TableCell>
                 <TableCell>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     step="0.01"
-                   {...register(`items.${index}.subtotal`, { valueAsNumber: true })} 
-                   readOnly
-                   className="bg-gray-50 dark:bg-gray-900"
+                    {...register(`items.${index}.subtotal`, { valueAsNumber: true })}
+                    readOnly
+                    className="bg-gray-50 dark:bg-gray-900"
                   />
                 </TableCell>
                 {!readOnly && (
                   <TableCell>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => remove(index)}
                       className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/50"
                     >

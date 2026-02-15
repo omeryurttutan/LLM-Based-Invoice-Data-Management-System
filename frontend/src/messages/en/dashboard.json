@@ -1,0 +1,26 @@
+{
+    "title": "Dashboard",
+    "dateSelect": "Select Date Range",
+    "currencyLabel": "Currency",
+    "cards": {
+        "totalInvoices": "Total Invoices",
+        "totalAmount": "Total Amount",
+        "average": "Average",
+        "pending": "Pending",
+        "thisMonth": "This Month"
+    },
+    "charts": {
+        "monthlyTrend": "Monthly Invoice Trend",
+        "categoryDistribution": "Category Distribution",
+        "statusDistribution": "Status Distribution"
+    },
+    "recent": {
+        "title": "Recent Activity",
+        "viewAll": "View All"
+    },
+    "actions": {
+        "title": "Pending Actions",
+        "verify": "Verify ({count})",
+        "noActions": "No pending actions"
+    }
+}

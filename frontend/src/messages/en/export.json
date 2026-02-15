@@ -1,0 +1,18 @@
+{
+    "title": "Export",
+    "format": "Select Format",
+    "formats": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)",
+        "logo": "Logo Accounting",
+        "mikro": "Mikro Software",
+        "netsis": "Netsis",
+        "luca": "Luca"
+    },
+    "options": {
+        "all": "All Invoices",
+        "filtered": "Filtered Results",
+        "selected": "Selected Invoices ({count})"
+    },
+    "downloading": "Preparing..."
+}

@@ -1,0 +1,86 @@
+{
+    "buttons": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "close": "Close",
+        "confirm": "Confirm",
+        "retry": "Retry",
+        "back": "Back",
+        "next": "Next",
+        "export": "Export",
+        "import": "Import",
+        "upload": "Upload",
+        "download": "Download",
+        "search": "Search",
+        "filter": "Filter",
+        "clearFilters": "Clear Filters",
+        "selectAll": "Select All",
+        "verify": "Verify",
+        "reject": "Reject",
+        "reopen": "Reopen",
+        "apply": "Apply",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "profile": "Profile"
+    },
+    "status": {
+        "pending": "Pending",
+        "verified": "Verified",
+        "rejected": "Rejected",
+        "processing": "Processing",
+        "active": "Active",
+        "inactive": "Inactive",
+        "locked": "Locked"
+    },
+    "messages": {
+        "success": {
+            "created": "{entity} successfully created",
+            "updated": "{entity} successfully updated",
+            "deleted": "{entity} successfully deleted",
+            "generic": "Operation completed successfully",
+            "logoutSuccess": "Logged out successfully"
+        },
+        "error": {
+            "generic": "An error occurred. Please try again.",
+            "notFound": "{entity} not found",
+            "unauthorized": "You are not authorized for this action",
+            "networkError": "Connection error. Please check your internet connection.",
+            "rateLimited": "Too many requests. Please wait a moment.",
+            "serverError": "Server error. Please try again later.",
+            "validation": "Please check the form."
+        },
+        "confirm": {
+            "delete": "Are you sure you want to delete {entity}? This action cannot be undone.",
+            "discard": "There are unsaved changes. Are you sure you want to discard them?"
+        }
+    },
+    "roles": {
+        "admin": "Admin",
+        "manager": "Manager",
+        "accountant": "Accountant",
+        "intern": "Intern"
+    },
+    "labels": {
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "actions": "Actions",
+        "details": "Details",
+        "total": "Total",
+        "noData": "No data found",
+        "loading": "Loading...",
+        "showing": "Showing {from}-{to} of {total}",
+        "rowsPerPage": "Rows per page"
+    },
+    "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{count} minutes ago",
+        "hoursAgo": "{count} hours ago",
+        "daysAgo": "{count} days ago",
+        "yesterday": "Yesterday",
+        "today": "Today"
+    }
+}

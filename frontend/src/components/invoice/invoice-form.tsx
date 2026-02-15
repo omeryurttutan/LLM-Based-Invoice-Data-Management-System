@@ -1,13 +1,13 @@
 // @ts-nocheck
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { CalendarIcon, Trash2, Plus } from 'lucide-react';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import { tr, enUS } from 'date-fns/locale';
 
 import { cn, formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -39,34 +39,36 @@ import { Separator } from '@/components/ui/separator';
 
 import { CreateInvoiceRequest, UnitType, Currency } from '@/types/invoice';
 import { Category } from '@/types/category';
+import { useLocale, useTranslations } from 'next-intl';
 
-const invoiceSchema = z.object({
-  invoiceNumber: z.string().min(1, 'Fatura numarası zorunludur'),
+type InvoiceFormValues = z.infer<returnType<typeof getInvoiceSchema>>;
+
+const getInvoiceSchema = (t: any) => z.object({
+  invoiceNumber: z.string().min(1, t('form.validation.invoiceNumberRequired')),
   invoiceDate: z.date(),
   dueDate: z.date().optional(),
-  supplierName: z.string().min(1, 'Tedarikçi adı zorunludur'),
-  supplierTaxNumber: z.string().regex(/^[0-9]{10,11}$/, 'Vergi numarası 10 veya 11 haneli olmalıdır').optional().or(z.literal('')),
+  supplierName: z.string().min(1, t('form.validation.supplierNameRequired')),
+  supplierTaxNumber: z.string().regex(/^[0-9]{10,11}$/, t('form.validation.taxIdInvalid')).optional().or(z.literal('')),
   supplierTaxOffice: z.string().optional(),
   supplierAddress: z.string().optional(),
   supplierPhone: z.string().optional(),
-  supplierEmail: z.string().email('Geçerli bir e-posta adresi giriniz').optional().or(z.literal('')),
+  supplierEmail: z.string().email(t('form.validation.emailInvalid')).optional().or(z.literal('')),
   currency: z.enum(['TRY', 'USD', 'EUR', 'GBP'] as const),
   exchangeRate: z.coerce.number().min(0).optional(),
   categoryId: z.string().optional(),
   notes: z.string().optional(),
   items: z.array(z.object({
-    description: z.string().min(1, 'Açıklama zorunludur'),
-    quantity: z.coerce.number().min(0.0001, 'Miktar 0 dan büyük olmalıdır'),
+    description: z.string().min(1, t('form.validation.descriptionRequired')),
+    quantity: z.coerce.number().min(0.0001, t('form.validation.quantityMin')),
     unit: z.enum(['ADET', 'KG', 'LT', 'M', 'M2', 'M3', 'PAKET', 'KUTU', 'SAAT', 'GUN'] as const),
-    unitPrice: z.coerce.number().min(0, 'Birim fiyat 0 dan küçük olamaz'),
+    unitPrice: z.coerce.number().min(0, t('form.validation.unitPriceMin')),
     taxRate: z.coerce.number().min(0).max(100),
     productCode: z.string().optional(),
     taxAmount: z.number().optional(), // Calculated, strictly for display/internal use
     total: z.number().optional(), // Calculated
-  })).min(1, 'En az bir kalem eklemelisiniz'),
+  })).min(1, t('form.validation.itemsMin')),
 });
 
-type InvoiceFormValues = z.infer<typeof invoiceSchema>;
 
 interface InvoiceFormProps {
   initialData?: any;
@@ -76,6 +78,13 @@ interface InvoiceFormProps {
 }
 
 export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: InvoiceFormProps) {
+  const t = useTranslations('invoices');
+  const locale = useLocale();
+  const dateLocale = locale === 'tr' ? tr : enUS;
+
+  const invoiceSchema = useMemo(() => getInvoiceSchema(t), [t]);
+  type InvoiceFormValues = z.infer<typeof invoiceSchema>;
+
   const defaultValues: Partial<InvoiceFormValues> = {
     invoiceDate: new Date(),
     currency: 'TRY',
@@ -142,7 +151,7 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
           {/* Invoice Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Fatura Bilgileri</CardTitle>
+              <CardTitle>{t('form.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
@@ -150,9 +159,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                 name="invoiceNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Fatura No</FormLabel>
+                    <FormLabel>{t('form.invoiceNumber')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="FTR-2024-..." {...field} />
+                      <Input placeholder={t('form.invoiceNumberPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -165,7 +174,7 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                   name="invoiceDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Fatura Tarihi</FormLabel>
+                      <FormLabel>{t('form.date')}</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -177,9 +186,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                               )}
                             >
                               {field.value ? (
-                                format(field.value, "d MMMM yyyy", { locale: tr })
+                                format(field.value, "d MMMM yyyy", { locale: dateLocale })
                               ) : (
-                                <span>Tarih seçin</span>
+                                <span>{t('form.datePlaceholder')}</span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -207,7 +216,7 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                   name="dueDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Vade Tarihi</FormLabel>
+                      <FormLabel>{t('form.dueDate')}</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -219,9 +228,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                               )}
                             >
                               {field.value ? (
-                                format(field.value, "d MMMM yyyy", { locale: tr })
+                                format(field.value, "d MMMM yyyy", { locale: dateLocale })
                               ) : (
-                                <span>Tarih seçin</span>
+                                <span>{t('form.datePlaceholder')}</span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -249,11 +258,11 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                   name="currency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Para Birimi</FormLabel>
+                      <FormLabel>{t('form.currency')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Seçiniz" />
+                            <SelectValue placeholder={t('form.selectPlaceholder')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -273,15 +282,15 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                   name="categoryId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kategori</FormLabel>
+                      <FormLabel>{t('form.category')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Seçiniz" />
+                            <SelectValue placeholder={t('form.selectPlaceholder')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="none">Kategorisiz</SelectItem>
+                          <SelectItem value="none">{t('form.noCategory')}</SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category.id} value={category.id}>
                               {category.name}
@@ -300,7 +309,7 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
           {/* Supplier Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Tedarikçi Bilgileri</CardTitle>
+              <CardTitle>{t('form.supplier.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
@@ -308,9 +317,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                 name="supplierName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Firma Adı</FormLabel>
+                    <FormLabel>{t('form.supplier.name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Firma Adı" {...field} />
+                      <Input placeholder={t('form.supplier.namePlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -323,9 +332,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                   name="supplierTaxNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Vergi No / TCKN</FormLabel>
+                      <FormLabel>{t('form.supplier.taxId')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Vergi No" {...field} />
+                        <Input placeholder={t('form.supplier.taxIdPlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -336,9 +345,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                   name="supplierTaxOffice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Vergi Dairesi</FormLabel>
+                      <FormLabel>{t('form.supplier.taxOffice')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Vergi Dairesi" {...field} />
+                        <Input placeholder={t('form.supplier.taxOfficePlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -352,9 +361,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                   name="supplierPhone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Telefon</FormLabel>
+                      <FormLabel>{t('form.supplier.phone')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Telefon" {...field} />
+                        <Input placeholder={t('form.supplier.phonePlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -365,9 +374,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                   name="supplierEmail"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>E-posta</FormLabel>
+                      <FormLabel>{t('form.supplier.email')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="E-posta" type="email" {...field} />
+                        <Input placeholder={t('form.supplier.emailPlaceholder')} type="email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -380,9 +389,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                 name="supplierAddress"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Adres</FormLabel>
+                    <FormLabel>{t('form.supplier.address')}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Adres" className="min-h-[60px]" {...field} />
+                      <Textarea placeholder={t('form.supplier.addressPlaceholder')} className="min-h-[60px]" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -395,11 +404,11 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
         {/* Invoice Items */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Fatura Kalemleri</CardTitle>
+            <CardTitle>{t('form.items.title')}</CardTitle>
             <Button type="button" variant="secondary" size="sm" onClick={() => append({
               description: '', quantity: 1, unit: 'ADET', unitPrice: 0, taxRate: 20
             })}>
-              <Plus className="h-4 w-4 mr-2" /> Kalem Ekle
+              <Plus className="h-4 w-4 mr-2" /> {t('form.items.add')}
             </Button>
           </CardHeader>
           <CardContent>
@@ -412,9 +421,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                       name={`items.${index}.description`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className={cn(index !== 0 && "sr-only")}>Açıklama</FormLabel>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>{t('form.items.description')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Ürün/Hizmet" {...field} />
+                            <Input placeholder={t('form.items.descriptionPlaceholder')} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -428,7 +437,7 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                       name={`items.${index}.quantity`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className={cn(index !== 0 && "sr-only")}>Miktar</FormLabel>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>{t('form.items.quantity')}</FormLabel>
                           <FormControl>
                             <Input type="number" min="0" step="any" {...field} />
                           </FormControl>
@@ -444,16 +453,16 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                       name={`items.${index}.unit`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className={cn(index !== 0 && "sr-only")}>Birim</FormLabel>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>{t('form.items.unit')}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Birim" />
+                                <SelectValue placeholder={t('form.items.unitPlaceholder')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
                               {['ADET', 'KG', 'LT', 'M', 'M2', 'M3', 'PAKET', 'KUTU', 'SAAT', 'GUN'].map(u => (
-                                <SelectItem key={u} value={u}>{u}</SelectItem>
+                                <SelectItem key={u} value={u}>{t(`units.${u}`)}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -469,7 +478,7 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                       name={`items.${index}.unitPrice`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className={cn(index !== 0 && "sr-only")}>Birim Fiyat</FormLabel>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>{t('form.items.unitPrice')}</FormLabel>
                           <FormControl>
                             <Input type="number" min="0" step="any" {...field} />
                           </FormControl>
@@ -485,7 +494,7 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                       name={`items.${index}.taxRate`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className={cn(index !== 0 && "sr-only")}>KDV %</FormLabel>
+                          <FormLabel className={cn(index !== 0 && "sr-only")}>{t('form.items.taxRate')}</FormLabel>
                           <FormControl>
                             <Input type="number" min="0" max="100" step="1" {...field} />
                           </FormControl>
@@ -515,16 +524,16 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
 
             <div className="flex flex-col gap-2 items-end text-sm">
               <div className="flex justify-between w-[250px]">
-                <span className="text-muted-foreground">Ara Toplam:</span>
+                <span className="text-muted-foreground">{t('form.items.subtotal')}:</span>
                 <span className="font-medium">{formatCurrency(totals.subtotal, watchedCurrency)}</span>
               </div>
               <div className="flex justify-between w-[250px]">
-                <span className="text-muted-foreground">Toplam KDV:</span>
+                <span className="text-muted-foreground">{t('form.items.totalTax')}:</span>
                 <span className="font-medium">{formatCurrency(totals.taxAmount, watchedCurrency)}</span>
               </div>
               <Separator className="w-[250px]" />
               <div className="flex justify-between w-[250px] text-lg font-bold">
-                <span>Genel Toplam:</span>
+                <span>{t('form.items.grandTotal')}:</span>
                 <span className="text-primary">{formatCurrency(totals.totalAmount, watchedCurrency)}</span>
               </div>
             </div>
@@ -538,9 +547,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notlar</FormLabel>
+                  <FormLabel>{t('form.notes.label')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Fatura ile ilgili notlar..." className="min-h-[80px]" {...field} />
+                    <Textarea placeholder={t('form.notes.placeholder')} className="min-h-[80px]" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -550,9 +559,9 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
         </Card>
 
         <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={() => window.history.back()}>İptal</Button>
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>{t('form.buttons.cancel')}</Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Kaydediliyor...' : 'Kaydet'}
+            {isLoading ? t('form.buttons.saving') : t('form.buttons.save')}
           </Button>
         </div>
       </form>

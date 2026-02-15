@@ -1,9 +1,7 @@
-"use client"
-
 import { useEffect, useState } from "react"
 
 import { usePathname } from "next/navigation"
-import { 
+import {
   Briefcase,
   ChevronLeft
 } from "lucide-react"
@@ -16,15 +14,17 @@ import { SidebarNavItem } from "@/components/layout/sidebar-nav-item"
 import { useSidebarStore } from "@/stores/sidebar-store"
 
 import { navItems } from "@/components/layout/nav-config"
+import { useTranslations } from "next-intl"
 
 // Mock role for now - Phase 11 will implement auth
-const USER_ROLE = "ADMIN" 
+const USER_ROLE = "ADMIN"
 
 export function Sidebar() {
   const pathname = usePathname()
   const { isCollapsed, toggle } = useSidebarStore()
   // Hydration check for persist middleware
   const [isMounted, setIsMounted] = useState(false)
+  const t = useTranslations('navigation.sidebar')
 
   useEffect(() => {
     setIsMounted(true)
@@ -48,11 +48,11 @@ export function Sidebar() {
     >
       <div className="flex h-16 items-center px-4 py-4">
         <div className={cn("flex items-center gap-2 font-bold text-xl", isCollapsed && "justify-center w-full")}>
-           <Briefcase className="h-6 w-6 text-primary" />
-           {!isCollapsed && <span className="truncate">Fatura OCR</span>}
+          <Briefcase className="h-6 w-6 text-primary" />
+          {!isCollapsed && <span className="truncate">Fatura OCR</span>}
         </div>
       </div>
-      
+
       <Separator />
 
       <ScrollArea className="flex-1 py-4">
@@ -65,16 +65,16 @@ export function Sidebar() {
               <div key={section} className="flex flex-col gap-1">
                 {!isCollapsed && index > 0 && <Separator className="my-2" />}
                 {!isCollapsed && index > 0 && (
-                   <span className="px-2 text-xs font-semibold text-muted-foreground uppercase mb-1">
-                     {section === "management" ? "Yönetim" : "Diğer"}
-                   </span>
+                  <span className="px-2 text-xs font-semibold text-muted-foreground uppercase mb-1">
+                    {section === "management" ? t('management') : (section === "other" ? t('other') : "")}
+                  </span>
                 )}
-                
+
                 {items.map((item) => (
                   <SidebarNavItem
                     key={item.href}
                     icon={item.icon}
-                    label={item.title}
+                    label={t(item.title)}
                     href={item.href}
                     isActive={pathname === item.href}
                     isCollapsed={isCollapsed}
@@ -94,7 +94,7 @@ export function Sidebar() {
           className="w-full h-9"
           onClick={toggle}
         >
-           <ChevronLeft className={cn("h-4 w-4 transition-transform", isCollapsed && "rotate-180")} />
+          <ChevronLeft className={cn("h-4 w-4 transition-transform", isCollapsed && "rotate-180")} />
         </Button>
       </div>
     </div>

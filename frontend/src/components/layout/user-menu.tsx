@@ -1,8 +1,7 @@
-'use client';
-
 import { useRouter } from 'next/navigation';
 import { User, Settings, LogOut, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 
 import {
   DropdownMenu,
@@ -20,10 +19,13 @@ import { authService } from '@/services/auth-service';
 import { toast } from 'sonner';
 
 export function UserMenu() {
+  const t = useTranslations('navigation.header.userMenu');
+  const tCommon = useTranslations('common');
+  const tTheme = useTranslations('navigation.header.theme');
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { user, refreshToken, logout } = useAuthStore();
-  
+
   const handleLogout = async () => {
     try {
       if (refreshToken) {
@@ -34,12 +36,12 @@ export function UserMenu() {
       console.error('Logout API error:', error);
     } finally {
       logout();
-      toast.success('Başarıyla çıkış yapıldı');
+      toast.success(tCommon('logoutSuccess'));
       router.push('/login');
       router.refresh();
     }
   };
-  
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -48,19 +50,19 @@ export function UserMenu() {
       .toUpperCase()
       .slice(0, 2);
   };
-  
+
   const getRoleBadge = (role: string) => {
     const roleLabels: Record<string, string> = {
-      ADMIN: 'Yönetici',
-      MANAGER: 'Müdür',
-      ACCOUNTANT: 'Muhasebeci',
-      INTERN: 'Stajyer',
+      ADMIN: tCommon('roles.admin'),
+      MANAGER: tCommon('roles.manager'),
+      ACCOUNTANT: tCommon('roles.accountant'),
+      INTERN: tCommon('roles.intern'),
     };
     return roleLabels[role] || role;
   };
-  
+
   if (!user) return null;
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -72,7 +74,7 @@ export function UserMenu() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      
+
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
@@ -83,36 +85,36 @@ export function UserMenu() {
             </p>
           </div>
         </DropdownMenuLabel>
-        
+
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuItem onClick={() => router.push('/profile')}>
           <User className="mr-2 h-4 w-4" />
-          Profilim
+          {t('profile')}
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={() => router.push('/settings')}>
           <Settings className="mr-2 h-4 w-4" />
-          Ayarlar
+          {t('settings')}
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
           {theme === 'dark' ? (
             <Sun className="mr-2 h-4 w-4" />
           ) : (
             <Moon className="mr-2 h-4 w-4" />
           )}
-          {theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
+          {theme === 'dark' ? tTheme('light') : tTheme('dark')}
         </DropdownMenuItem>
-        
+
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuItem
           onClick={handleLogout}
           className="text-destructive focus:text-destructive"
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Çıkış Yap
+          {t('logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

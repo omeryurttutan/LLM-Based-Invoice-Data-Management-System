@@ -1,0 +1,86 @@
+{
+    "buttons": {
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "delete": "Sil",
+        "edit": "Düzenle",
+        "create": "Oluştur",
+        "close": "Kapat",
+        "confirm": "Onayla",
+        "retry": "Tekrar Dene",
+        "back": "Geri",
+        "next": "İleri",
+        "export": "Dışa Aktar",
+        "import": "İçe Aktar",
+        "upload": "Yükle",
+        "download": "İndir",
+        "search": "Ara",
+        "filter": "Filtrele",
+        "clearFilters": "Filtreleri Temizle",
+        "selectAll": "Tümünü Seç",
+        "verify": "Doğrula",
+        "reject": "Reddet",
+        "reopen": "Yeniden Aç",
+        "apply": "Uygula",
+        "login": "Giriş Yap",
+        "register": "Kayıt Ol",
+        "logout": "Çıkış Yap",
+        "profile": "Profil"
+    },
+    "status": {
+        "pending": "Beklemede",
+        "verified": "Doğrulandı",
+        "rejected": "Reddedildi",
+        "processing": "İşleniyor",
+        "active": "Aktif",
+        "inactive": "Pasif",
+        "locked": "Kilitli"
+    },
+    "messages": {
+        "success": {
+            "created": "{entity} başarıyla oluşturuldu",
+            "updated": "{entity} başarıyla güncellendi",
+            "deleted": "{entity} başarıyla silindi",
+            "generic": "İşlem başarıyla tamamlandı",
+            "logoutSuccess": "Başarıyla çıkış yapıldı"
+        },
+        "error": {
+            "generic": "Bir hata oluştu. Lütfen tekrar deneyin.",
+            "notFound": "{entity} bulunamadı",
+            "unauthorized": "Bu işlem için yetkiniz bulunmuyor",
+            "networkError": "Bağlantı hatası. İnternet bağlantınızı kontrol edin.",
+            "rateLimited": "Çok fazla istek gönderildi. Lütfen biraz bekleyin.",
+            "serverError": "Sunucu hatası. Lütfen daha sonra tekrar deneyin.",
+            "validation": "Lütfen formu kontrol edin."
+        },
+        "confirm": {
+            "delete": "{entity} silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+            "discard": "Kaydedilmemiş değişiklikler var. Çıkmak istediğinize emin misiniz?"
+        }
+    },
+    "roles": {
+        "admin": "Yönetici",
+        "manager": "Müdür",
+        "accountant": "Muhasebeci",
+        "intern": "Stajyer"
+    },
+    "labels": {
+        "createdAt": "Oluşturulma Tarihi",
+        "updatedAt": "Güncellenme Tarihi",
+        "actions": "İşlemler",
+        "details": "Detaylar",
+        "total": "Toplam",
+        "noData": "Veri bulunamadı",
+        "loading": "Yükleniyor...",
+        "showing": "{from}-{to} arası gösteriliyor, toplam {total}",
+        "rowsPerPage": "Sayfa başına satır"
+    },
+    "time": {
+        "justNow": "Az önce",
+        "minutesAgo": "{count} dakika önce",
+        "hoursAgo": "{count} saat önce",
+        "daysAgo": "{count} gün önce",
+        "yesterday": "Dün",
+        "today": "Bugün"
+    }
+}

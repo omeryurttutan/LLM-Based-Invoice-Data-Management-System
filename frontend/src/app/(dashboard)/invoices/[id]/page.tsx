@@ -15,17 +15,17 @@ import {
   Trash2,
   Pencil,
   Loader2,
-  GitCompare // Added this
+  GitCompare
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
-import { useQuery } from '@tanstack/react-query'; // Added this
+import { tr, enUS } from 'date-fns/locale';
+import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Added this
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -63,13 +63,7 @@ import { InvoiceVersionSummary, VersionDiff } from '@/types/version-history';
 import { VersionTimeline } from '@/components/invoice/VersionTimeline';
 import { VersionDiffViewer } from '@/components/invoice/VersionDiffViewer';
 import { RevertDialog } from '@/components/invoice/RevertDialog';
-
-const statusConfig: Record<InvoiceStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  PENDING: { label: 'Beklemede', variant: 'secondary' },
-  PROCESSING: { label: 'İşleniyor', variant: 'outline' },
-  VERIFIED: { label: 'Onaylı', variant: 'default' },
-  REJECTED: { label: 'Reddedildi', variant: 'destructive' },
-};
+import { useLocale, useTranslations } from 'next-intl';
 
 interface InvoiceDetailPageProps {
   params: {
@@ -78,6 +72,18 @@ interface InvoiceDetailPageProps {
 }
 
 export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
+  const t = useTranslations('invoices');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const dateLocale = locale === 'tr' ? tr : enUS;
+
+  const statusConfig: Record<InvoiceStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+    PENDING: { label: t('status.pending'), variant: 'secondary' },
+    PROCESSING: { label: t('status.processing'), variant: 'outline' },
+    VERIFIED: { label: t('status.verified'), variant: 'default' },
+    REJECTED: { label: t('status.rejected'), variant: 'destructive' },
+  };
+
   const router = useRouter();
   const { id } = params;
   const { user } = useAuthStore();
@@ -167,8 +173,8 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   if (error || !invoice) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-4">
-        <p className="text-xl text-muted-foreground">Fatura bulunamadı veya bir hata oluştu.</p>
-        <Button variant="outline" onClick={() => router.push('/invoices')}>Listeye Dön</Button>
+        <p className="text-xl text-muted-foreground">{t('notFound')}</p>
+        <Button variant="outline" onClick={() => router.push('/invoices')}>{t('backToList')}</Button>
       </div>
     );
   }
@@ -196,23 +202,23 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           {invoice.status === 'PENDING' && canVerify && (
             <>
               <Button variant="default" className="bg-green-600 hover:bg-green-700" onClick={handleVerify}>
-                <CheckCircle className="mr-2 h-4 w-4" /> Onayla
+                <CheckCircle className="mr-2 h-4 w-4" /> {t('actions.verify')}
               </Button>
               <Button variant="destructive" onClick={() => setIsRejectOpen(true)}>
-                <XCircle className="mr-2 h-4 w-4" /> Reddet
+                <XCircle className="mr-2 h-4 w-4" /> {t('actions.reject')}
               </Button>
             </>
           )}
 
           {invoice.status === 'REJECTED' && isAdminOrManager && (
             <Button variant="outline" onClick={handleReopen}>
-              <RotateCcw className="mr-2 h-4 w-4" /> Yeniden Aç
+              <RotateCcw className="mr-2 h-4 w-4" /> {t('actions.reopen')}
             </Button>
           )}
 
           {invoice.status === 'PENDING' && canEdit && (
             <Button variant="outline" onClick={() => router.push(`/invoices/${id}/edit`)}>
-              <Pencil className="mr-2 h-4 w-4" /> Düzenle
+              <Pencil className="mr-2 h-4 w-4" /> {t('actions.edit')}
             </Button>
           )}
 
@@ -226,14 +232,14 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
 
       {invoice.status === 'REJECTED' && invoice.rejectionReason && (
         <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4 text-sm text-destructive">
-          <strong>Red Nedeni:</strong> {invoice.rejectionReason}
+          <strong>{t('reject.reasonLabel')}:</strong> {invoice.rejectionReason}
         </div>
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-          <TabsTrigger value="details">Fatura Detayı</TabsTrigger>
-          <TabsTrigger value="history">Geçmiş & Versiyonlar</TabsTrigger>
+          <TabsTrigger value="details">{t('detail.tabs.details')}</TabsTrigger>
+          <TabsTrigger value="history">{t('detail.tabs.history')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="mt-6">
@@ -243,32 +249,32 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
               {/* Invoice Info */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Fatura Özeti</CardTitle>
+                  <CardTitle className="text-lg">{t('detail.invoiceInfo')}</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 gap-y-4 text-sm">
                   <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1"><CalendarIcon className="h-3 w-3" /> Fatura Tarihi</span>
-                    <span className="font-medium block">{format(new Date(invoice.invoiceDate), 'd MMMM yyyy', { locale: tr })}</span>
+                    <span className="text-muted-foreground flex items-center gap-1"><CalendarIcon className="h-3 w-3" /> {t('table.date')}</span>
+                    <span className="font-medium block">{format(new Date(invoice.invoiceDate), 'd MMMM yyyy', { locale: dateLocale })}</span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1"><CalendarIcon className="h-3 w-3" /> Vade Tarihi</span>
+                    <span className="text-muted-foreground flex items-center gap-1"><CalendarIcon className="h-3 w-3" /> {t('table.dueDate')}</span>
                     <span className="font-medium block">
-                      {invoice.dueDate ? format(new Date(invoice.dueDate), 'd MMMM yyyy', { locale: tr }) : '-'}
+                      {invoice.dueDate ? format(new Date(invoice.dueDate), 'd MMMM yyyy', { locale: dateLocale }) : '-'}
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1"><CreditCard className="h-3 w-3" /> Para Birimi</span>
+                    <span className="text-muted-foreground flex items-center gap-1"><CreditCard className="h-3 w-3" /> {t('table.currency')}</span>
                     <span className="font-medium block">{invoice.currency}
-                      {invoice.exchangeRate && invoice.exchangeRate !== 1 ? ` (Kur: ${invoice.exchangeRate})` : ''}
+                      {invoice.exchangeRate && invoice.exchangeRate !== 1 ? ` (${t('detail.exchangeRate')}: ${invoice.exchangeRate})` : ''}
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1"><FileText className="h-3 w-3" /> Kategori</span>
+                    <span className="text-muted-foreground flex items-center gap-1"><FileText className="h-3 w-3" /> {t('table.category')}</span>
                     <span className="font-medium block">{invoice.categoryName || '-'}</span>
                   </div>
                   {invoice.sourceType === 'LLM' && (
                     <div className="space-y-1">
-                      <span className="text-muted-foreground">Kaynak / Güven Skoru</span>
+                      <span className="text-muted-foreground">{t('table.source')} / {t('table.confidence')}</span>
                       <span className="font-medium block">{invoice.llmProvider} / %{Math.round((invoice.confidenceScore || 0) * 100)}</span>
                     </div>
                   )}
@@ -278,18 +284,18 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
               {/* Items Table */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Fatura Kalemleri</CardTitle>
+                  <CardTitle className="text-lg">{t('detail.items')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-[40px]">#</TableHead>
-                        <TableHead>Açıklama</TableHead>
-                        <TableHead className="text-right">Miktar</TableHead>
-                        <TableHead className="text-right">Birim Fiyat</TableHead>
-                        <TableHead className="text-right">KDV</TableHead>
-                        <TableHead className="text-right">Toplam</TableHead>
+                        <TableHead>{t('detail.itemsTable.description')}</TableHead>
+                        <TableHead className="text-right">{t('detail.itemsTable.quantity')}</TableHead>
+                        <TableHead className="text-right">{t('detail.itemsTable.unitPrice')}</TableHead>
+                        <TableHead className="text-right">{t('detail.itemsTable.tax')}</TableHead>
+                        <TableHead className="text-right">{t('detail.itemsTable.total')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -298,7 +304,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                           <TableCell>{index + 1}</TableCell>
                           <TableCell className="font-medium">
                             {item.description}
-                            {item.productCode && <div className="text-xs text-muted-foreground">Kod: {item.productCode}</div>}
+                            {item.productCode && <div className="text-xs text-muted-foreground">{t('detail.itemsTable.code')}: {item.productCode}</div>}
                           </TableCell>
                           <TableCell className="text-right">{item.quantity} {item.unit}</TableCell>
                           <TableCell className="text-right">{formatCurrency(item.unitPrice, invoice.currency)}</TableCell>
@@ -313,15 +319,15 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
 
                   <div className="flex flex-col items-end gap-2 text-sm">
                     <div className="flex justify-between w-[200px]">
-                      <span className="text-muted-foreground">Ara Toplam:</span>
+                      <span className="text-muted-foreground">{t('detail.subtotal')}:</span>
                       <span>{formatCurrency(invoice.subtotal, invoice.currency)}</span>
                     </div>
                     <div className="flex justify-between w-[200px]">
-                      <span className="text-muted-foreground">Toplam KDV:</span>
+                      <span className="text-muted-foreground">{t('detail.taxAmount')}:</span>
                       <span>{formatCurrency(invoice.taxAmount, invoice.currency)}</span>
                     </div>
                     <div className="flex justify-between w-[200px] font-bold text-lg mt-2">
-                      <span>Genel Toplam:</span>
+                      <span>{t('detail.totalAmount')}:</span>
                       <span className="text-primary">{formatCurrency(invoice.totalAmount, invoice.currency)}</span>
                     </div>
                   </div>
@@ -331,7 +337,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
               {invoice.notes && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Notlar</CardTitle>
+                    <CardTitle className="text-lg">{t('detail.notes')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">{invoice.notes}</p>
@@ -344,7 +350,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Tedarikçi Bilgileri</CardTitle>
+                  <CardTitle className="text-lg">{t('detail.supplier.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">
                   <div className="flex items-start gap-2">
@@ -356,25 +362,25 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                   </div>
                   {invoice.supplierTaxNumber && (
                     <div className="grid grid-cols-2 gap-1 pt-2 border-t">
-                      <span className="text-muted-foreground">Vergi No:</span>
+                      <span className="text-muted-foreground">{t('detail.supplier.taxNo')}:</span>
                       <span>{invoice.supplierTaxNumber}</span>
                     </div>
                   )}
                   {invoice.supplierTaxOffice && (
                     <div className="grid grid-cols-2 gap-1">
-                      <span className="text-muted-foreground">Vergi Dairesi:</span>
+                      <span className="text-muted-foreground">{t('detail.supplier.taxOffice')}:</span>
                       <span>{invoice.supplierTaxOffice}</span>
                     </div>
                   )}
                   {invoice.supplierPhone && (
                     <div className="grid grid-cols-2 gap-1">
-                      <span className="text-muted-foreground">Telefon:</span>
+                      <span className="text-muted-foreground">{t('detail.supplier.phone')}:</span>
                       <span>{invoice.supplierPhone}</span>
                     </div>
                   )}
                   {invoice.supplierEmail && (
                     <div className="grid grid-cols-2 gap-1">
-                      <span className="text-muted-foreground">E-posta:</span>
+                      <span className="text-muted-foreground">{t('detail.supplier.email')}:</span>
                       <span className="truncate" title={invoice.supplierEmail}>{invoice.supplierEmail}</span>
                     </div>
                   )}
@@ -383,15 +389,15 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Kayıt Bilgileri</CardTitle>
+                  <CardTitle className="text-lg">{t('detail.record.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Oluşturan</p>
+                      <p className="text-xs text-muted-foreground">{t('detail.record.created')}</p>
                       <p className="font-medium">{invoice.createdByUserName}</p>
-                      <p className="text-xs text-muted-foreground">{format(new Date(invoice.createdAt), 'd MMM yyyy HH:mm', { locale: tr })}</p>
+                      <p className="text-xs text-muted-foreground">{format(new Date(invoice.createdAt), 'd MMM yyyy HH:mm', { locale: dateLocale })}</p>
                     </div>
                   </div>
 
@@ -399,10 +405,10 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                     <div className="flex items-center gap-2 pt-3 border-t">
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <div>
-                        <p className="text-xs text-muted-foreground">Onaylayan</p>
+                        <p className="text-xs text-muted-foreground">{t('detail.record.verified')}</p>
                         <p className="font-medium">{invoice.verifiedByUserName}</p>
                         <p className="text-xs text-muted-foreground">
-                          {invoice.verifiedAt ? format(new Date(invoice.verifiedAt), 'd MMM yyyy HH:mm', { locale: tr }) : '-'}
+                          {invoice.verifiedAt ? format(new Date(invoice.verifiedAt), 'd MMM yyyy HH:mm', { locale: dateLocale }) : '-'}
                         </p>
                       </div>
                     </div>
@@ -428,9 +434,9 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
               {compareMode && compareVersion && selectedVersion ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium">Karşılaştırma</h3>
+                    <h3 className="text-lg font-medium">{t('detail.history.compareTitle')}</h3>
                     <Button variant="ghost" size="sm" onClick={() => setCompareMode(false)}>
-                      Kapat
+                      {t('actions.close')}
                     </Button>
                   </div>
                   {isDiffLoading ? (
@@ -442,15 +448,15 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
                       currentVersionNum={selectedVersion.versionNumber}
                     />
                   ) : (
-                    <p>Fark verisi yüklenemedi.</p>
+                    <p>{t('detail.history.diffError')}</p>
                   )}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[400px] border border-dashed rounded-lg bg-muted/20 p-8 text-center text-muted-foreground">
                   <GitCompare className="h-12 w-12 mb-4 opacity-20" />
-                  <h3 className="text-lg font-medium mb-2">Versiyon Karşılaştırma</h3>
+                  <h3 className="text-lg font-medium mb-2">{t('detail.history.emptyTitle')}</h3>
                   <p className="max-w-[300px]">
-                    Soldaki listeden bir versiyon seçerek "Karşılaştır" butonuna tıklayın ve değişiklikleri inceleyin.
+                    {t('detail.history.emptyDescription')}
                   </p>
                 </div>
               )}
@@ -463,21 +469,21 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
       <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Faturayı Reddet</DialogTitle>
+            <DialogTitle>{t('reject.title')}</DialogTitle>
             <DialogDescription>
-              Faturayı reddetmek üzeresiniz. Lütfen bir neden belirtin.
+              {t('reject.description')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Textarea
-              placeholder="Red nedeni..."
+              placeholder={t('reject.reasonPlaceholder')}
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRejectOpen(false)}>İptal</Button>
-            <Button variant="destructive" onClick={handleReject} disabled={!rejectionReason}>Reddet</Button>
+            <Button variant="outline" onClick={() => setIsRejectOpen(false)}>{tCommon('cancel')}</Button>
+            <Button variant="destructive" onClick={handleReject} disabled={!rejectionReason}>{t('actions.reject')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -486,15 +492,15 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+            <AlertDialogTitle>{tCommon('areYouSure')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu faturayı silmek üzeresiniz. Bu işlem geri alınamaz.
+              {t('delete.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-              Sil
+              {tCommon('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

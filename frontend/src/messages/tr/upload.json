@@ -1,0 +1,24 @@
+{
+    "title": "Fatura Yükle",
+    "dropzone": {
+        "title": "Dosyaları buraya sürükleyin",
+        "description": "veya dosya seçmek için tıklayın",
+        "hint": "PDF, JPG, PNG (Maks. 10MB)"
+    },
+    "batch": {
+        "title": "Toplu Yükleme",
+        "status": "Durum: {processed} / {total} işlendi",
+        "complete": "Tüm dosyalar işlendi"
+    },
+    "processing": {
+        "uploading": "Yükleniyor...",
+        "analyzing": "Analiz ediliyor...",
+        "extracting": "Veri çıkarılıyor...",
+        "saving": "Kaydediliyor..."
+    },
+    "errors": {
+        "fileTooLarge": "Dosya boyutu çok büyük",
+        "invalidType": "Geçersiz dosya formatı",
+        "uploadFailed": "Yükleme başarısız oldu"
+    }
+}

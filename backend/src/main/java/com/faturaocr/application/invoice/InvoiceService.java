@@ -33,6 +33,7 @@ import com.faturaocr.domain.template.service.SupplierTemplateService;
 import com.faturaocr.domain.rule.service.RuleEngine;
 import com.faturaocr.domain.rule.valueobject.TriggerPoint;
 import com.faturaocr.infrastructure.audit.AuditRequestContext;
+import com.faturaocr.infrastructure.common.util.SanitizationUtils;
 import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaEntity;
 import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaRepository;
 import com.faturaocr.infrastructure.persistence.invoice.InvoiceSpecification;
@@ -107,15 +108,15 @@ public class InvoiceService {
         invoice.setInvoiceNumber(command.getInvoiceNumber());
         invoice.setInvoiceDate(command.getInvoiceDate());
         invoice.setDueDate(command.getDueDate());
-        invoice.setSupplierName(command.getSupplierName());
+        invoice.setSupplierName(SanitizationUtils.sanitizeHtml(command.getSupplierName()));
         invoice.setSupplierTaxNumber(command.getSupplierTaxNumber());
         invoice.setSupplierTaxOffice(command.getSupplierTaxOffice());
-        invoice.setSupplierAddress(command.getSupplierAddress());
+        invoice.setSupplierAddress(SanitizationUtils.sanitizeHtml(command.getSupplierAddress()));
         invoice.setSupplierPhone(command.getSupplierPhone());
         invoice.setSupplierEmail(command.getSupplierEmail());
         invoice.setCurrency(Currency.valueOf(command.getCurrency()));
         invoice.setExchangeRate(command.getExchangeRate() != null ? command.getExchangeRate() : BigDecimal.ONE);
-        invoice.setNotes(command.getNotes());
+        invoice.setNotes(SanitizationUtils.sanitizeHtml(command.getNotes()));
         invoice.setSourceType(SourceType.MANUAL);
         invoice.setStatus(InvoiceStatus.PENDING);
 
@@ -128,7 +129,7 @@ public class InvoiceService {
         for (CreateInvoiceCommand.CreateInvoiceItemCommand itemCmd : command.getItems()) {
             InvoiceItem item = new InvoiceItem();
             item.setLineNumber(lineNumber++);
-            item.setDescription(itemCmd.getDescription());
+            item.setDescription(SanitizationUtils.sanitizeHtml(itemCmd.getDescription()));
             item.setQuantity(itemCmd.getQuantity());
             item.setUnit(itemCmd.getUnit());
             item.setUnitPrice(itemCmd.getUnitPrice());
@@ -280,15 +281,15 @@ public class InvoiceService {
         invoice.setInvoiceNumber(command.getInvoiceNumber());
         invoice.setInvoiceDate(command.getInvoiceDate());
         invoice.setDueDate(command.getDueDate());
-        invoice.setSupplierName(command.getSupplierName());
+        invoice.setSupplierName(SanitizationUtils.sanitizeHtml(command.getSupplierName()));
         invoice.setSupplierTaxNumber(command.getSupplierTaxNumber());
         invoice.setSupplierTaxOffice(command.getSupplierTaxOffice());
-        invoice.setSupplierAddress(command.getSupplierAddress());
+        invoice.setSupplierAddress(SanitizationUtils.sanitizeHtml(command.getSupplierAddress()));
         invoice.setSupplierPhone(command.getSupplierPhone());
         invoice.setSupplierEmail(command.getSupplierEmail());
         invoice.setCurrency(Currency.valueOf(command.getCurrency()));
         invoice.setExchangeRate(command.getExchangeRate());
-        invoice.setNotes(command.getNotes());
+        invoice.setNotes(SanitizationUtils.sanitizeHtml(command.getNotes()));
 
         // Update extraction corrections if provided
         if (command.getExtractionCorrections() != null) {
@@ -605,7 +606,7 @@ public class InvoiceService {
         for (InvoiceItem existingItem : invoice.getItems()) {
             UpdateInvoiceCommand.UpdateInvoiceItemCommand cmd = commandMap.get(existingItem.getId());
             if (cmd != null) {
-                existingItem.setDescription(cmd.getDescription());
+                existingItem.setDescription(SanitizationUtils.sanitizeHtml(cmd.getDescription()));
                 existingItem.setQuantity(cmd.getQuantity());
                 existingItem.setUnit(cmd.getUnit());
                 existingItem.setUnitPrice(cmd.getUnitPrice());
@@ -625,7 +626,7 @@ public class InvoiceService {
             if (cmd.getId() == null) {
                 InvoiceItem newItem = new InvoiceItem();
                 newItem.setLineNumber(nextLineNumber++);
-                newItem.setDescription(cmd.getDescription());
+                newItem.setDescription(SanitizationUtils.sanitizeHtml(cmd.getDescription()));
                 newItem.setQuantity(cmd.getQuantity());
                 newItem.setUnit(cmd.getUnit());
                 newItem.setUnitPrice(cmd.getUnitPrice());

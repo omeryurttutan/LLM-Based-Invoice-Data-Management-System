@@ -25,10 +25,22 @@ public class AuditLogRepositoryAdapter implements AuditLogRepository {
 
     private final AuditLogJpaRepository auditLogJpaRepository;
     private final AuditLogMapper auditLogMapper;
+    private final DataMaskingService dataMaskingService;
 
     @Override
     public AuditLog save(AuditLog auditLog) {
+        // Mask sensitive data in old and new values
+        String maskedOldValue = dataMaskingService.mask(auditLog.getEntityType(), auditLog.getOldValue());
+        String maskedNewValue = dataMaskingService.mask(auditLog.getEntityType(), auditLog.getNewValue());
+
+        // Rebuild or update the log with masked values (AuditLog is immutable, so maybe
+        // modify entity after mapping?)
+        // Or better, modify the mapped JPA entity set methods.
+
         AuditLogJpaEntity entity = auditLogMapper.toJpaEntity(auditLog);
+        entity.setOldValue(maskedOldValue);
+        entity.setNewValue(maskedNewValue);
+
         AuditLogJpaEntity savedEntity = auditLogJpaRepository.save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Failed to save audit log: saved entity is null");

@@ -1,0 +1,17 @@
+{
+    "title": "Otomasyon Kuralları",
+    "create": "Yeni Kural",
+    "condition": "Koşul",
+    "action": "Eylem",
+    "isActive": "Aktif",
+    "conditions": {
+        "supplierEquals": "Tedarikçi Eşittir",
+        "amountGreaterThan": "Tutar Büyüktür",
+        "descriptionContains": "Açıklama İçerir"
+    },
+    "actions": {
+        "setCategory": "Kategori Ata",
+        "markVerified": "Otomatik Doğrula",
+        "flagReview": "İncelemeye İşaretle"
+    }
+}

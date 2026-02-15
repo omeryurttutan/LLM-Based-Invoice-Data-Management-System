@@ -5,6 +5,12 @@ import { ThemeProvider } from '@/components/providers/theme-provider'
 import QueryProvider from '@/components/providers/query-provider'
 import { ToastProvider } from '@/components/providers/toast-provider'
 import { AuthProvider } from '@/components/providers/auth-provider'
+import { InstallPrompt } from '@/components/pwa/install-prompt'
+import { UpdatePrompt } from '@/components/pwa/update-prompt'
+import { OfflineStatus } from '@/components/pwa/offline-status'
+
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,27 +19,44 @@ export const metadata: Metadata = {
     description: 'Invoice OCR and Data Management System',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    const locale = await getLocale();
+    const messages = await getMessages();
+
     return (
-        <html lang="tr" suppressHydrationWarning>
+        <html lang={locale} suppressHydrationWarning>
+            <head>
+                <link rel="manifest" href="/manifest.json" />
+                <meta name="theme-color" content="#1e40af" />
+                <meta name="apple-mobile-web-app-capable" content="yes" />
+                <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+                <meta name="apple-mobile-web-app-title" content="FaturaOCR" />
+                <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+            </head>
             <body className={inter.className}>
-                <QueryProvider>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                    >
-                        <AuthProvider>
-                            {children}
-                        </AuthProvider>
-                        <ToastProvider />
-                    </ThemeProvider>
-                </QueryProvider>
+                <NextIntlClientProvider messages={messages}>
+                    <QueryProvider>
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="system"
+                            enableSystem
+                            disableTransitionOnChange
+                        >
+                            <AuthProvider>
+                                {children}
+                                <OfflineStatus />
+                                <UpdatePrompt />
+                                <InstallPrompt />
+                            </AuthProvider>
+                            <ToastProvider />
+                        </ThemeProvider>
+                    </QueryProvider>
+                </NextIntlClientProvider>
             </body>
         </html>
     )

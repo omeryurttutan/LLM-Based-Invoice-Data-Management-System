@@ -14,7 +14,9 @@ import com.faturaocr.domain.user.port.UserRepository;
 import com.faturaocr.domain.user.valueobject.Email;
 import com.faturaocr.domain.user.valueobject.Role;
 import com.faturaocr.infrastructure.audit.AuditRequestContext;
+import com.faturaocr.infrastructure.common.util.SanitizationUtils;
 import com.faturaocr.infrastructure.security.JwtTokenProvider;
+import com.faturaocr.infrastructure.security.LoginAttemptService;
 import com.faturaocr.infrastructure.security.RefreshTokenService;
 
 import org.slf4j.Logger;
@@ -35,11 +37,12 @@ public class AuthenticationService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final AuditLogRepository auditLogRepository;
+    private final LoginAttemptService loginAttemptService;
 
-    @Value("${security.brute-force.max-attempts:5}")
+    @org.springframework.beans.factory.annotation.Value("${security.brute-force.max-attempts:5}")
     private int maxLoginAttempts;
 
-    @Value("${security.brute-force.lock-duration-minutes:30}")
+    @org.springframework.beans.factory.annotation.Value("${security.brute-force.lock-duration-minutes:30}")
     private int lockDurationMinutes;
 
     public AuthenticationService(
@@ -47,12 +50,14 @@ public class AuthenticationService {
             PasswordEncoder passwordEncoder,
             JwtTokenProvider jwtTokenProvider,
             RefreshTokenService refreshTokenService,
-            AuditLogRepository auditLogRepository) {
+            AuditLogRepository auditLogRepository,
+            LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenService = refreshTokenService;
         this.auditLogRepository = auditLogRepository;
+        this.loginAttemptService = loginAttemptService;
     }
 
     /**
@@ -69,11 +74,13 @@ public class AuthenticationService {
         }
 
         // Create user
+        String sanitizedFullName = SanitizationUtils.sanitizeHtml(command.fullName());
+
         User user = User.builder()
                 .companyId(command.companyId())
                 .email(email)
                 .passwordHash(passwordEncoder.encode(command.password()))
-                .fullName(command.fullName())
+                .fullName(sanitizedFullName)
                 .phone(command.phone())
                 .role(Role.ACCOUNTANT) // Default role for new registrations
                 .isActive(true)
@@ -92,15 +99,25 @@ public class AuthenticationService {
     public AuthResponse login(LoginCommand command) {
         LOGGER.info("Login attempt for email: {}", command.email());
 
+        // Check block status from Redis first
+        if (loginAttemptService.isBlocked(command.email())) {
+            long remaining = loginAttemptService.getRemainingBlockMinutes(command.email());
+            LOGGER.warn("Login failed: account is locked for email: {} (Redis)", command.email());
+            throw new DomainException("AUTH_ACCOUNT_LOCKED",
+                    "Hesabınız çok fazla başarısız giriş denemesi nedeniyle geçici olarak kilitlendi. " + remaining
+                            + " dakika sonra tekrar deneyin.");
+        }
+
         Email email = Email.of(command.email());
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     LOGGER.warn("Login failed: user not found for email: {}", command.email());
+                    loginAttemptService.loginFailed(command.email());
                     return new DomainException("AUTH_INVALID_CREDENTIALS", "Invalid email or password");
                 });
 
-        // Check if account is locked
+        // Check if account is locked (DB fallback)
         if (user.isLocked()) {
             LOGGER.warn("Login failed: account is locked for email: {}", command.email());
             throw new DomainException("AUTH_ACCOUNT_LOCKED",
@@ -115,11 +132,13 @@ public class AuthenticationService {
 
         // Verify password
         if (!passwordEncoder.matches(command.password(), user.getPasswordHash())) {
-            handleFailedLogin(user);
+            loginAttemptService.loginFailed(command.email());
+            handleFailedLogin(user); // Keep DB logic for persistent history/locking if needed
             throw new DomainException("AUTH_INVALID_CREDENTIALS", "Invalid email or password");
         }
 
         // Successful login
+        loginAttemptService.loginSucceeded(command.email());
         user.recordSuccessfulLogin();
         userRepository.save(user);
 

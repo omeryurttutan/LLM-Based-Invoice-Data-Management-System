@@ -2,6 +2,8 @@ package com.faturaocr.infrastructure.persistence.kvkk;
 
 import com.faturaocr.domain.kvkk.valueobject.ConsentType;
 import com.faturaocr.infrastructure.persistence.common.BaseJpaEntity;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import org.hibernate.annotations.Type;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +45,7 @@ public class UserConsentJpaEntity extends BaseJpaEntity {
     @Column(name = "revoked_at")
     private LocalDateTime revokedAt;
 
+    @Type(JsonType.class)
     @Column(name = "metadata", columnDefinition = "jsonb")
     private String metadata;
 }

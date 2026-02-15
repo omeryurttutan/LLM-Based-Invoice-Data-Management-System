@@ -1,0 +1,8 @@
+{
+    "required": "Bu alan zorunludur",
+    "email": "Geçerli bir e-posta giriniz",
+    "number": "Geçerli bir sayı giriniz",
+    "min": "En az {min} olmalı",
+    "max": "En çok {max} olmalı",
+    "date": "Geçerli bir tarih giriniz"
+}

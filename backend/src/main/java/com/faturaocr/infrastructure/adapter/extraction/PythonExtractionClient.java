@@ -14,11 +14,14 @@ import java.nio.file.Path;
 public class PythonExtractionClient {
 
     private final RestClient restClient;
+    private final String internalApiKey;
 
     public PythonExtractionClient(
             RestClient.Builder restClientBuilder,
             @Value("${upload.extraction-service-url:http://extraction-service:8000}") String extractionServiceUrl,
-            @Value("${upload.extraction-timeout-seconds:90}") long timeoutSeconds) {
+            @Value("${upload.extraction-timeout-seconds:90}") long timeoutSeconds,
+            @Value("${app.security.internal-api-key}") String internalApiKey) {
+        this.internalApiKey = internalApiKey;
         this.restClient = restClientBuilder
                 .baseUrl(extractionServiceUrl)
                 .build();
@@ -30,6 +33,7 @@ public class PythonExtractionClient {
 
         return restClient.post()
                 .uri("/extract")
+                .header("X-Internal-API-Key", internalApiKey)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(builder.build())
                 .retrieve()

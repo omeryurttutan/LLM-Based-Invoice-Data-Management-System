@@ -3,6 +3,7 @@
 
 import { usePathname } from "next/navigation"
 import { Slash } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 import {
   Breadcrumb,
@@ -14,44 +15,35 @@ import {
 } from "@/components/ui/breadcrumb"
 
 export function Breadcrumbs() {
+  const t = useTranslations('navigation.breadcrumbs')
   const pathname = usePathname()
   const segments = pathname.split("/").filter((segment) => segment !== "")
 
-  const segmentLabels: Record<string, string> = {
-    invoices: "Faturalar",
-    new: "Yeni",
-    upload: "Yükle",
-    categories: "Kategoriler",
-    users: "Kullanıcılar",
-    company: "Şirket",
-    "audit-logs": "Denetim Logu",
-    profile: "Profil",
-    settings: "Ayarlar",
-    edit: "Düzenle"
-  }
-
   if (segments.length === 0) {
-     return (
-        <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
-     )
+    return (
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbPage>{t('home')}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    )
   }
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+          <BreadcrumbLink href="/">{t('home')}</BreadcrumbLink>
         </BreadcrumbItem>
         {segments.map((segment, index) => {
           const href = `/${segments.slice(0, index + 1).join("/")}`
           const isLast = index === segments.length - 1
-          const label = segmentLabels[segment] || segment
+
+          // For dynamic IDs (like invoice UUIDs), we might want to just show the segment or a generic label
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment)
+          const label = isUuid ? t('detail') : (t.has(segment) ? t(segment) : segment)
 
           return (
             <div key={href} className="flex items-center">
@@ -60,9 +52,9 @@ export function Breadcrumbs() {
               </BreadcrumbSeparator>
               <BreadcrumbItem className="ml-2">
                 {isLast ? (
-                  <BreadcrumbPage className="capitalize">{label}</BreadcrumbPage>
+                  <BreadcrumbPage>{label}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={href} className="capitalize">{label}</BreadcrumbLink>
+                  <BreadcrumbLink href={href}>{label}</BreadcrumbLink>
                 )}
               </BreadcrumbItem>
             </div>

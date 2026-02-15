@@ -22,18 +22,18 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   // Main
-  { title: "Dashboard", href: "/", icon: LayoutDashboard, section: "main" },
-  { title: "Faturalar", href: "/invoices", icon: FileText, section: "main" },
-  { title: "Fatura Yükle", href: "/invoices/upload", icon: Upload, section: "main" },
-  { title: "Kategoriler", href: "/categories", icon: FolderOpen, section: "main" },
-  { title: "Bildirimler", href: "/notifications", icon: Bell, section: "main" },
+  { title: "dashboard", href: "/", icon: LayoutDashboard, section: "main" },
+  { title: "invoices", href: "/invoices", icon: FileText, section: "main" },
+  { title: "upload", href: "/invoices/upload", icon: Upload, section: "main" },
+  { title: "categories", href: "/categories", icon: FolderOpen, section: "main" },
+  { title: "notifications", href: "/notifications", icon: Bell, section: "main" },
 
   // Management
-  { title: "Kullanıcılar", href: "/users", icon: Users, section: "management", roles: ["ADMIN"] },
-  { title: "Şirket", href: "/company", icon: Building2, section: "management", roles: ["ADMIN", "MANAGER"] },
-  { title: "Denetim Logu", href: "/audit-logs", icon: ScrollText, section: "management", roles: ["ADMIN", "MANAGER"] },
+  { title: "users", href: "/users", icon: Users, section: "management", roles: ["ADMIN"] },
+  { title: "company", href: "/company", icon: Building2, section: "management", roles: ["ADMIN", "MANAGER"] },
+  { title: "audit", href: "/audit-logs", icon: ScrollText, section: "management", roles: ["ADMIN", "MANAGER"] },
 
   // Other
-  { title: "Profil", href: "/profile", icon: UserCircle, section: "other" },
-  { title: "Ayarlar", href: "/settings", icon: Settings, section: "other" },
+  { title: "profile", href: "/profile", icon: UserCircle, section: "other" },
+  { title: "settings", href: "/settings", icon: Settings, section: "other" },
 ]

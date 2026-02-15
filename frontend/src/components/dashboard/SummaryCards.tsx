@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardStats } from "@/services/dashboard.service";
+import { useLocale, useTranslations } from "next-intl";
 import { FileText, TrendingUp, Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
@@ -14,8 +15,12 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
+  const t = useTranslations('dashboard');
+  const tStatus = useTranslations('common.status');
+  const locale = useLocale();
+
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("tr-TR", {
+    return new Intl.NumberFormat(locale === 'tr' ? 'tr-TR' : 'en-US', {
       style: "currency",
       currency: currency,
     }).format(amount);
@@ -48,7 +53,7 @@ export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
       <Link href="/invoices">
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Fatura</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('cards.totalInvoices')}</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -64,7 +69,7 @@ export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
       <Link href="/invoices">
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam Tutar</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('cards.totalAmount')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -72,7 +77,7 @@ export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
               {formatCurrency(summary.totalAmount)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Ortalama: {formatCurrency(summary.averageAmount)}
+              {t('cards.average')}: {formatCurrency(summary.averageAmount)}
             </p>
           </CardContent>
         </Card>
@@ -81,7 +86,7 @@ export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
       <Link href="/invoices?status=PENDING">
         <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-yellow-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bekleyen Onay</CardTitle>
+            <CardTitle className="text-sm font-medium">{tStatus('pending')}</CardTitle>
             <Clock className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
@@ -96,7 +101,7 @@ export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
       <Link href="/invoices?status=VERIFIED">
         <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-green-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Onaylanan</CardTitle>
+            <CardTitle className="text-sm font-medium">{tStatus('verified')}</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>

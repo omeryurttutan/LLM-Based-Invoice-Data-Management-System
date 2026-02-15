@@ -47,6 +47,48 @@ app = FastAPI(
     openapi_url="/openapi.json"
 )
 
+# Security Middleware
+from fastapi import status
+import time
+from collections import defaultdict
+
+RATE_LIMIT = 30 # requests
+RATE_WINDOW = 60 # seconds
+request_counts = defaultdict(list)
+
+@app.middleware("http")
+async def security_middleware(request: Request, call_next):
+    # Skip health check and docs
+    if request.url.path.startswith("/health") or request.url.path.startswith("/docs") or request.url.path.startswith("/openapi.json") or request.url.path.startswith("/redoc"):
+         return await call_next(request)
+
+    # Check API Key
+    api_key = request.headers.get("X-Internal-API-Key")
+    expected_api_key = settings.INTERNAL_API_KEY
+
+    if not api_key or api_key != expected_api_key:
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"error": "UNAUTHORIZED", "message": "Invalid or missing Internal API Key"}
+        )
+
+    # Rate Limiting
+    client_ip = request.client.host
+    now = time.time()
+    
+    # Clean old requests
+    request_counts[client_ip] = [t for t in request_counts[client_ip] if now - t < RATE_WINDOW]
+    
+    if len(request_counts[client_ip]) >= RATE_LIMIT:
+        return JSONResponse(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            content={"error": "RATE_LIMIT_EXCEEDED", "message": "Too many requests. Please try again later."}
+        )
+    
+    request_counts[client_ip].append(now)
+    
+    return await call_next(request)
+
 # Middleware
 app.add_middleware(RequestContextMiddleware)
 

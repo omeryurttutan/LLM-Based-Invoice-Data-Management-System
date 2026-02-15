@@ -1,0 +1,19 @@
+{
+    "title": "Bildirimler",
+    "markAllRead": "Tümünü Okundu İşaretle",
+    "viewAll": "Tüm Bildirimleri Göster",
+    "empty": "Bildirim bulunmuyor",
+    "types": {
+        "info": "Bilgi",
+        "success": "Başarılı",
+        "warning": "Uyarı",
+        "error": "Hata",
+        "invoice_processed": "Fatura İşlendi",
+        "invoice_rejected": "Fatura Reddedildi",
+        "invoice_verified": "Fatura Doğrulandı"
+    },
+    "tabs": {
+        "all": "Tümü",
+        "unread": "Okunmamış"
+    }
+}

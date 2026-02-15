@@ -1,0 +1,26 @@
+{
+    "title": "Panel",
+    "dateSelect": "Tarih Aralığı Seçin",
+    "currencyLabel": "Para Birimi",
+    "cards": {
+        "totalInvoices": "Toplam Fatura",
+        "totalAmount": "Toplam Tutar",
+        "average": "Ortalama",
+        "pending": "Bekleyen",
+        "thisMonth": "Bu Ay"
+    },
+    "charts": {
+        "monthlyTrend": "Aylık Fatura Trendi",
+        "categoryDistribution": "Kategori Dağılımı",
+        "statusDistribution": "Durum Dağılımı"
+    },
+    "recent": {
+        "title": "Son Hareketler",
+        "viewAll": "Tümünü Gör"
+    },
+    "actions": {
+        "title": "Bekleyen İşlemler",
+        "verify": "Doğrula ({count})",
+        "noActions": "Bekleyen işlem bulunmuyor"
+    }
+}

@@ -10,6 +10,7 @@ import com.faturaocr.domain.user.port.UserRepository;
 import com.faturaocr.domain.user.valueobject.Email;
 import com.faturaocr.domain.user.valueobject.Role;
 import com.faturaocr.infrastructure.security.JwtTokenProvider;
+import com.faturaocr.infrastructure.security.LoginAttemptService;
 import com.faturaocr.infrastructure.security.RefreshTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,8 @@ class AuthenticationServiceTest {
     private RefreshTokenService refreshTokenService;
     @Mock
     private AuditLogRepository auditLogRepository;
+    @Mock
+    private LoginAttemptService loginAttemptService;
 
     private AuthenticationService authenticationService;
 
@@ -43,7 +46,9 @@ class AuthenticationServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         authenticationService = new AuthenticationService(userRepository, passwordEncoder, jwtTokenProvider,
-                refreshTokenService, auditLogRepository);
+                refreshTokenService, auditLogRepository, loginAttemptService);
+
+        lenient().when(loginAttemptService.isBlocked(any())).thenReturn(false);
     }
 
     @Test

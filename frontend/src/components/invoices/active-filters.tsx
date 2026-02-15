@@ -5,10 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import { useTranslations } from 'next-intl';
 
 export function ActiveFilters() {
   const { filters, setFilters, clearFilters, activeFilterCount } = useInvoiceFilters();
+  const t = useTranslations('invoices.filter');
 
   if (activeFilterCount === 0) return null;
 
@@ -34,24 +35,24 @@ export function ActiveFilters() {
 
   return (
     <div className='flex flex-wrap items-center gap-2 pt-2'>
-      <span className='text-sm text-muted-foreground'>Aktif Filtreler:</span>
-      
-      {filters.status && renderFilterChip('status', filters.status, 'Durum')}
-      {filters.dateFrom && renderFilterChip('dateFrom', format(new Date(filters.dateFrom), 'dd.MM.yyyy'), 'Başlangıç')}
-      {filters.dateTo && renderFilterChip('dateTo', format(new Date(filters.dateTo), 'dd.MM.yyyy'), 'Bitiş')}
-      {filters.amountMin && renderFilterChip('amountMin', filters.amountMin, 'Min Tutar')}
-      {filters.amountMax && renderFilterChip('amountMax', filters.amountMax, 'Max Tutar')}
-      {filters.supplierName && renderFilterChip('supplierName', filters.supplierName, 'Tedarikçi')}
-      {filters.currency && renderFilterChip('currency', filters.currency, 'Para Birimi')}
-      {filters.sourceType && renderFilterChip('sourceType', filters.sourceType, 'Kaynak')}
-      
-      <Button 
-        variant='ghost' 
-        size='sm' 
+      <span className='text-sm text-muted-foreground'>{t('activeFilters')}:</span>
+
+      {filters.status && renderFilterChip('status', filters.status, t('status'))}
+      {filters.dateFrom && renderFilterChip('dateFrom', format(new Date(filters.dateFrom), 'dd.MM.yyyy'), t('startDate'))}
+      {filters.dateTo && renderFilterChip('dateTo', format(new Date(filters.dateTo), 'dd.MM.yyyy'), t('endDate'))}
+      {filters.amountMin && renderFilterChip('amountMin', filters.amountMin, t('minAmount'))}
+      {filters.amountMax && renderFilterChip('amountMax', filters.amountMax, t('maxAmount'))}
+      {filters.supplierName && renderFilterChip('supplierName', filters.supplierName, t('supplier'))}
+      {filters.currency && renderFilterChip('currency', filters.currency, t('currency'))}
+      {filters.sourceType && renderFilterChip('sourceType', filters.sourceType, t('sourceType'))}
+
+      <Button
+        variant='ghost'
+        size='sm'
         onClick={clearFilters}
         className='h-7 px-2 text-xs text-muted-foreground hover:text-destructive'
       >
-        Tümünü Temizle
+        {t('clearAll')}
       </Button>
     </div>
   );

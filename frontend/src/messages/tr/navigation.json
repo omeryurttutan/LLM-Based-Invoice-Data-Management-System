@@ -1,0 +1,44 @@
+{
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "invoices": "Faturalar",
+        "upload": "Yükleme",
+        "categories": "Kategoriler",
+        "automation": {
+            "title": "Otomasyon",
+            "templates": "Şablonlar",
+            "rules": "Kurallar"
+        },
+        "notifications": "Bildirimler",
+        "settings": "Ayarlar",
+        "users": "Kullanıcılar",
+        "company": "Şirket",
+        "audit": "Denetim Logu",
+        "profile": "Profil",
+        "management": "Yönetim",
+        "other": "Diğer"
+    },
+    "header": {
+        "theme": {
+            "light": "Aydınlık Mod",
+            "dark": "Karanlık Mod",
+            "system": "Sistem"
+        },
+        "userMenu": {
+            "profile": "Profil",
+            "settings": "Ayarlar",
+            "logout": "Çıkış Yap"
+        }
+    },
+    "breadcrumbs": {
+        "home": "Ana Sayfa",
+        "invoices": "Faturalar",
+        "upload": "Fatura Yükle",
+        "categories": "Kategoriler",
+        "templates": "Şablonlar",
+        "rules": "Kurallar",
+        "notifications": "Bildirimler",
+        "settings": "Ayarlar",
+        "detail": "Detay"
+    }
+}

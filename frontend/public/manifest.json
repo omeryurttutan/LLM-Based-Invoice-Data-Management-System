@@ -1,0 +1,57 @@
+{
+    "name": "Fatura OCR ve Veri Yönetim Sistemi",
+    "short_name": "FaturaOCR",
+    "description": "Fatura görüntülerinden otomatik veri çıkarım ve yönetim sistemi",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "any",
+    "theme_color": "#1e40af",
+    "background_color": "#ffffff",
+    "scope": "/",
+    "lang": "tr",
+    "dir": "ltr",
+    "categories": [
+        "business",
+        "finance",
+        "productivity"
+    ],
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Fatura Yükle",
+            "short_name": "Yükle",
+            "url": "/upload",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Faturalarım",
+            "short_name": "Faturalar",
+            "url": "/invoices",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}

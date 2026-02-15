@@ -19,6 +19,7 @@ import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslations } from 'next-intl';
 
 interface ExportDialogProps {
   open: boolean;
@@ -43,6 +44,8 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogProps) {
+  const t = useTranslations('export');
+  const tCommon = useTranslations('common');
   const [formats, setFormats] = useState<ExportFormatMetadata[]>([]);
   const [selectedFormat, setSelectedFormat] = useState<string>('XLSX');
   const [includeItems, setIncludeItems] = useState(false);
@@ -61,23 +64,23 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
         } catch (error) {
           console.error('Failed to load export formats:', error);
           toast({
-            title: "Format listesi alınamadı",
-            description: "Varsayılan formatlar kullanılacak.",
+            title: t('formatsError.title'),
+            description: t('formatsError.description'),
             variant: "destructive"
           });
           // Fallback formats
           setFormats([
-            { format: 'XLSX', label: 'Excel (XLSX)', description: 'Excel formatı', category: 'GENERAL', fileExtension: 'xlsx', icon: 'file-spreadsheet' },
-            { format: 'CSV', label: 'CSV', description: 'CSV formatı', category: 'GENERAL', fileExtension: 'csv', icon: 'file-text' }
+            { format: 'XLSX', label: 'Excel (XLSX)', description: t('formats.xlsx.description'), category: 'GENERAL', fileExtension: 'xlsx', icon: 'file-spreadsheet' },
+            { format: 'CSV', label: 'CSV', description: t('formats.csv.description'), category: 'GENERAL', fileExtension: 'csv', icon: 'file-text' }
           ]);
         } finally {
           setIsLoadingFormats(false);
         }
       };
-      
+
       loadFormats();
     }
-  }, [open, toast]);
+  }, [open, toast, t]);
 
   const currentFormat = formats.find(f => f.format === selectedFormat);
   const isAccountingFormat = currentFormat?.category === 'ACCOUNTING';
@@ -92,7 +95,7 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
   const handleExport = async () => {
     try {
       setIsExporting(true);
-      
+
       const response = await apiClient.get('/invoices/export', {
         params: {
           ...filters,
@@ -106,13 +109,13 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      
+
       // Generate filename
       const dateStr = format(new Date(), 'yyyy-MM-dd_HHmmss');
       const ext = currentFormat?.fileExtension || 'dat';
       const prefix = isAccountingFormat ? selectedFormat : 'faturalar';
       const filename = `${prefix}_${dateStr}.${ext}`;
-      
+
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
@@ -120,17 +123,17 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
       window.URL.revokeObjectURL(url);
 
       toast({
-        title: "Dışa aktarım başarılı",
-        description: `Dosya indirildi: ${filename}`,
+        title: t('success.title'),
+        description: t('success.description', { filename }),
         variant: "default"
       });
-      
+
       onOpenChange(false);
     } catch (error) {
       console.error('Export failed:', error);
       toast({
-        title: "Dışa aktarım başarısız",
-        description: "Bir hata oluştu. Lütfen tekrar deneyin.",
+        title: t('error.title'),
+        description: t('error.description'),
         variant: "destructive"
       });
     } finally {
@@ -146,7 +149,7 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
 
   const renderFormatOption = (format: ExportFormatMetadata) => {
     const Icon = iconMap[format.icon] || FileText;
-    
+
     return (
       <div key={format.format}>
         <RadioGroupItem value={format.format} id={format.format} className="peer sr-only" />
@@ -155,7 +158,12 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer h-full"
         >
           <Icon className="mb-2 h-6 w-6" />
-          <span className="font-medium text-center">{format.label}</span>
+          <span className="font-medium text-center">{// Use translated label if available, fallback to format label
+            // NOTE: Backend returns labels. If we want frontend translation, we need to map format.format to key.
+            // For now assume backend returns translatable key or we just stick with fallback if custom.
+            // Or better, just display format.label since it might be dynamic from backend plugins.
+            format.label
+          }</span>
         </Label>
       </div>
     );
@@ -165,25 +173,28 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
-          <DialogTitle>Fatura Verilerini Dışa Aktar</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Mevcut filtrelerinize uyan <strong>{totalCount}</strong> fatura dışa aktarılacaktır.
+            {t.rich('description', {
+              count: totalCount,
+              strong: (chunks) => <strong>{chunks}</strong>
+            })}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
           {isEmptyDataset && (
-             <div className="flex items-center gap-2 p-3 text-sm text-yellow-600 bg-yellow-50 rounded-md border border-yellow-200">
-               <AlertTriangle className="h-4 w-4" />
-               <span>Dışa aktarılacak fatura bulunamadı.</span>
-             </div>
+            <div className="flex items-center gap-2 p-3 text-sm text-yellow-600 bg-yellow-50 rounded-md border border-yellow-200">
+              <AlertTriangle className="h-4 w-4" />
+              <span>{t('noData')}</span>
+            </div>
           )}
 
           {isLargeDataset && (
-             <div className="flex items-center gap-2 p-3 text-sm text-blue-600 bg-blue-50 rounded-md border border-blue-200">
-               <Loader2 className="h-4 w-4" />
-               <span>Büyük veri seti ({totalCount} kayıt). İndirme işlemi birkaç dakika sürebilir.</span>
-             </div>
+            <div className="flex items-center gap-2 p-3 text-sm text-blue-600 bg-blue-50 rounded-md border border-blue-200">
+              <Loader2 className="h-4 w-4" />
+              <span>{t('largeDataset', { count: totalCount })}</span>
+            </div>
           )}
 
           {isLoadingFormats ? (
@@ -195,7 +206,7 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
               <RadioGroup value={selectedFormat} onValueChange={setSelectedFormat}>
                 {/* General Formats */}
                 <div className="space-y-3">
-                  <Label>Genel Formatlar</Label>
+                  <Label>{t('sections.general')}</Label>
                   <div className="grid grid-cols-2 gap-4">
                     {generalFormats.map(renderFormatOption)}
                   </div>
@@ -206,14 +217,14 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
                 {/* Accounting Formats */}
                 <div className="space-y-3">
                   <Label className="flex items-center gap-2">
-                    Muhasebe Yazılımları
+                    {t('sections.accounting')}
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Bu formatlar doğrudan muhasebe programlarına aktarım içindir.</p>
+                          <p>{t('accountingTooltip')}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -223,19 +234,20 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
                   </div>
                 </div>
               </RadioGroup>
-              
+
               <div className="bg-muted/50 p-3 rounded-md text-xs text-muted-foreground">
                 <p>{currentFormat?.description}</p>
-                <p className="mt-1">Dosya uzantısı: <strong>.{currentFormat?.fileExtension}</strong></p>
+                <p className="mt-1">{t('fileExtension')}: <strong>.{currentFormat?.fileExtension}</strong></p>
               </div>
 
               {isAccountingFormat && (
                 <Alert variant="default" className="bg-blue-50 border-blue-200 text-blue-800">
                   <Info className="h-4 w-4" />
-                  <AlertTitle>Önemli Bilgi</AlertTitle>
+                  <AlertTitle>{t('importantInfo')}</AlertTitle>
                   <AlertDescription>
-                    Muhasebe formatları sadece <strong>Onaylanmış (Verified)</strong> faturaları içerir. 
-                    Bekleyen veya reddedilen faturalar otomatik olarak hariç tutulacaktır.
+                    {t.rich('accountingWarning', {
+                      strong: (chunks) => <strong>{chunks}</strong>
+                    })}
                   </AlertDescription>
                 </Alert>
               )}
@@ -243,37 +255,37 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
           )}
 
           <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="includeItems" 
-              checked={includeItems} 
-              onCheckedChange={(c: boolean | 'indeterminate') => setIncludeItems(!!c)} 
+            <Checkbox
+              id="includeItems"
+              checked={includeItems}
+              onCheckedChange={(c: boolean | 'indeterminate') => setIncludeItems(!!c)}
               disabled={isAccountingFormat}
             />
             <div className="grid gap-1.5 leading-none">
               <Label htmlFor="includeItems" className="cursor-pointer">
-                Fatura kalemlerini dahil et
+                {t('options.includeItems')}
               </Label>
               <p className="text-xs text-muted-foreground">
-                {isAccountingFormat 
-                  ? "Muhasebe formatları için bu seçenek zorunludur." 
-                  : "Seçilirse, her fatura kalemi için ayrı bir satır oluşturulur."}
+                {isAccountingFormat
+                  ? t('options.includeItemsMandatory')
+                  : t('options.includeItemsDesc')}
               </p>
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>İptal</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{tCommon('cancel')}</Button>
           <Button onClick={handleExport} disabled={isExporting || isEmptyDataset || isLoadingFormats}>
             {isExporting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Hazırlanıyor...
+                {t('exporting')}...
               </>
             ) : (
               <>
                 <Download className="mr-2 h-4 w-4" />
-                İndir
+                {t('download')}
               </>
             )}
           </Button>

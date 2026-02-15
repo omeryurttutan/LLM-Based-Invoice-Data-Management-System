@@ -56,6 +56,10 @@ public class GlobalExceptionHandler {
                                 ex.getMessage(),
                                 request.getDescription(false).replace("uri=", ""));
 
+                if ("AUTH_ACCOUNT_LOCKED".equals(ex.getErrorCode())) {
+                        return ResponseEntity.status(HttpStatus.LOCKED).body(error);
+                }
+
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 

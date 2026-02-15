@@ -54,10 +54,15 @@ public class EncryptionService {
         }
 
         byte[] keyBytes = Base64.getDecoder().decode(keyBase64);
+        if (keyBytes.length != 32) {
+            throw new IllegalArgumentException("Encryption key must be 32 bytes (256 bits)");
+        }
         this.secretKey = new SecretKeySpec(keyBytes, "AES");
     }
 
-    // Constructor for testing
+    /**
+     * Constructor for testing purposes.
+     */
     public EncryptionService(SecretKey secretKey) {
         this.secureRandom = new SecureRandom();
         this.secretKey = secretKey;

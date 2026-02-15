@@ -1,0 +1,343 @@
+{
+    "title": "Faturalar",
+    "singular": "Fatura",
+    "export": "Dışa Aktar",
+    "noExportPermission": "Dışa aktarım yetkiniz bulunmamaktadır",
+    "uploadInvoice": "Fatura Yükle",
+    "newInvoice": "Yeni Fatura",
+    "backToList": "Listeye Dön",
+    "notFound": "Fatura bulunamadı veya bir hata oluştu.",
+    "units": {
+        "ADET": "Adet",
+        "KG": "Kg",
+        "LT": "Lt",
+        "M": "M",
+        "M2": "M²",
+        "M3": "M³",
+        "PAKET": "Paket",
+        "KUTU": "Kutu",
+        "SAAT": "Saat",
+        "GUN": "Gün"
+    },
+    "table": {
+        "invoiceNumber": "Fatura No",
+        "supplier": "Tedarikçi",
+        "date": "Fatura Tarihi",
+        "dueDate": "Vade Tarihi",
+        "amount": "Tutar",
+        "currency": "Para Birimi",
+        "status": "Durum",
+        "source": "Kaynak",
+        "confidence": "Güven Skoru",
+        "category": "Kategori",
+        "actions": "İşlemler"
+    },
+    "status": {
+        "pending": "Beklemede",
+        "processing": "İşleniyor",
+        "verified": "Onaylı",
+        "rejected": "Reddedildi"
+    },
+    "sort": {
+        "label": "Sıralama",
+        "newest": "En Yeniler",
+        "oldest": "En Eskiler",
+        "dateDesc": "Fatura Tarihi (Y-E)",
+        "dateAsc": "Fatura Tarihi (E-Y)",
+        "amountDesc": "Tutar (Y-D)",
+        "amountAsc": "Tutar (D-Y)"
+    },
+    "actions": {
+        "openMenu": "Menü aç",
+        "view": "Görüntüle",
+        "edit": "Düzenle",
+        "verify": "Onayla",
+        "reject": "Reddet",
+        "reopen": "Yeniden Aç",
+        "delete": "Sil",
+        "compare": "Karşılaştır",
+        "close": "Kapat"
+    },
+    "detail": {
+        "title": "Fatura Detayı",
+        "invoiceInfo": "Fatura Özeti",
+        "supplierInfo": "Tedarikçi Bilgileri",
+        "buyerInfo": "Alıcı Bilgileri",
+        "items": "Fatura Kalemleri",
+        "summary": "Özet",
+        "subtotal": "Ara Toplam",
+        "taxAmount": "Toplam KDV",
+        "totalAmount": "Genel Toplam",
+        "exchangeRate": "Kur",
+        "notes": "Notlar",
+        "tabs": {
+            "details": "Fatura Detayı",
+            "history": "Geçmiş & Versiyonlar"
+        },
+        "supplier": {
+            "title": "Tedarikçi Bilgileri",
+            "taxNo": "Vergi No",
+            "taxOffice": "Vergi Dairesi",
+            "phone": "Telefon",
+            "email": "E-posta"
+        },
+        "record": {
+            "title": "Kayıt Bilgileri",
+            "created": "Oluşturan",
+            "verified": "Onaylayan"
+        },
+        "history": {
+            "compareTitle": "Karşılaştırma",
+            "emptyTitle": "Versiyon Karşılaştırma",
+            "emptyDescription": "Soldaki listeden bir versiyon seçerek \"Karşılaştır\" butonuna tıklayın ve değişiklikleri inceleyin.",
+            "diffError": "Fark verisi yüklenemedi."
+        },
+        "itemsTable": {
+            "description": "Açıklama",
+            "quantity": "Miktar",
+            "unitPrice": "Birim Fiyat",
+            "tax": "KDV",
+            "total": "Toplam",
+            "code": "Kod"
+        }
+    },
+    "create": {
+        "title": "Yeni Fatura Oluştur",
+        "subtitle": "Fatura bilgilerini girerek yeni bir kayıt oluşturun.",
+        "manual": "Manuel Fatura Girişi"
+    },
+    "edit": {
+        "title": "Fatura Düzenle",
+        "subtitle": "{invoiceNumber} numaralı faturayı düzenliyorsunuz.",
+        "pendingError": "Sadece beklemedeki faturalar düzenlenebilir."
+    },
+    "form": {
+        "title": "Fatura Bilgileri",
+        "invoiceNumber": "Fatura No",
+        "invoiceNumberPlaceholder": "FTR-2024-...",
+        "date": "Fatura Tarihi",
+        "datePlaceholder": "Tarih seçin",
+        "dueDate": "Vade Tarihi",
+        "currency": "Para Birimi",
+        "selectPlaceholder": "Seçiniz",
+        "category": "Kategori",
+        "noCategory": "Kategorisiz",
+        "supplier": {
+            "title": "Tedarikçi Bilgileri",
+            "name": "Firma Adı",
+            "namePlaceholder": "Firma Adı",
+            "taxId": "Vergi No / TCKN",
+            "taxIdPlaceholder": "Vergi No",
+            "taxOffice": "Vergi Dairesi",
+            "taxOfficePlaceholder": "Vergi Dairesi",
+            "phone": "Telefon",
+            "phonePlaceholder": "Telefon",
+            "email": "E-posta",
+            "emailPlaceholder": "E-posta",
+            "address": "Adres",
+            "addressPlaceholder": "Adres"
+        },
+        "items": {
+            "title": "Fatura Kalemleri",
+            "add": "Kalem Ekle",
+            "description": "Açıklama",
+            "descriptionPlaceholder": "Ürün/Hizmet",
+            "quantity": "Miktar",
+            "unit": "Birim",
+            "unitPrice": "Birim Fiyat",
+            "taxRate": "KDV %",
+            "subtotal": "Ara Toplam",
+            "totalTax": "Toplam KDV",
+            "grandTotal": "Genel Toplam",
+            "unitPlaceholder": "Birim"
+        },
+        "notes": {
+            "label": "Notlar",
+            "placeholder": "Fatura ile ilgili notlar..."
+        },
+        "buttons": {
+            "cancel": "İptal",
+            "save": "Kaydet",
+            "saving": "Kaydediliyor..."
+        },
+        "validation": {
+            "invoiceNumberRequired": "Fatura numarası zorunludur",
+            "supplierNameRequired": "Tedarikçi adı zorunludur",
+            "taxIdInvalid": "Vergi numarası 10 veya 11 haneli olmalıdır",
+            "emailInvalid": "Geçerli bir e-posta adresi giriniz",
+            "descriptionRequired": "Açıklama zorunludur",
+            "quantityMin": "Miktar 0 dan büyük olmalıdır",
+            "unitPriceMin": "Birim fiyat 0 dan küçük olamaz",
+            "itemsMin": "En az bir kalem eklemelisiniz"
+        }
+    },
+    "verify": {
+        "title": "Fatura Doğrulama",
+        "confirmVerify": "Bu faturayı doğrulamak istediğinize emin misiniz?",
+        "confirmReject": "Bu faturayı reddetmek istediğinize emin misiniz?",
+        "rejectReason": "Red nedeni (opsiyonel)"
+    },
+    "reject": {
+        "title": "Faturayı Reddet",
+        "description": "Faturayı reddetmek üzeresiniz. Lütfen bir neden belirtin.",
+        "reasonPlaceholder": "Red nedeni...",
+        "reasonLabel": "Red Nedeni"
+    },
+    "delete": {
+        "description": "Bu faturayı silmek üzeresiniz. Bu işlem geri alınamaz."
+    },
+    "filter": {
+        "dateRange": "Tarih Aralığı",
+        "supplier": "Tedarikçi",
+        "category": "Kategori",
+        "status": "Durum",
+        "amountRange": "Tutar Aralığı",
+        "minAmount": "Min. Tutar",
+        "maxAmount": "Maks. Tutar",
+        "sourceType": "Kaynak Tipi",
+        "currency": "Para Birimi",
+        "search": "Fatura no veya tedarikçi ara...",
+        "filters": "Filtreler",
+        "detailedFilters": "Detaylı Filtreleme Seçenekleri",
+        "clear": "Temizle",
+        "applyFilters": "Filtreleri Uygula",
+        "activeFilters": "Aktif Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "startDate": "Başlangıç",
+        "endDate": "Bitiş",
+        "min": "Min",
+        "max": "Mak",
+        "selectCategory": "Kategori Seç",
+        "searchSupplier": "Tedarikçi Ara",
+        "supplierName": "Tedarikçi adı",
+        "searching": "Aranıyor...",
+        "noSupplierFound": "Tedarikçi bulunamadı"
+    },
+    "empty": {
+        "title": "Henüz fatura bulunmuyor",
+        "description": "İlk faturanızı yükleyin veya manuel olarak ekleyin.",
+        "cta": "Fatura Yükle",
+        "filtered": "Seçilen filtrelere uygun fatura bulunamadı."
+    },
+    "llmProvider": {
+        "gemini": "Gemini",
+        "gpt": "GPT",
+        "claude": "Claude"
+    },
+    "sourceType": {
+        "llm": "LLM Çıkarım",
+        "eInvoice": "E-Fatura",
+        "manual": "Manuel Giriş"
+    },
+    "upload": {
+        "title": "Fatura Yükle",
+        "subtitle": "Sisteme yeni fatura eklemek için dosyalarınızı yükleyin.",
+        "dropzone": "Dosyalarınızı sürükleyip bırakın",
+        "dropOrSelect": "veya dosya seçmek için tıklayın",
+        "supported": "Desteklenen:",
+        "clear": "Temizle",
+        "uploading": "Yükleniyor...",
+        "uploadNew": "Yeni Yükleme Yap",
+        "startUpload": "Yüklemeyi Başlat",
+        "info": {
+            "title": "Bilgilendirme",
+            "single": "Tekli Yükleme: Sonuçlar hemen görüntülenir (30-90 sn sürebilir).",
+            "bulk": "Toplu Yükleme: Dosyalar arka planda işlenir. İlerleme durumunu buradan takip edebilirsiniz.",
+            "formats": "Desteklenen formatlar:"
+        },
+        "batch": {
+            "title": "Toplu İşlem Durumu",
+            "processed": "İşlenen",
+            "success": "Başarılı",
+            "failed": "Hatalı"
+        },
+        "zone": {
+            "maxFiles": "En fazla {maxFiles} dosya yükleyebilirsiniz.",
+            "maxTotalSize": "Toplam dosya boyutu {maxTotalSize} MB'ı aşamaz.",
+            "invalidExtension": "{fileName}: Desteklenmeyen dosya formatı.",
+            "sizeLimit": "{fileName}: Dosya boyutu limitin üzerinde ({limit} MB).",
+            "emptyFile": "{fileName}: Boş dosya yüklenemez.",
+            "dropTitle": "Dosyalarınızı sürükleyip bırakın",
+            "dropSubtitle": "veya dosya seçmek için tıklayın",
+            "supported": "Desteklenen:"
+        },
+        "list": {
+            "title": "Yükleme Listesi",
+            "count": "{count} dosya",
+            "view": "Görüntüle",
+            "retry": "Tekrar Dene",
+            "remove": "Kaldır"
+        },
+        "duplicate": {
+            "title": "Dosya Daha Önce Yüklenmiş",
+            "description": "{fileName} dosyası sisteme daha önce yüklenmiş. Yine de bu dosyayı tekrar yüklemek ve yeni bir analiz başlatmak istiyor musunuz?",
+            "confirm": "Devam Et",
+            "cancel": "İptal"
+        }
+    },
+    "verification": {
+        "title": "Fatura Doğrulama",
+        "saveDraft": "Taslak Kaydet",
+        "revalidate": "Yeniden Doğrula",
+        "validating": "Doğrulanıyor...",
+        "submitting": "İşleniyor...",
+        "consistent": "Tutarlar Tutarlı",
+        "inconsistent": "Ara Toplam + KDV Toplamı, Genel Toplama eşit değil! Lütfen kontrol ediniz.",
+        "shortcuts": "Kısayollar:",
+        "tabShortcut": "Tab (Geçiş)",
+        "ctrlEnterShortcut": "Ctrl+Enter (Onayla)",
+        "ctrlSShortcut": "Ctrl+S (Taslak Kaydet)",
+        "form": {
+            "general": "Genel Bilgiler",
+            "supplier": "Tedarikçi Bilgileri",
+            "buyer": "Alıcı Bilgileri",
+            "items": "Fatura Kalemleri",
+            "amounts": "Tutarlar",
+            "notes": "Notlar",
+            "invoiceNumber": "Fatura Numarası",
+            "invoiceDate": "Fatura Tarihi",
+            "dueDate": "Vade Tarihi",
+            "currency": "Para Birimi",
+            "supplierName": "Tedarikçi Adı",
+            "taxNumber": "Vergi Numarası",
+            "address": "Adres",
+            "buyerName": "Alıcı Adı",
+            "subtotal": "Ara Toplam",
+            "taxAmount": "KDV Tutarı",
+            "totalAmount": "Genel Toplam",
+            "notesPlaceholder": "Fatura ile ilgili notlar..."
+        },
+        "dialogs": {
+            "reject": {
+                "title": "Faturayı Reddet",
+                "description": "Faturayı reddetmek istediğinize emin misiniz? Lütfen bir sebep belirtin.",
+                "placeholder": "Red sebebi...",
+                "confirm": "Reddet"
+            },
+            "verify": {
+                "title": "Onaylama İşlemi",
+                "description": "Bu faturayı onaylamak istediğinize emin misiniz? Onaylanan faturalar düzenleme için kilitlenir.",
+                "confirm": "Onayla"
+            }
+        },
+        "messages": {
+            "draftSaved": "Taslak Kaydedildi",
+            "draftSavedDesc": "Değişiklikler taslak olarak kaydedildi.",
+            "draftError": "Taslak Kaydedilemedi",
+            "draftErrorDesc": "Taslak kaydedilirken bir hata oluştu.",
+            "revalidateSuccess": "Yeniden Doğrulama Tamamlandı",
+            "revalidateSuccessDesc": "Güven Skoru: {score}/100",
+            "revalidateError": "Yeniden Doğrulama Başarısız",
+            "revalidateErrorDesc": "Yeniden doğrulama başarısız oldu.",
+            "verifySuccess": "Fatura Onaylandı",
+            "verifySuccessDesc": "Fatura başarıyla doğrulandı ve onaylandı.",
+            "verifyError": "Onaylama Hatası",
+            "verifyErrorDesc": "Fatura onaylanırken bir hata oluştu.",
+            "rejectSuccess": "Fatura Reddedildi",
+            "rejectSuccessDesc": "Fatura reddedildi.",
+            "rejectError": "Reddetme Hatası",
+            "rejectErrorDesc": "Fatura reddedilirken bir hata oluştu.",
+            "reasonRequired": "Lütfen bir ret sebebi belirtin."
+        }
+    }
+}

@@ -3,6 +3,7 @@ package com.faturaocr.domain.rule.service;
 import com.faturaocr.domain.rule.entity.AutomationRule;
 import com.faturaocr.domain.rule.port.AutomationRuleRepository;
 import com.faturaocr.domain.rule.valueobject.TriggerPoint;
+import com.faturaocr.infrastructure.common.util.SanitizationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,8 @@ public class AutomationRuleService {
     @Transactional
     public AutomationRule createRule(AutomationRule rule) {
         validateRule(rule);
+        rule.setName(SanitizationUtils.sanitizeHtml(rule.getName()));
+        rule.setDescription(SanitizationUtils.sanitizeHtml(rule.getDescription()));
         rule.setCreatedAt(LocalDateTime.now());
         rule.setUpdatedAt(LocalDateTime.now());
         rule.setExecutionCount(0);
@@ -33,8 +36,8 @@ public class AutomationRuleService {
         AutomationRule existingRule = getRule(id, companyId);
         validateRule(updatedRule);
 
-        existingRule.setName(updatedRule.getName());
-        existingRule.setDescription(updatedRule.getDescription());
+        existingRule.setName(SanitizationUtils.sanitizeHtml(updatedRule.getName()));
+        existingRule.setDescription(SanitizationUtils.sanitizeHtml(updatedRule.getDescription()));
         existingRule.setConditions(updatedRule.getConditions());
         existingRule.setActions(updatedRule.getActions());
         existingRule.setConditionLogic(updatedRule.getConditionLogic());

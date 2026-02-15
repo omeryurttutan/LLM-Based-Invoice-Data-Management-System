@@ -1,0 +1,24 @@
+{
+    "title": "Upload Invoice",
+    "dropzone": {
+        "title": "Drag files here",
+        "description": "or click to select files",
+        "hint": "PDF, JPG, PNG (Max. 10MB)"
+    },
+    "batch": {
+        "title": "Batch Upload",
+        "status": "Status: {processed} / {total} processed",
+        "complete": "All files processed"
+    },
+    "processing": {
+        "uploading": "Uploading...",
+        "analyzing": "Analyzing...",
+        "extracting": "Extracting data...",
+        "saving": "Saving..."
+    },
+    "errors": {
+        "fileTooLarge": "File size too large",
+        "invalidType": "Invalid file format",
+        "uploadFailed": "Upload failed"
+    }
+}

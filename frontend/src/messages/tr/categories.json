@@ -1,0 +1,10 @@
+{
+    "title": "Kategoriler",
+    "create": "Yeni Kategori",
+    "edit": "Kategori Düzenle",
+    "nameLabel": "Kategori Adı",
+    "descriptionLabel": "Açıklama",
+    "colorLabel": "Renk",
+    "keywordsLabel": "Anahtar Kelimeler",
+    "deleteConfirm": "Bu kategoriyi silmek, ilgili faturaların kategorisiz kalmasına neden olabilir. Devam etmek istiyor musunuz?"
+}

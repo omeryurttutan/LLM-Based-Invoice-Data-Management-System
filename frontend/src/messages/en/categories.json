@@ -1,0 +1,10 @@
+{
+    "title": "Categories",
+    "create": "New Category",
+    "edit": "Edit Category",
+    "nameLabel": "Category Name",
+    "descriptionLabel": "Description",
+    "colorLabel": "Color",
+    "keywordsLabel": "Keywords",
+    "deleteConfirm": "Deleting this category may leave related invoices uncategorized. Do you want to continue?"
+}

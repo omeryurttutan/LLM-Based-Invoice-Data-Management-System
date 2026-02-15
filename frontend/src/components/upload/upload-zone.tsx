@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface UploadZoneProps {
   onFilesSelected: (files: File[]) => void;
@@ -22,6 +23,7 @@ export function UploadZone({
 }: UploadZoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations('invoices');
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -65,14 +67,14 @@ export function UploadZone({
   const validateAndSelect = (files: File[]) => {
     // 1. File Count Check
     if (files.length > maxFiles) {
-      toast.error(`En fazla ${maxFiles} dosya yükleyebilirsiniz.`);
+      toast.error(t('upload.zone.maxFiles', { maxFiles }));
       return;
     }
 
     // 2. Total Size Check
     const totalSize = files.reduce((acc, file) => acc + file.size, 0);
     if (totalSize > maxTotalSizeMB * 1024 * 1024) {
-      toast.error(`Toplam dosya boyutu ${maxTotalSizeMB} MB'ı aşamaz.`);
+      toast.error(t('upload.zone.maxTotalSize', { maxTotalSize: maxTotalSizeMB }));
       return;
     }
 
@@ -82,7 +84,7 @@ export function UploadZone({
       // 3. Extension Check
       const extension = "." + file.name.split(".").pop()?.toLowerCase();
       if (!acceptedExtensions.includes(extension)) {
-        toast.error(`${file.name}: Desteklenmeyen dosya formatı.`);
+        toast.error(t('upload.zone.invalidExtension', { fileName: file.name }));
         return;
       }
 
@@ -93,13 +95,13 @@ export function UploadZone({
       else if (extension === ".xml") limit = 50;
 
       if (file.size > limit * 1024 * 1024) {
-        toast.error(`${file.name}: Dosya boyutu limitin üzerinde (${limit} MB).`);
+        toast.error(t('upload.zone.sizeLimit', { fileName: file.name, limit }));
         return;
       }
 
       // 5. Empty Check
       if (file.size === 0) {
-        toast.error(`${file.name}: Boş dosya yüklenemez.`);
+        toast.error(t('upload.zone.emptyFile', { fileName: file.name }));
         return;
       }
 
@@ -149,15 +151,15 @@ export function UploadZone({
 
         <div className="space-y-2">
           <h3 className="text-lg font-semibold tracking-tight">
-            Dosyalarınızı sürükleyip bırakın
+            {t('upload.zone.dropTitle')}
           </h3>
           <p className="text-sm text-muted-foreground">
-            veya dosya seçmek için tıklayın
+            {t('upload.zone.dropSubtitle')}
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground bg-background/50 px-3 py-1 rounded-full border">
-          <span className="font-medium">Desteklenen:</span>
+          <span className="font-medium">{t('upload.zone.supported')}</span>
           {acceptedExtensions.map(ext => ext.replace(".", "").toUpperCase()).join(", ")}
         </div>
       </div>

@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from "next-intl";
 
 interface DuplicateDialogProps {
   isOpen: boolean;
@@ -28,26 +29,30 @@ export function DuplicateDialog({
   invoiceNumber,
   date,
 }: DuplicateDialogProps) {
+  const t = useTranslations('invoices');
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Dosya Daha Önce Yüklenmiş</AlertDialogTitle>
+          <AlertDialogTitle>{t('upload.duplicate.title')}</AlertDialogTitle>
           <AlertDialogDescription>
-            <strong>{fileName}</strong> dosyası
-            {date && ` ${date} tarihinde`}
-            {invoiceNumber && ` ${invoiceNumber} fatura numarasıyla`} sisteme daha önce yüklenmiş.
-            <br />
-            <br />
-            Yine de bu dosyayı tekrar yüklemek ve yeni bir analiz başlatmak istiyor musunuz?
+            {t.rich('upload.duplicate.description', {
+              fileName: fileName,
+              details: (date || invoiceNumber) ? (
+                (date ? t('upload.duplicate.detailsDate', { date }) : '') +
+                (invoiceNumber ? t('upload.duplicate.detailsInvoice', { invoiceNumber }) : '')
+              ) : '',
+              strong: (chunks) => <strong>{chunks}</strong>
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => onOpenChange(false)}>İptal</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => onOpenChange(false)}>{t('upload.duplicate.cancel')}</AlertDialogCancel>
           <AlertDialogAction onClick={() => {
             onConfirm();
             onOpenChange(false);
-          }}>Devam Et</AlertDialogAction>
+          }}>{t('upload.duplicate.confirm')}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

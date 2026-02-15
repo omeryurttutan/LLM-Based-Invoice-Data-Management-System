@@ -1,11 +1,8 @@
-"use client"
-
 import { MobileSidebar } from "@/components/layout/mobile-sidebar"
 import { Breadcrumbs } from "@/components/layout/breadcrumbs"
 import { UserMenu } from "@/components/layout/user-menu"
-import { Button } from "@/components/ui/button"
-import { Bell } from "lucide-react"
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown"
+import { LanguageSwitcher } from "@/components/language-switcher"
 
 export function Header() {
   return (
@@ -15,6 +12,7 @@ export function Header() {
         <Breadcrumbs />
       </div>
       <div className="flex flex-1 items-center justify-end gap-4">
+        <LanguageSwitcher />
         <NotificationDropdown />
         <UserMenu />
       </div>

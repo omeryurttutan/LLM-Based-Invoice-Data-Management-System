@@ -4,10 +4,11 @@ import React from "react";
 import { DateRange } from "react-day-picker";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { tr } from "date-fns/locale";
+import { tr, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Popover,
   PopoverContent,
@@ -34,9 +35,13 @@ export function DashboardHeader({
   currency,
   setCurrency,
 }: DashboardHeaderProps) {
+  const t = useTranslations('dashboard');
+  const locale = useLocale();
+  const dateLocale = locale === 'tr' ? tr : enUS;
+
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+      <h1 className="text-3xl font-bold tracking-tight">{t('title') || 'Dashboard'}</h1>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="grid gap-2">
           <Popover>
@@ -53,14 +58,14 @@ export function DashboardHeader({
                 {dateRange?.from ? (
                   dateRange.to ? (
                     <>
-                      {format(dateRange.from, "LLO", { locale: tr })} -{" "}
-                      {format(dateRange.to, "LLO", { locale: tr })}
+                      {format(dateRange.from, "LLO", { locale: dateLocale })} -{" "}
+                      {format(dateRange.to, "LLO", { locale: dateLocale })}
                     </>
                   ) : (
-                    format(dateRange.from, "LLO", { locale: tr })
+                    format(dateRange.from, "LLO", { locale: dateLocale })
                   )
                 ) : (
-                  <span>Tarih Aralığı Seçin</span>
+                  <span>{t('dateSelect') || 'Tarih Aralığı Seçin'}</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -72,14 +77,14 @@ export function DashboardHeader({
                 selected={dateRange}
                 onSelect={setDateRange}
                 numberOfMonths={2}
-                locale={tr}
+                locale={dateLocale}
               />
             </PopoverContent>
           </Popover>
         </div>
         <Select value={currency} onValueChange={setCurrency}>
-          <SelectTrigger className="w-[100px]">
-            <SelectValue placeholder="Para Birimi" />
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder={t('currencyLabel') || "Para Birimi"} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="TRY">TRY (₺)</SelectItem>
