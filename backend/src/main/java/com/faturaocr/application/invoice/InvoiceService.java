@@ -4,8 +4,18 @@ import com.faturaocr.application.common.exception.BusinessException;
 import com.faturaocr.application.common.exception.DuplicateInvoiceException;
 import com.faturaocr.application.common.exception.ResourceNotFoundException;
 import com.faturaocr.application.common.service.ApplicationService;
-import com.faturaocr.application.invoice.dto.*;
-
+import com.faturaocr.application.invoice.dto.CreateInvoiceCommand;
+import com.faturaocr.application.invoice.dto.DuplicateCheckRequest;
+import com.faturaocr.application.invoice.dto.DuplicateCheckResult;
+import com.faturaocr.application.invoice.dto.FilterOptionsResponse;
+import com.faturaocr.application.invoice.dto.InvoiceDetailResponse;
+import com.faturaocr.application.invoice.dto.InvoiceItemResponse;
+import com.faturaocr.application.invoice.dto.InvoiceListResponse;
+import com.faturaocr.application.invoice.dto.InvoiceResponse;
+import com.faturaocr.application.invoice.dto.RejectInvoiceCommand;
+import com.faturaocr.application.invoice.dto.UpdateInvoiceCommand;
+import com.faturaocr.application.invoice.dto.VerifyInvoiceCommand;
+import com.faturaocr.domain.audit.annotation.Auditable;
 import com.faturaocr.domain.audit.valueobject.AuditActionType;
 import com.faturaocr.domain.category.port.CategoryRepository;
 import com.faturaocr.domain.invoice.entity.Invoice;
@@ -14,23 +24,30 @@ import com.faturaocr.domain.invoice.port.InvoiceRepository;
 import com.faturaocr.domain.invoice.valueobject.Currency;
 import com.faturaocr.domain.invoice.valueobject.DuplicateConfidence;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
+import com.faturaocr.domain.invoice.valueobject.LlmProvider;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
-import com.faturaocr.domain.audit.annotation.Auditable;
+import com.faturaocr.infrastructure.audit.AuditRequestContext;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaEntity;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaRepository;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceSpecification;
 import com.faturaocr.infrastructure.security.AuthenticatedUser;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
+import com.faturaocr.interfaces.rest.invoice.dto.InvoiceFilterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,6 +57,7 @@ import java.util.stream.Collectors;
 public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceJpaRepository invoiceJpaRepository;
     private final CategoryRepository categoryRepository;
     private final DuplicateDetectionService duplicateDetectionService;
 
@@ -67,7 +85,7 @@ public class InvoiceService {
             }
         } else {
             // Log that this was a forced duplicate creation
-            com.faturaocr.infrastructure.audit.AuditRequestContext.setMetadata(
+            AuditRequestContext.setMetadata(
                     "{\"forcedDuplicate\": true, \"highestConfidence\": \"HIGH\"}");
         }
 
@@ -128,16 +146,86 @@ public class InvoiceService {
         return duplicateDetectionService.checkForDuplicates(request);
     }
 
-    public Page<InvoiceListResponse> listInvoices(Pageable pageable) {
+    public Page<InvoiceListResponse> listInvoices(InvoiceFilterRequest filter, Pageable pageable) {
         UUID companyId = CompanyContextHolder.getCompanyId();
-        return invoiceRepository.findAllByCompanyId(companyId, pageable)
-                .map(this::mapToListResponse);
+
+        Specification<InvoiceJpaEntity> spec = Specification.where(InvoiceSpecification.hasCompanyId(companyId))
+                .and(InvoiceSpecification.isNotDeleted());
+
+        if (filter != null) {
+            spec = spec.and(InvoiceSpecification.hasDateRange(filter.getDateFrom(), filter.getDateTo()))
+                    .and(InvoiceSpecification.hasStatuses(filter.getStatus()))
+                    .and(InvoiceSpecification.hasSupplierNames(filter.getSupplierName()))
+                    .and(InvoiceSpecification.hasCategoryIds(filter.getCategoryId()))
+                    .and(InvoiceSpecification.hasAmountRange(filter.getAmountMin(), filter.getAmountMax()))
+                    .and(InvoiceSpecification.hasCurrencies(filter.getCurrency()))
+                    .and(InvoiceSpecification.hasSourceTypes(filter.getSourceType()))
+                    .and(InvoiceSpecification.hasLlmProviders(filter.getLlmProvider()))
+                    .and(InvoiceSpecification.hasConfidenceRange(filter.getConfidenceMin(), filter.getConfidenceMax()))
+                    .and(InvoiceSpecification.searchText(filter.getSearch()))
+                    .and(InvoiceSpecification.hasCreatedByUser(filter.getCreatedByUserId()))
+                    .and(InvoiceSpecification.hasCreatedDateRange(filter.getCreatedFrom(), filter.getCreatedTo()));
+        }
+
+        return invoiceJpaRepository.findAll(spec, pageable)
+                .map(this::mapJpaToListResponse);
     }
 
-    public Page<InvoiceListResponse> listInvoicesByStatus(InvoiceStatus status, Pageable pageable) {
+    public Page<InvoiceListResponse> listInvoices(Pageable pageable) {
+        return listInvoices(null, pageable);
+    }
+
+    public List<String> getSuppliers(String search) {
         UUID companyId = CompanyContextHolder.getCompanyId();
-        return invoiceRepository.findAllByCompanyIdAndStatus(companyId, status, pageable)
-                .map(this::mapToListResponse);
+        // Limit to 50 results
+        return invoiceJpaRepository.findDistinctSupplierNames(companyId, search, Pageable.ofSize(50));
+    }
+
+    public FilterOptionsResponse getFilterOptions() {
+        UUID companyId = CompanyContextHolder.getCompanyId();
+
+        // Get dynamic data from DB
+        List<LlmProvider> distinctProviders = invoiceJpaRepository.findDistinctLlmProviders(companyId);
+        Object[] amountRange = invoiceJpaRepository.findMinMaxTotalAmount(companyId);
+        Object[] dateRange = invoiceJpaRepository.findMinMaxInvoiceDate(companyId);
+        Object[] confidenceRange = invoiceJpaRepository.findMinMaxConfidenceScore(companyId);
+
+        // Process ranges safely
+        BigDecimal minAmount = amountRange != null && amountRange[0] != null ? (BigDecimal) amountRange[0]
+                : BigDecimal.ZERO;
+        BigDecimal maxAmount = amountRange != null && amountRange[1] != null ? (BigDecimal) amountRange[1]
+                : BigDecimal.ZERO;
+
+        LocalDate minDate = dateRange != null && dateRange[0] != null ? (LocalDate) dateRange[0] : null;
+        LocalDate maxDate = dateRange != null && dateRange[1] != null ? (LocalDate) dateRange[1] : null;
+
+        Double minConfidence = confidenceRange != null && confidenceRange[0] != null
+                ? ((BigDecimal) confidenceRange[0]).doubleValue()
+                : null;
+        Double maxConfidence = confidenceRange != null && confidenceRange[1] != null
+                ? ((BigDecimal) confidenceRange[1]).doubleValue()
+                : null;
+
+        // Build Response
+        return FilterOptionsResponse.builder()
+                .statuses(Arrays.stream(InvoiceStatus.values())
+                        .map(s -> FilterOptionsResponse.StatusOption.builder().value(s).label(s.name()).build())
+                        .collect(Collectors.toList()))
+                .categories(categoryRepository.findAllByCompanyId(companyId).stream()
+                        .map(c -> FilterOptionsResponse.CategoryOption.builder()
+                                .id(c.getId())
+                                .name(c.getName())
+                                .color(c.getColor())
+                                .build())
+                        .collect(Collectors.toList()))
+                .currencies(Arrays.asList(Currency.values()))
+                .sourceTypes(Arrays.asList(SourceType.values()))
+                .llmProviders(distinctProviders)
+                .amountRange(FilterOptionsResponse.Range.<BigDecimal>builder().min(minAmount).max(maxAmount).build())
+                .dateRange(FilterOptionsResponse.Range.<LocalDate>builder().min(minDate).max(maxDate).build())
+                .confidenceRange(
+                        FilterOptionsResponse.Range.<Double>builder().min(minConfidence).max(maxConfidence).build())
+                .build();
     }
 
     public InvoiceDetailResponse getInvoiceById(UUID id) {
@@ -383,28 +471,6 @@ public class InvoiceService {
         }
     }
 
-    private InvoiceListResponse mapToListResponse(Invoice invoice) {
-        InvoiceListResponse response = new InvoiceListResponse();
-        response.setId(invoice.getId());
-        response.setInvoiceNumber(invoice.getInvoiceNumber());
-        response.setInvoiceDate(invoice.getInvoiceDate());
-        response.setDueDate(invoice.getDueDate());
-        response.setSupplierName(invoice.getSupplierName());
-        response.setTotalAmount(invoice.getTotalAmount());
-        response.setCurrency(invoice.getCurrency());
-        response.setStatus(invoice.getStatus());
-        response.setSourceType(invoice.getSourceType());
-        response.setItemCount(invoice.getItems().size());
-        response.setCreatedAt(invoice.getCreatedAt());
-        // Populate category name and user name if needed (omitted for performance or
-        // fetched via joins)
-        // For now just basic mapping
-        if (invoice.getCategoryId() != null) {
-            categoryRepository.findById(invoice.getCategoryId()).ifPresent(c -> response.setCategoryName(c.getName()));
-        }
-        return response;
-    }
-
     private InvoiceDetailResponse mapToDetailResponse(Invoice invoice) {
         InvoiceDetailResponse response = new InvoiceDetailResponse();
         response.setId(invoice.getId());
@@ -458,6 +524,30 @@ public class InvoiceService {
         }).collect(Collectors.toList());
         response.setItems(itemResponses);
 
+        return response;
+    }
+
+    private InvoiceListResponse mapJpaToListResponse(InvoiceJpaEntity invoice) {
+        InvoiceListResponse response = new InvoiceListResponse();
+        response.setId(invoice.getId());
+        response.setInvoiceNumber(invoice.getInvoiceNumber());
+        response.setInvoiceDate(invoice.getInvoiceDate());
+        response.setDueDate(invoice.getDueDate());
+        response.setSupplierName(invoice.getSupplierName());
+        response.setTotalAmount(invoice.getTotalAmount());
+        response.setCurrency(invoice.getCurrency());
+        response.setStatus(invoice.getStatus());
+        response.setSourceType(invoice.getSourceType());
+        if (invoice.getItems() != null) {
+            response.setItemCount(invoice.getItems().size());
+        } else {
+            response.setItemCount(0);
+        }
+        response.setCreatedAt(invoice.getCreatedAt());
+
+        if (invoice.getCategoryId() != null) {
+            categoryRepository.findById(invoice.getCategoryId()).ifPresent(c -> response.setCategoryName(c.getName()));
+        }
         return response;
     }
 }

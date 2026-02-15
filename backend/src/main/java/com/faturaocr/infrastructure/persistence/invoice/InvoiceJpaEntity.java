@@ -42,16 +42,19 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
     @Column(name = "verified_by_user_id")
     private UUID verifiedByUserId;
 
-    @Column(name = "invoice_number", nullable = false)
+    @Column(name = "batch_id")
+    private UUID batchId;
+
+    @Column(name = "invoice_number")
     private String invoiceNumber;
 
-    @Column(name = "invoice_date", nullable = false)
+    @Column(name = "invoice_date")
     private LocalDate invoiceDate;
 
     @Column(name = "due_date")
     private LocalDate dueDate;
 
-    @Column(name = "supplier_name", nullable = false)
+    @Column(name = "supplier_name")
     private String supplierName;
 
     @Column(name = "supplier_tax_number")
@@ -69,13 +72,13 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
     @Column(name = "supplier_email")
     private String supplierEmail;
 
-    @Column(name = "subtotal", nullable = false)
+    @Column(name = "subtotal")
     private BigDecimal subtotal;
 
-    @Column(name = "tax_amount", nullable = false)
+    @Column(name = "tax_amount")
     private BigDecimal taxAmount;
 
-    @Column(name = "total_amount", nullable = false)
+    @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
@@ -105,6 +108,12 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
 
     @Column(name = "original_file_path")
     private String originalFilePath;
+
+    @Column(name = "stored_file_path")
+    private String storedFilePath;
+
+    @Column(name = "file_hash")
+    private String fileHash;
 
     @Column(name = "original_file_name")
     private String originalFileName;

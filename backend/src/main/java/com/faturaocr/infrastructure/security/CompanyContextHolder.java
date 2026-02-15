@@ -5,6 +5,7 @@ import java.util.UUID;
 /**
  * Thread-local holder for current company context.
  * Used for multi-tenant data isolation.
+ *
  */
 public class CompanyContextHolder {
 

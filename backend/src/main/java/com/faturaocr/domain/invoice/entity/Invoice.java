@@ -22,6 +22,7 @@ public class Invoice {
     private UUID categoryId;
     private UUID createdByUserId;
     private UUID verifiedByUserId;
+    private UUID batchId;
     private String correlationId;
 
     // Identification
@@ -55,7 +56,9 @@ public class Invoice {
 
     // File
     private String originalFilePath;
+    private String storedFilePath;
     private String originalFileName;
+    private String fileHash;
     private Integer originalFileSize;
     private String originalFileType;
 

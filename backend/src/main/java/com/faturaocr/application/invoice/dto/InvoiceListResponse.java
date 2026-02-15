@@ -3,14 +3,20 @@ package com.faturaocr.application.invoice.dto;
 import com.faturaocr.domain.invoice.valueobject.Currency;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class InvoiceListResponse {
     private UUID id;
     private String invoiceNumber;

@@ -112,4 +112,12 @@ public class InvoiceRepositoryAdapter implements InvoiceRepository {
                 .map(invoiceMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Invoice> findByBatchId(UUID batchId) {
+        return invoiceJpaRepository.findByBatchId(batchId)
+                .stream()
+                .map(invoiceMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

@@ -21,6 +21,7 @@ public class InvoiceMapper {
         invoice.setCategoryId(entity.getCategoryId());
         invoice.setCreatedByUserId(entity.getCreatedByUserId());
         invoice.setVerifiedByUserId(entity.getVerifiedByUserId());
+        invoice.setBatchId(entity.getBatchId());
         invoice.setInvoiceNumber(entity.getInvoiceNumber());
         invoice.setInvoiceDate(entity.getInvoiceDate());
         invoice.setDueDate(entity.getDueDate());
@@ -41,6 +42,8 @@ public class InvoiceMapper {
         invoice.setConfidenceScore(entity.getConfidenceScore());
         invoice.setProcessingDurationMs(entity.getProcessingDurationMs());
         invoice.setOriginalFilePath(entity.getOriginalFilePath());
+        invoice.setStoredFilePath(entity.getStoredFilePath());
+        invoice.setFileHash(entity.getFileHash());
         invoice.setOriginalFileName(entity.getOriginalFileName());
         invoice.setOriginalFileSize(entity.getOriginalFileSize());
         invoice.setOriginalFileType(entity.getOriginalFileType());
@@ -102,6 +105,7 @@ public class InvoiceMapper {
         entity.setCategoryId(domain.getCategoryId());
         entity.setCreatedByUserId(domain.getCreatedByUserId());
         entity.setVerifiedByUserId(domain.getVerifiedByUserId());
+        entity.setBatchId(domain.getBatchId());
         entity.setInvoiceNumber(domain.getInvoiceNumber());
         entity.setInvoiceDate(domain.getInvoiceDate());
         entity.setDueDate(domain.getDueDate());
@@ -122,6 +126,8 @@ public class InvoiceMapper {
         entity.setConfidenceScore(domain.getConfidenceScore());
         entity.setProcessingDurationMs(domain.getProcessingDurationMs());
         entity.setOriginalFilePath(domain.getOriginalFilePath());
+        entity.setStoredFilePath(domain.getStoredFilePath());
+        entity.setFileHash(domain.getFileHash());
         entity.setOriginalFileName(domain.getOriginalFileName());
         entity.setOriginalFileSize(domain.getOriginalFileSize());
         entity.setOriginalFileType(domain.getOriginalFileType());

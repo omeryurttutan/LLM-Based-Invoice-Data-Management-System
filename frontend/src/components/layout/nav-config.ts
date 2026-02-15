@@ -23,7 +23,7 @@ export const navItems: NavItem[] = [
   // Main
   { title: "Dashboard", href: "/", icon: LayoutDashboard, section: "main" },
   { title: "Faturalar", href: "/invoices", icon: FileText, section: "main" },
-  { title: "Fatura Yükle", href: "/upload", icon: Upload, section: "main" },
+  { title: "Fatura Yükle", href: "/invoices/upload", icon: Upload, section: "main" },
   { title: "Kategoriler", href: "/categories", icon: FolderOpen, section: "main" },
   
   // Management

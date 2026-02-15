@@ -42,7 +42,7 @@ public class RabbitMQProducerService {
                 .invoiceId(invoice.getId())
                 .companyId(invoice.getCompanyId())
                 .userId(invoice.getCreatedByUserId())
-                .filePath(invoice.getOriginalFilePath())
+                .filePath(invoice.getStoredFilePath())
                 .fileName(invoice.getOriginalFileName())
                 .fileType(invoice.getOriginalFileType())
                 .fileSize(Long.valueOf(invoice.getOriginalFileSize()))
