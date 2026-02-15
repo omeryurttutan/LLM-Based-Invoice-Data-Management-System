@@ -64,3 +64,27 @@ management:
   endpoint:
     health:
       show-details: always
+
+# File Upload Configuration
+upload:
+  storage-path: ${UPLOAD_STORAGE_PATH:/data/invoices}
+  max-file-size: ${UPLOAD_MAX_FILE_SIZE_MB:20}MB
+  max-bulk-total-size: ${UPLOAD_MAX_BULK_TOTAL_SIZE_MB:200}MB
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 200MB
+
+export:
+  logo:
+    firm-number: "001"
+    use-legacy-format: false
+  netsis:
+    branch-code: "0"
+    use-legacy-format: false
+  mikro:
+    delimiter: ";"
+    database-name: "MIKRO_DB"
+  luca:
+    firm-code: "100"

@@ -6,12 +6,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Base class for all domain entities.
  * Provides common fields and behavior for entity identity and auditing.
  */
 @Getter
+@Setter
 public abstract class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

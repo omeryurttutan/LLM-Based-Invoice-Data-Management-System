@@ -8,7 +8,6 @@ import com.faturaocr.application.invoice.dto.InvoiceDetailResponse;
 import com.faturaocr.application.invoice.dto.InvoiceListResponse;
 import com.faturaocr.application.invoice.dto.InvoiceResponse;
 import com.faturaocr.application.invoice.dto.UpdateInvoiceCommand;
-import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
 import com.faturaocr.infrastructure.security.annotations.CanDeleteInvoice;
 import com.faturaocr.infrastructure.security.annotations.CanEditInvoice;
@@ -20,6 +19,8 @@ import com.faturaocr.interfaces.rest.invoice.dto.UpdateInvoiceRequest;
 import com.faturaocr.interfaces.rest.invoice.dto.VerifyInvoiceRequest;
 import com.faturaocr.application.invoice.dto.RejectInvoiceCommand;
 import com.faturaocr.application.invoice.dto.VerifyInvoiceCommand;
+import com.faturaocr.application.invoice.dto.FilterOptionsResponse;
+import com.faturaocr.interfaces.rest.invoice.dto.InvoiceFilterRequest; // Added import
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,6 +37,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -46,6 +48,7 @@ import java.util.UUID;
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
+    private final com.faturaocr.application.export.ExportService exportService;
 
     @Operation(summary = "Create a new invoice")
     @ApiResponse(responseCode = "201", description = "Invoice created successfully")
@@ -131,19 +134,26 @@ public class InvoiceController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
-    @Operation(summary = "List invoices with pagination")
+    @Operation(summary = "List invoices with filtering")
     public ResponseEntity<Page<InvoiceListResponse>> listInvoices(
+            @Valid InvoiceFilterRequest filterRequest,
             @PageableDefault(size = 20, sort = "invoiceDate") Pageable pageable) {
-        return ResponseEntity.ok(invoiceService.listInvoices(pageable));
+        return ResponseEntity.ok(invoiceService.listInvoices(filterRequest, pageable));
     }
 
-    @GetMapping("/status/{status}")
+    @GetMapping("/suppliers")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
-    @Operation(summary = "List invoices by status")
-    public ResponseEntity<Page<InvoiceListResponse>> listInvoicesByStatus(
-            @PathVariable InvoiceStatus status,
-            @PageableDefault(size = 20, sort = "invoiceDate") Pageable pageable) {
-        return ResponseEntity.ok(invoiceService.listInvoicesByStatus(status, pageable));
+    @Operation(summary = "Get distinct supplier names for autocomplete")
+    public ResponseEntity<List<String>> getSuppliers(
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(invoiceService.getSuppliers(search));
+    }
+
+    @GetMapping("/filter-options")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
+    @Operation(summary = "Get available filter options and ranges")
+    public ResponseEntity<FilterOptionsResponse> getFilterOptions() {
+        return ResponseEntity.ok(invoiceService.getFilterOptions());
     }
 
     private CreateInvoiceCommand mapToCommand(CreateInvoiceRequest request) {
@@ -203,5 +213,12 @@ public class InvoiceController {
                                 .build())
                         .toList() : null)
                 .build();
+    }
+
+    @GetMapping("/export/formats")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT')")
+    @Operation(summary = "Get available export formats")
+    public ResponseEntity<List<com.faturaocr.application.export.dto.ExportFormatMetadata>> getExportFormats() {
+        return ResponseEntity.ok(exportService.getExportFormats());
     }
 }

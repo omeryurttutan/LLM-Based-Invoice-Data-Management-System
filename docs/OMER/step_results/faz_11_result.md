@@ -50,16 +50,16 @@ frontend/src/
 
 ## Test Sonuçları (Manuel Doğrulama)
 
-| Test Senaryosu | Durum | Notlar |
-|----------------|-------|--------|
-| Kayıt Ol (Geçerli Veri) | ✅ | Başarılı şekilde dashboard'a yönlendiriyor |
-| Kayıt Ol (Validasyon) | ✅ | Şifre kuralları ve zorunlu alanlar çalışıyor |
-| Giriş Yap (Geçerli) | ✅ | Token alınıyor ve saklanıyor |
-| Giriş Yap (Hatalı) | ✅ | Hata mesajları düzgün görüntüleniyor |
-| Oturum Kalıcılığı | ✅ | Sayfa yenilemede oturum korunuyor |
-| Token Yenileme | ✅ | Arka planda refresh mekanizması kurulu |
-| Korumalı Rota | ✅ | Giriş yapmadan erişim engelleniyor |
-| Çıkış Yap | ✅ | Tokenlar siliniyor ve login'e yönlendiriyor |
+| Test Senaryosu          | Durum | Notlar                                       |
+| ----------------------- | ----- | -------------------------------------------- |
+| Kayıt Ol (Geçerli Veri) | ✅    | Başarılı şekilde dashboard'a yönlendiriyor   |
+| Kayıt Ol (Validasyon)   | ✅    | Şifre kuralları ve zorunlu alanlar çalışıyor |
+| Giriş Yap (Geçerli)     | ✅    | Token alınıyor ve saklanıyor                 |
+| Giriş Yap (Hatalı)      | ✅    | Hata mesajları düzgün görüntüleniyor         |
+| Oturum Kalıcılığı       | ✅    | Sayfa yenilemede oturum korunuyor            |
+| Token Yenileme          | ✅    | Arka planda refresh mekanizması kurulu       |
+| Korumalı Rota           | ✅    | Giriş yapmadan erişim engelleniyor           |
+| Çıkış Yap               | ✅    | Tokenlar siliniyor ve login'e yönlendiriyor  |
 
 ## Karşılaşılan Sorunlar ve Çözümler
 

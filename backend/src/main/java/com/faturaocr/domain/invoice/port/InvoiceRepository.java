@@ -12,33 +12,35 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface InvoiceRepository {
-    Invoice save(Invoice invoice);
+        Invoice save(Invoice invoice);
 
-    Optional<Invoice> findById(UUID id);
+        Optional<Invoice> findById(UUID id);
 
-    Optional<Invoice> findByIdAndCompanyId(UUID id, UUID companyId);
+        Optional<Invoice> findByIdAndCompanyId(UUID id, UUID companyId);
 
-    Page<Invoice> findAllByCompanyId(UUID companyId, Pageable pageable);
+        Page<Invoice> findAllByCompanyId(UUID companyId, Pageable pageable);
 
-    Page<Invoice> findAllByCompanyIdAndStatus(UUID companyId, InvoiceStatus status, Pageable pageable);
+        Page<Invoice> findAllByCompanyIdAndStatus(UUID companyId, InvoiceStatus status, Pageable pageable);
 
-    boolean existsByInvoiceNumberAndCompanyId(String invoiceNumber, UUID companyId);
+        boolean existsByInvoiceNumberAndCompanyId(String invoiceNumber, UUID companyId);
 
-    void softDelete(UUID id);
+        void softDelete(UUID id);
 
-    long countByCompanyId(UUID companyId);
+        long countByCompanyId(UUID companyId);
 
-    long countByCompanyIdAndStatus(UUID companyId, InvoiceStatus status);
+        long countByCompanyIdAndStatus(UUID companyId, InvoiceStatus status);
 
-    long countByCategoryId(UUID categoryId);
+        long countByCategoryId(UUID categoryId);
 
-    // Duplicate detection queries
-    Optional<Invoice> findByInvoiceNumberAndCompanyIdAndNotDeleted(String invoiceNumber, UUID companyId);
+        // Duplicate detection queries
+        Optional<Invoice> findByInvoiceNumberAndCompanyIdAndNotDeleted(String invoiceNumber, UUID companyId);
 
-    List<Invoice> findBySupplierTaxNumberAndDateAndAmountAndCompanyId(
-            String supplierTaxNumber, LocalDate date, BigDecimal amount, UUID companyId);
+        List<Invoice> findBySupplierTaxNumberAndDateAndAmountAndCompanyId(
+                        String supplierTaxNumber, LocalDate date, BigDecimal amount, UUID companyId);
 
-    List<Invoice> findPotentialDuplicatesBySupplierNameAndDateAndAmountRange(
-            String supplierName, LocalDate date, BigDecimal minAmount, BigDecimal maxAmount,
-            UUID companyId, UUID excludeId);
+        List<Invoice> findPotentialDuplicatesBySupplierNameAndDateAndAmountRange(
+                        String supplierName, LocalDate date, BigDecimal minAmount, BigDecimal maxAmount,
+                        UUID companyId, UUID excludeId);
+
+        List<Invoice> findByBatchId(UUID batchId);
 }
