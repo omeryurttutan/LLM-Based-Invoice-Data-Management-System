@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CategoryDistribution } from "@/services/dashboard.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useFormatter, useTranslations } from "next-intl";
 
 interface CategoryDistributionChartProps {
   data?: CategoryDistribution[];
@@ -26,12 +27,15 @@ export function CategoryDistributionChart({
   currency,
 }: CategoryDistributionChartProps) {
   const router = useRouter();
+  const t = useTranslations('dashboard.charts');
+  const tCommon = useTranslations('common.labels');
+  const format = useFormatter();
 
   if (loading) {
     return (
       <Card className="col-span-1">
         <CardHeader>
-          <CardTitle>Kategori Dağılımı</CardTitle>
+          <CardTitle>{t('categoryDistribution')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[300px] flex items-center justify-center">
           <Skeleton className="h-[250px] w-[250px] rounded-full" />
@@ -44,20 +48,20 @@ export function CategoryDistributionChart({
     return (
       <Card className="col-span-1">
         <CardHeader>
-          <CardTitle>Kategori Dağılımı</CardTitle>
+          <CardTitle>{t('categoryDistribution')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[300px] flex items-center justify-center text-muted-foreground">
-          Henüz kategorize edilmiş fatura bulunmuyor
+          {tCommon('noData')}
         </CardContent>
       </Card>
     );
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("tr-TR", {
+    return format.number(amount, {
       style: "currency",
       currency: currency,
-    }).format(amount);
+    });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,7 +84,7 @@ export function CategoryDistributionChart({
   return (
     <Card className="col-span-1">
       <CardHeader>
-        <CardTitle>Kategori Dağılımı</CardTitle>
+        <CardTitle>{t('categoryDistribution')}</CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">

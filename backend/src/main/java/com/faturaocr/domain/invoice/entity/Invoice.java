@@ -128,4 +128,39 @@ public class Invoice {
             this.totalAmount = this.totalAmount.add(item.getTotalAmount());
         }
     }
+
+    public void verify(UUID verifiedByUserId) {
+        if (this.status == InvoiceStatus.VERIFIED) {
+            throw new IllegalStateException("Invoice is already verified");
+        }
+        if (this.status == InvoiceStatus.REJECTED) {
+            throw new IllegalStateException("Cannot verify a rejected invoice. Reopen it first.");
+        }
+        this.status = InvoiceStatus.VERIFIED;
+        this.verifiedAt = LocalDateTime.now();
+        this.verifiedByUserId = verifiedByUserId;
+    }
+
+    public void reject(String reason) {
+        if (this.status == InvoiceStatus.REJECTED) {
+            throw new IllegalStateException("Invoice is already rejected");
+        }
+        if (this.status == InvoiceStatus.VERIFIED) {
+            throw new IllegalStateException("Cannot reject a verified invoice. Reopen it first.");
+        }
+        this.status = InvoiceStatus.REJECTED;
+        this.rejectedAt = LocalDateTime.now();
+        this.rejectionReason = reason;
+    }
+
+    public void reopen() {
+        if (this.status == InvoiceStatus.PENDING) {
+            return; // Already pending
+        }
+        this.status = InvoiceStatus.PENDING;
+        this.verifiedAt = null;
+        this.verifiedByUserId = null;
+        this.rejectedAt = null;
+        this.rejectionReason = null;
+    }
 }

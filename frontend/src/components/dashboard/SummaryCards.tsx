@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardStats } from "@/services/dashboard.service";
-import { useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { FileText, TrendingUp, Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
@@ -17,13 +17,13 @@ interface SummaryCardsProps {
 export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
   const t = useTranslations('dashboard');
   const tStatus = useTranslations('common.status');
-  const locale = useLocale();
+  const format = useFormatter();
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat(locale === 'tr' ? 'tr-TR' : 'en-US', {
+    return format.number(amount, {
       style: "currency",
       currency: currency,
-    }).format(amount);
+    });
   };
 
   if (loading || !stats) {

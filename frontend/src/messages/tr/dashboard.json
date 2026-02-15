@@ -12,7 +12,9 @@
     "charts": {
         "monthlyTrend": "Aylık Fatura Trendi",
         "categoryDistribution": "Kategori Dağılımı",
-        "statusDistribution": "Durum Dağılımı"
+        "statusDistribution": "Durum Dağılımı",
+        "topSuppliers": "En Çok Çalışılan Tedarikçiler",
+        "other": "Diğer"
     },
     "recent": {
         "title": "Son Hareketler",
@@ -22,5 +24,37 @@
         "title": "Bekleyen İşlemler",
         "verify": "Doğrula ({count})",
         "noActions": "Bekleyen işlem bulunmuyor"
+    },
+    "performance": {
+        "title": "LLM Çıkarım Performansı",
+        "description": "Yapay zeka modellerinin başarı oranları",
+        "successRate": "Başarı Oranı",
+        "totalExtractions": "Toplam Çıkarım",
+        "avgConfidence": "Ort. Güven",
+        "avgDuration": "Ort. Süre",
+        "providerAttempts": "Sağlayıcı Bazlı Denemeler",
+        "model": "Model",
+        "success": "Başarı",
+        "error": "Hata",
+        "cost": "Maliyet",
+        "successful": "Başarılı",
+        "failed": "Başarısız"
+    },
+    "system": {
+        "title": "Sistem Durumu",
+        "description": "Sunucu ve servislerin anlık durumu",
+        "adminDescription": "Sunucu ve servislerin anlık durumu (Admin Paneli)",
+        "allSystemsUp": "Tüm Sistemler Çalışıyor",
+        "serviceOutage": "Servis Kesintisi Var",
+        "running": "ÇALIŞIYOR",
+        "down": "KAPALI",
+        "resourceUsage": "Kaynak Kullanımı",
+        "jvmHeap": "JVM Heap",
+        "dbConnections": "DB Bağlantıları",
+        "diskSpace": "Disk Alanı",
+        "recentAlerts": "Son Alarmlar",
+        "noCriticalAlerts": "Son 24 saatte kritik alarm yok.",
+        "loadError": "Sistem durumu yüklenemedi.",
+        "checkAdmin": "Yönetici yetkisine sahip olduğunuzdan emin olun veya servisi kontrol edin."
     }
 }

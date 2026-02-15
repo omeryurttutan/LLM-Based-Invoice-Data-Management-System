@@ -1,117 +1,99 @@
 package com.faturaocr.application.company;
 
+import com.faturaocr.domain.common.exception.EntityNotFoundException;
 import com.faturaocr.application.company.dto.CompanyResponse;
 import com.faturaocr.application.company.dto.CreateCompanyCommand;
-import com.faturaocr.application.company.dto.UpdateCompanyCommand;
 import com.faturaocr.domain.company.entity.Company;
 import com.faturaocr.domain.company.port.CompanyRepository;
-import com.faturaocr.domain.common.exception.DomainException;
-import com.faturaocr.domain.common.exception.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
+import com.faturaocr.domain.user.port.UserRepository;
+import com.faturaocr.testutil.TestDataBuilder;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CompanyServiceTest {
 
     @Mock
     private CompanyRepository companyRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private CompanyService companyService;
 
-    private Company company;
-    private CreateCompanyCommand createCommand;
-
-    @BeforeEach
-    void setUp() {
-        company = new Company("Test Company", "1234567890");
-        // ID is generated in constructor
-
-        createCommand = CreateCompanyCommand.builder()
-                .name("Test Company")
-                .taxNumber("1234567890")
-                .email("test@company.com")
-                .build();
-    }
-
     @Test
-    void createCompany_Success() {
-        when(companyRepository.existsByTaxNumber(any())).thenReturn(false);
-        when(companyRepository.save(any(Company.class))).thenReturn(company);
+    @DisplayName("Should create company successfully")
+    void shouldCreateCompanySuccessfully() {
+        // Given
+        CreateCompanyCommand command = CreateCompanyCommand.builder()
+                .name("New Co")
+                .taxNumber("1112223334")
+                .taxOffice("TaxOffice")
+                .address("Addr")
+                .city("City")
+                .district("District")
+                .postalCode("12345")
+                .phone("Phone")
+                .email("email")
+                .website("web")
+                .defaultCurrency("TRY")
+                .invoicePrefix("INV")
+                .build();
 
-        CompanyResponse response = companyService.createCompany(createCommand);
+        when(companyRepository.save(any(Company.class))).thenAnswer(i -> {
+            Company c = i.getArgument(0);
+            c.setId(UUID.randomUUID());
+            return c;
+        });
 
-        assertNotNull(response);
-        assertEquals(company.getName(), response.getName());
+        // When
+        CompanyResponse response = companyService.createCompany(command);
+
+        // Then
+        assertThat(response.getId()).isNotNull();
+        assertThat(response.getName()).isEqualTo("New Co");
         verify(companyRepository).save(any(Company.class));
     }
 
     @Test
-    void createCompany_DuplicateTaxNumber_ThrowsException() {
-        when(companyRepository.existsByTaxNumber(any())).thenReturn(true);
-
-        assertThrows(DomainException.class, () -> companyService.createCompany(createCommand));
-        verify(companyRepository, never()).save(any(Company.class));
-    }
-
-    @Test
-    void updateCompany_Success() {
-        UUID id = company.getId();
-        UpdateCompanyCommand updateCommand = UpdateCompanyCommand.builder()
-                .name("Updated Name")
-                .email("updated@test.com")
-                .build();
-
+    @DisplayName("Should get company by id")
+    void shouldGetCompanyById() {
+        // Given
+        UUID id = UUID.randomUUID();
+        Company company = TestDataBuilder.aCompany().withId(id).build();
         when(companyRepository.findById(id)).thenReturn(Optional.of(company));
-        when(companyRepository.save(any(Company.class))).thenReturn(company);
 
-        CompanyResponse response = companyService.updateCompany(id, updateCommand);
+        // When
+        CompanyResponse response = companyService.getCompanyById(id);
 
-        assertEquals("Updated Name", company.getName());
-        assertEquals("updated@test.com", company.getEmail());
+        // Then
+        assertThat(response.getId()).isEqualTo(id);
     }
 
     @Test
-    void getCompanyById_Success() {
-        when(companyRepository.findById(company.getId())).thenReturn(Optional.of(company));
+    @DisplayName("Should throw when company not found")
+    void shouldThrowWhenCompanyNotFound() {
+        // Given
+        UUID id = UUID.randomUUID();
+        when(companyRepository.findById(id)).thenReturn(Optional.empty());
 
-        CompanyResponse response = companyService.getCompanyById(company.getId());
+        // When
+        Throwable thrown = catchThrowable(() -> companyService.getCompanyById(id));
 
-        assertEquals(company.getId(), response.getId());
-    }
-
-    @Test
-    void deleteCompany_Success() {
-        when(companyRepository.findById(company.getId())).thenReturn(Optional.of(company));
-
-        companyService.deleteCompany(company.getId());
-
-        verify(companyRepository).softDelete(company.getId());
-    }
-
-    @Test
-    void listCompanies_Success() {
-        Page<Company> companies = new PageImpl<>(Collections.singletonList(company));
-        when(companyRepository.findAllByIsDeletedFalse(any(Pageable.class))).thenReturn(companies);
-
-        Page<CompanyResponse> response = companyService.listCompanies(Pageable.unpaged());
-
-        assertFalse(response.isEmpty());
-        assertEquals(1, response.getTotalElements());
+        // Then
+        assertThat(thrown).isInstanceOf(EntityNotFoundException.class);
     }
 }

@@ -1,6 +1,13 @@
 {
     "title": "Faturalar",
     "singular": "Fatura",
+    "filters": {
+        "title": "Filtreler",
+        "detailedOptions": "Detaylı Filtreleme Seçenekleri",
+        "apply": "Filtreleri Uygula",
+        "clear": "Temizle",
+        "searchPlaceholder": "Fatura no, tedarikçi ara..."
+    },
     "export": "Dışa Aktar",
     "noExportPermission": "Dışa aktarım yetkiniz bulunmamaktadır",
     "uploadInvoice": "Fatura Yükle",

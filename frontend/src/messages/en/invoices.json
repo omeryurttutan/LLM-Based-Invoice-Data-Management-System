@@ -1,6 +1,13 @@
 {
     "title": "Invoices",
     "singular": "Invoice",
+    "filters": {
+        "title": "Filters",
+        "detailedOptions": "Detailed Filtering Options",
+        "apply": "Apply Filters",
+        "clear": "Clear",
+        "searchPlaceholder": "Search invoice no, supplier..."
+    },
     "export": "Export",
     "noExportPermission": "You do not have permission to export",
     "uploadInvoice": "Upload Invoice",

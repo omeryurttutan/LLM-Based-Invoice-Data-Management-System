@@ -12,7 +12,9 @@
     "charts": {
         "monthlyTrend": "Monthly Invoice Trend",
         "categoryDistribution": "Category Distribution",
-        "statusDistribution": "Status Distribution"
+        "statusDistribution": "Status Distribution",
+        "topSuppliers": "Top Suppliers",
+        "other": "Other"
     },
     "recent": {
         "title": "Recent Activity",
@@ -22,5 +24,37 @@
         "title": "Pending Actions",
         "verify": "Verify ({count})",
         "noActions": "No pending actions"
+    },
+    "performance": {
+        "title": "LLM Extraction Performance",
+        "description": "Success rates of AI models",
+        "successRate": "Success Rate",
+        "totalExtractions": "Total Extractions",
+        "avgConfidence": "Avg. Confidence",
+        "avgDuration": "Avg. Duration",
+        "providerAttempts": "Provider Attempts",
+        "model": "Model",
+        "success": "Success",
+        "error": "Error",
+        "cost": "Cost",
+        "successful": "Successful",
+        "failed": "Failed"
+    },
+    "system": {
+        "title": "System Status",
+        "description": "Current status of server and services",
+        "adminDescription": "Current status of server and services (Admin Panel)",
+        "allSystemsUp": "All Systems Operational",
+        "serviceOutage": "Service Outage",
+        "running": "RUNNING",
+        "down": "DOWN",
+        "resourceUsage": "Resource Usage",
+        "jvmHeap": "JVM Heap",
+        "dbConnections": "DB Connections",
+        "diskSpace": "Disk Space",
+        "recentAlerts": "Recent Alerts",
+        "noCriticalAlerts": "No critical alerts in the last 24 hours.",
+        "loadError": "System status could not be loaded.",
+        "checkAdmin": "Ensure you have admin privileges or check the service."
     }
 }

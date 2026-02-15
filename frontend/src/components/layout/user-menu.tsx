@@ -1,3 +1,5 @@
+'use client';
+
 import { useRouter } from 'next/navigation';
 import { User, Settings, LogOut, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';

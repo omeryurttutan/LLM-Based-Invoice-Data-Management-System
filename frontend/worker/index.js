@@ -119,15 +119,104 @@ registerRoute(
     })
 );
 
-// 3. API Responses - Stale While Revalidate
+// 3. API Responses - Specific Strategies
+
+// 3.1 Invoices List (5 minutes)
 registerRoute(
-    ({ url }) => url.pathname.startsWith('/api/v1/') && !url.pathname.includes('/auth/'),
+    ({ url }) => url.pathname === '/api/v1/invoices',
     new StaleWhileRevalidate({
-        cacheName: 'api-responses',
+        cacheName: 'api-invoices-list',
         plugins: [
             new ExpirationPlugin({
-                maxEntries: 100,
-                maxAgeSeconds: 15 * 60, // 15 minutes
+                maxEntries: 20,
+                maxAgeSeconds: 5 * 60,
+            }),
+        ],
+    })
+);
+
+// 3.2 Invoice Details (10 minutes)
+registerRoute(
+    ({ url }) => url.pathname.startsWith('/api/v1/invoices/') && !url.pathname.includes('/upload'),
+    new StaleWhileRevalidate({
+        cacheName: 'api-invoice-details',
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 50,
+                maxAgeSeconds: 10 * 60,
+            }),
+        ],
+    })
+);
+
+// 3.3 Dashboard (5 minutes)
+registerRoute(
+    ({ url }) => url.pathname.startsWith('/api/v1/dashboard'),
+    new StaleWhileRevalidate({
+        cacheName: 'api-dashboard',
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 10,
+                maxAgeSeconds: 5 * 60,
+            }),
+        ],
+    })
+);
+
+// 3.4 Categories (1 hour)
+registerRoute(
+    ({ url }) => url.pathname.startsWith('/api/v1/categories'),
+    new StaleWhileRevalidate({
+        cacheName: 'api-categories',
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60,
+            }),
+        ],
+    })
+);
+
+// 3.5 Templates & Rules (15 minutes)
+registerRoute(
+    ({ url }) => url.pathname.startsWith('/api/v1/templates') || url.pathname.startsWith('/api/v1/rules'),
+    new StaleWhileRevalidate({
+        cacheName: 'api-automation',
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 20,
+                maxAgeSeconds: 15 * 60,
+            }),
+        ],
+    })
+);
+
+// 3.6 Notifications (1 minute)
+registerRoute(
+    ({ url }) => url.pathname.startsWith('/api/v1/notifications'),
+    new StaleWhileRevalidate({
+        cacheName: 'api-notifications',
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 10,
+                maxAgeSeconds: 60,
+            }),
+        ],
+    })
+);
+
+// 3.7 General API Fallback (excluding auth and specific excluded paths)
+registerRoute(
+    ({ url }) => url.pathname.startsWith('/api/v1/') &&
+        !url.pathname.includes('/auth/') &&
+        !url.pathname.includes('/upload') &&
+        !url.pathname.includes('/export'),
+    new StaleWhileRevalidate({
+        cacheName: 'api-general',
+        plugins: [
+            new ExpirationPlugin({
+                maxEntries: 50,
+                maxAgeSeconds: 5 * 60,
             }),
         ],
     })

@@ -35,6 +35,7 @@ public class Company extends BaseEntity {
             String phone, String email, String website,
             String defaultCurrency, String invoicePrefix, boolean isActive) {
         super(id != null ? id : UUID.randomUUID());
+        validateTaxNumber(taxNumber);
         this.name = name;
         this.taxNumber = taxNumber;
         this.taxOffice = taxOffice;
@@ -53,10 +54,20 @@ public class Company extends BaseEntity {
     // Constructor for creating new company
     public Company(String name, String taxNumber) {
         super();
+        validateTaxNumber(taxNumber);
         this.name = name;
         this.taxNumber = taxNumber;
         this.defaultCurrency = "TRY";
         this.isActive = true;
+    }
+
+    private void validateTaxNumber(String taxNumber) {
+        if (taxNumber == null || taxNumber.length() != 10) {
+            throw new IllegalArgumentException("Tax number must be exactly 10 digits");
+        }
+        if (!taxNumber.matches("\\d+")) {
+            throw new IllegalArgumentException("Tax number must contain only digits");
+        }
     }
 
     public void updateInfo(String name, String taxOffice, String address, String city,

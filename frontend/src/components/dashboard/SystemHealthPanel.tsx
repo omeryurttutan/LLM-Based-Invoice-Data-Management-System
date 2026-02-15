@@ -7,16 +7,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useSystemStatus } from "@/hooks/use-dashboard";
 import { Button } from "@/components/ui/button";
+import { useFormatter, useTranslations } from "next-intl";
 
 export function SystemHealthPanel() {
     const { data, isLoading, error, refetch } = useSystemStatus(true);
+    const t = useTranslations('dashboard.system');
+    const tCommon = useTranslations('common');
+    const format = useFormatter();
 
     if (isLoading) {
         return (
             <Card className="col-span-full border-t-4 border-t-blue-500">
                 <CardHeader>
-                    <CardTitle>Sistem Durumu</CardTitle>
-                    <CardDescription>Sunucu ve servislerin anlık durumu</CardDescription>
+                    <CardTitle>{t('title')}</CardTitle>
+                    <CardDescription>{t('description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="h-[200px] flex items-center justify-center">
                     <Skeleton className="h-[150px] w-full" />
@@ -29,16 +33,16 @@ export function SystemHealthPanel() {
         return (
             <Card className="col-span-full border-t-4 border-t-red-500">
                 <CardHeader>
-                    <CardTitle>Sistem Durumu</CardTitle>
+                    <CardTitle>{t('title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="h-[200px] flex flex-col items-center justify-center text-center gap-4">
                     <div className="flex flex-col items-center text-muted-foreground">
                         <AlertTriangle className="h-8 w-8 text-red-500 mb-2" />
-                        <p>Sistem durumu yüklenemedi.</p>
-                        <p className="text-sm">Yönetici yetkisine sahip olduğunuzdan emin olun veya servisi kontrol edin.</p>
+                        <p>{t('loadError')}</p>
+                        <p className="text-sm">{t('checkAdmin')}</p>
                     </div>
                     <Button onClick={() => refetch()} variant="outline" size="sm">
-                        <RotateCcw className="mr-2 h-4 w-4" /> Tekrar Dene
+                        <RotateCcw className="mr-2 h-4 w-4" /> {tCommon('buttons.retry')}
                     </Button>
                 </CardContent>
             </Card>
@@ -57,9 +61,9 @@ export function SystemHealthPanel() {
                     <div>
                         <CardTitle className="flex items-center gap-2">
                             <Activity className="h-5 w-5 text-blue-500" />
-                            Sistem Durumu
+                            {t('title')}
                         </CardTitle>
-                        <CardDescription>Sunucu ve servislerin anlık durumu (Admin Paneli)</CardDescription>
+                        <CardDescription>{t('adminDescription')}</CardDescription>
                     </div>
                     <Badge
                         variant="outline"
@@ -67,7 +71,7 @@ export function SystemHealthPanel() {
                     ${allServicesUp ? 'text-green-600 bg-green-50 border-green-200' : 'text-red-600 bg-red-50 border-red-200'}
                 `}
                     >
-                        {allServicesUp ? "Tüm Sistemler Çalışıyor" : "Servis Kesintisi Var"}
+                        {allServicesUp ? t('allSystemsUp') : t('serviceOutage')}
                     </Badge>
                 </div>
             </CardHeader>
@@ -84,7 +88,7 @@ export function SystemHealthPanel() {
                             <div className="flex items-center gap-1.5">
                                 <div className={`h-2.5 w-2.5 rounded-full ${service.status === 'UP' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
                                 <span className={`text-xs font-bold ${service.status === 'UP' ? 'text-green-600' : 'text-red-600'}`}>
-                                    {service.status === 'UP' ? 'ÇALIŞIYOR' : 'KAPALI'}
+                                    {service.status === 'UP' ? t('running') : t('down')}
                                 </span>
                             </div>
                             {service.message && (
@@ -100,7 +104,7 @@ export function SystemHealthPanel() {
                     {/* Resource Usage */}
                     <div className="space-y-4">
                         <h4 className="text-sm font-semibold flex items-center gap-2">
-                            <Cpu className="h-4 w-4" /> Kaynak Kullanımı
+                            <Cpu className="h-4 w-4" /> {t('resourceUsage')}
                         </h4>
                         <div className="space-y-3">
                             <div>
@@ -155,13 +159,13 @@ export function SystemHealthPanel() {
                     {/* Recent Alerts */}
                     <div className="space-y-4">
                         <h4 className="text-sm font-semibold flex items-center gap-2">
-                            <AlertTriangle className="h-4 w-4" /> Son Alarmlar
+                            <AlertTriangle className="h-4 w-4" /> {t('recentAlerts')}
                         </h4>
                         <div className="space-y-2">
                             {data.alerts.length === 0 ? (
                                 <div className="flex items-center gap-3 text-sm p-3 rounded bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30">
                                     <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                    <span className="text-muted-foreground">Son 24 saatte kritik alarm yok.</span>
+                                    <span className="text-muted-foreground">{t('noCriticalAlerts')}</span>
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-2">
@@ -173,7 +177,7 @@ export function SystemHealthPanel() {
                                             <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
                                             <div className="flex flex-col">
                                                 <span className="font-medium">{alert.message}</span>
-                                                <span className="text-xs opacity-70">{new Date(alert.timestamp).toLocaleTimeString('tr-TR')}</span>
+                                                <span className="text-xs opacity-70">{format.dateTime(new Date(alert.timestamp), { hour: 'numeric', minute: 'numeric', second: 'numeric' })}</span>
                                             </div>
                                         </div>
                                     ))}

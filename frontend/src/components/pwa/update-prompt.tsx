@@ -57,6 +57,8 @@ export function UpdatePrompt() {
     const reloadPage = () => {
         if (waitingWorker) {
             waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+            // Also accept 'message' event listener in SW for some configurations
+            waitingWorker.postMessage('SKIP_WAITING');
         }
 
         // Also try Workbox message

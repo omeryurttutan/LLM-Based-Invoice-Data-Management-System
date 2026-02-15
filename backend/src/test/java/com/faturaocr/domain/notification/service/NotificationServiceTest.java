@@ -2,32 +2,33 @@ package com.faturaocr.domain.notification.service;
 
 import com.faturaocr.domain.notification.entity.Notification;
 import com.faturaocr.domain.notification.enums.NotificationReferenceType;
+import com.faturaocr.domain.notification.enums.NotificationSeverity;
 import com.faturaocr.domain.notification.enums.NotificationType;
-import com.faturaocr.domain.notification.service.channel.EmailNotificationChannel;
-import com.faturaocr.domain.notification.service.channel.InAppNotificationChannel;
 import com.faturaocr.domain.notification.service.channel.NotificationChannel;
-import com.faturaocr.domain.notification.service.channel.PushNotificationChannel;
 import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.port.UserRepository;
 import com.faturaocr.infrastructure.persistence.notification.NotificationRepository;
+import com.faturaocr.testutil.TestFixtures;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
@@ -39,30 +40,13 @@ class NotificationServiceTest {
     @Mock
     private NotificationPreferenceService preferenceService;
 
-    @Mock
-    private InAppNotificationChannel inAppChannel;
-    @Mock
-    private EmailNotificationChannel emailChannel;
-    @Mock
-    private PushNotificationChannel pushChannel;
-
+    private NotificationChannel mockChannel;
     private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
-        List<NotificationChannel> channels = new ArrayList<>();
-        channels.add(inAppChannel);
-        channels.add(emailChannel);
-        channels.add(pushChannel);
-
-        when(inAppChannel.getChannelName()).thenReturn("in_app");
-        when(emailChannel.getChannelName()).thenReturn("email");
-        when(pushChannel.getChannelName()).thenReturn("push");
-
-        when(inAppChannel.supports(any())).thenReturn(true);
-        when(emailChannel.supports(any())).thenReturn(true);
-        when(pushChannel.supports(any())).thenReturn(true);
-
+        mockChannel = mock(NotificationChannel.class);
+        List<NotificationChannel> channels = Collections.singletonList(mockChannel);
         notificationService = new NotificationService(
                 notificationRepository,
                 userRepository,
@@ -71,23 +55,111 @@ class NotificationServiceTest {
     }
 
     @Test
-    void notify_ShouldDispatchToEnabledChannels() {
+    @DisplayName("Should notify and dispatch to enabled channels")
+    void shouldNotifyAndDispatchToEnabledChannels() {
+        // Given
         UUID userId = UUID.randomUUID();
-        UUID companyId = UUID.randomUUID();
-        NotificationType type = NotificationType.EXTRACTION_COMPLETED;
+        UUID companyId = TestFixtures.COMPANY_ID;
+        NotificationType type = NotificationType.INVOICE_VERIFIED;
 
-        when(notificationRepository.save(any(Notification.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(i -> i.getArgument(0));
 
-        // Mock preferences: InApp=true, Email=true, Push=false
-        when(preferenceService.isChannelEnabled(userId, type, "in_app")).thenReturn(true);
+        // Mock channel behavior
+        when(mockChannel.supports(type)).thenReturn(true);
+        when(mockChannel.getChannelName()).thenReturn("email");
         when(preferenceService.isChannelEnabled(userId, type, "email")).thenReturn(true);
-        when(preferenceService.isChannelEnabled(userId, type, "push")).thenReturn(false);
 
-        notificationService.notify(userId, companyId, type, "Title", "Message",
+        // When
+        notificationService.notify(userId, companyId, type, "Title", "Message", NotificationReferenceType.INVOICE,
+                UUID.randomUUID(), null);
+
+        // Then
+        verify(notificationRepository).save(any(Notification.class));
+        try {
+            verify(mockChannel).send(any(Notification.class), eq(userId));
+        } catch (Exception e) {
+            // Should not happen
+        }
+    }
+
+    @Test
+    @DisplayName("Should not dispatch if channel is disabled")
+    void shouldNotDispatchIfChannelIsDisabled() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        UUID companyId = TestFixtures.COMPANY_ID;
+        NotificationType type = NotificationType.INVOICE_VERIFIED;
+
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(i -> i.getArgument(0));
+
+        when(mockChannel.supports(type)).thenReturn(true);
+        when(mockChannel.getChannelName()).thenReturn("email");
+        when(preferenceService.isChannelEnabled(userId, type, "email")).thenReturn(false);
+
+        // When
+        notificationService.notify(userId, companyId, type, "Title", "Message", NotificationReferenceType.INVOICE,
+                UUID.randomUUID(), null);
+
+        // Then
+        verify(notificationRepository).save(any(Notification.class));
+        try {
+            verify(mockChannel, never()).send(any(Notification.class), eq(userId));
+        } catch (Exception e) {
+        }
+    }
+
+    @Test
+    @DisplayName("Should notify company users")
+    void shouldNotifyCompanyUsers() {
+        // Given
+        UUID companyId = TestFixtures.COMPANY_ID;
+        User user1 = com.faturaocr.testutil.TestDataBuilder.aUser().withId(UUID.randomUUID()).build();
+        User user2 = com.faturaocr.testutil.TestDataBuilder.aUser().withId(UUID.randomUUID()).build();
+
+        when(userRepository.findAllByCompanyId(companyId)).thenReturn(List.of(user1, user2));
+        when(notificationRepository.save(any(Notification.class))).thenAnswer(i -> i.getArgument(0));
+
+        // When
+        notificationService.notifyCompany(companyId, NotificationType.INVOICE_REJECTED, "Title", "Message",
                 NotificationReferenceType.INVOICE, UUID.randomUUID(), null);
 
-        verify(inAppChannel, times(1)).send(any(Notification.class), any(UUID.class));
-        verify(emailChannel, times(1)).send(any(Notification.class), any(UUID.class));
-        verify(pushChannel, never()).send(any(Notification.class), any(UUID.class));
+        // Then
+        verify(notificationRepository, org.mockito.Mockito.times(2)).save(any(Notification.class));
+    }
+
+    @Test
+    @DisplayName("Should mark notification as read")
+    void shouldMarkNotificationAsRead() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        UUID notificationId = UUID.randomUUID();
+        Notification notification = new Notification();
+        notification.setId(notificationId);
+        notification.setUserId(userId);
+        notification.setRead(false);
+
+        when(notificationRepository.findByIdAndUserId(notificationId, userId)).thenReturn(Optional.of(notification));
+
+        // When
+        notificationService.markAsRead(notificationId, userId);
+
+        // Then
+        assertThat(notification.isRead()).isTrue();
+        assertThat(notification.getReadAt()).isNotNull();
+        verify(notificationRepository).save(notification);
+    }
+
+    @Test
+    @DisplayName("Should get unread count")
+    void shouldGetUnreadCount() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        when(notificationRepository.countByUserIdAndIsReadFalse(userId)).thenReturn(5L);
+
+        // When
+        long count = notificationService.getUnreadCount(userId);
+
+        // Then
+        assertThat(count).isEqualTo(5L);
     }
 }

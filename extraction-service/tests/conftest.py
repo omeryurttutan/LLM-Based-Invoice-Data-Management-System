@@ -1,6 +1,8 @@
 import pytest
 from PIL import Image
 import io
+import json
+import os
 try:
     import fitz # PyMuPDF
 except ImportError:
@@ -69,8 +71,7 @@ def rotated_image_bytes():
     """Create an image with EXIF rotation."""
     img = Image.new('RGB', (100, 50), color='green')
     exif = img.getexif()
-    exif[0x0112] = 6 # Rotated 90 CW (Requires 90 CW to fix? Or implies 90 CW state?)
-    # Tag 6 = The 0th row is the visual right-hand side of the image
+    exif[0x0112] = 6 # Rotated 90 CW
     buf = io.BytesIO()
     img.save(buf, format='JPEG', exif=exif)
     return buf.getvalue()
@@ -79,3 +80,42 @@ def rotated_image_bytes():
 def mock_upload_file(test_image_bytes):
     from fastapi import UploadFile
     return UploadFile(filename="test.jpg", file=io.BytesIO(test_image_bytes))
+
+# --- LLM Response Fixtures ---
+
+@pytest.fixture
+def mock_gemini_response():
+    """Return a mock Gemini response."""
+    path = os.path.join(os.path.dirname(__file__), "fixtures", "llm_responses", "gemini_valid.json")
+    with open(path, "r") as f:
+        return f.read()
+
+@pytest.fixture
+def mock_gpt_response():
+    """Return a mock OpenAI response."""
+    path = os.path.join(os.path.dirname(__file__), "fixtures", "llm_responses", "gpt_valid.json")
+    with open(path, "r") as f:
+        return f.read()
+
+@pytest.fixture
+def mock_claude_response():
+    """Return a mock Claude response."""
+    path = os.path.join(os.path.dirname(__file__), "fixtures", "llm_responses", "claude_valid.json")
+    with open(path, "r") as f:
+        return f.read()
+
+@pytest.fixture
+def mock_malformed_response():
+    """Return a malformed JSON response."""
+    path = os.path.join(os.path.dirname(__file__), "fixtures", "llm_responses", "malformed.json")
+    with open(path, "r") as f:
+        return f.read()
+
+# --- XML Fixtures ---
+
+@pytest.fixture
+def sample_xml_content():
+    """Return a sample valid UBL-TR XML content."""
+    path = os.path.join(os.path.dirname(__file__), "fixtures", "sample_xml", "valid_invoice.xml")
+    with open(path, "r") as f:
+        return f.read()

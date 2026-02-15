@@ -34,7 +34,8 @@
         "processing": "Processing",
         "active": "Active",
         "inactive": "Inactive",
-        "locked": "Locked"
+        "locked": "Locked",
+        "created": "Created"
     },
     "messages": {
         "success": {
@@ -73,7 +74,8 @@
         "noData": "No data found",
         "loading": "Loading...",
         "showing": "Showing {from}-{to} of {total}",
-        "rowsPerPage": "Rows per page"
+        "rowsPerPage": "Rows per page",
+        "count": "Count"
     },
     "time": {
         "justNow": "Just now",

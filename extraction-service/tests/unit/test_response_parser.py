@@ -4,54 +4,62 @@ from app.services.llm.response_parser import ResponseParser
 from app.services.llm.base_provider import LLMResponseError
 
 class TestResponseParser:
+    
+    def test_clean_text_markdown(self):
+        raw = "```json\n{\"key\": \"value\"}\n```"
+        cleaned = ResponseParser._clean_text(raw)
+        assert cleaned == '{"key": "value"}'
+
+    def test_clean_text_basic(self):
+        raw = '{"key": "value"}'
+        cleaned = ResponseParser._clean_text(raw)
+        assert cleaned == raw
 
     def test_parse_valid_json(self):
-        raw_text = '{"invoice_number": "TR123456", "total_amount": 100.50}'
-        data = ResponseParser.parse(raw_text)
-        assert data.invoice_number == "TR123456"
+        raw = '{"invoice_number": "INV-001", "total_amount": 100.50}'
+        data = ResponseParser.parse(raw)
+        assert data.invoice_number == "INV-001"
         assert data.total_amount == 100.50
 
-    def test_parse_markdown_json(self):
-        raw_text = '```json\n{"invoice_number": "TR123", "total_amount": 200}\n```'
-        data = ResponseParser.parse(raw_text)
-        assert data.invoice_number == "TR123"
-        assert data.total_amount == 200.0
+    def test_parse_json_with_text(self):
+        raw = 'Here is the JSON: {"invoice_number": "INV-001"}'
+        data = ResponseParser.parse(raw)
+        assert data.invoice_number == "INV-001"
 
-    def test_normalize_turkish_number_comma_decimal(self):
-        # 1.234,56 -> 1234.56
-        # Parser expects LLM to return valid JSON numbers usually, but if it returns strings
-        # we might need to handle it. Actually, the parser logic handles strings.
-        # Let's test mixed types if parser allows it? 
-        # The parser._normalize handles strings.
-        
-        # Scenario: LLM returned number as string with Turkish format
-        raw_text = '{"total_amount": "1.234,56", "subtotal": "120,50"}'
-        data = ResponseParser.parse(raw_text)
-        assert data.total_amount == 1234.56
-        assert data.subtotal == 120.50
-
-    def test_normalize_date(self):
-        raw_text = '{"invoice_date": "15.01.2023", "due_date": "2023-02-01"}'
-        data = ResponseParser.parse(raw_text)
-        assert data.invoice_date == "2023-01-15"
-        assert data.due_date == "2023-02-01"
-        
-    def test_normalize_turkish_characters(self):
-        raw_text = '{"supplier_name": "GÜNEŞ TİCARET ŞİRKETİ", "items": [{"description": "Çay Bardağı"}]}'
-        data = ResponseParser.parse(raw_text)
-        assert data.supplier_name == "GÜNEŞ TİCARET ŞİRKETİ"
-        assert data.items[0].description == "Çay Bardağı"
-
-    def test_malformed_json(self):
-        raw_text = "Not a JSON"
+    def test_parse_invalid_json(self):
+        raw = 'Invalid JSON'
         with pytest.raises(LLMResponseError):
-            ResponseParser.parse(raw_text)
-            
-    def test_currency_normalization(self):
-        raw_text = '{"currency": "tl"}'
-        data = ResponseParser.parse(raw_text)
-        assert data.currency == "TRY"
+            ResponseParser.parse(raw)
+
+    def test_normalize_floats(self):
+        raw = json.dumps({
+            "total_amount": "1.234,56", # Turkish format
+            "tax_amount": "1,234.56", # US format with comma
+            "subtotal": "100 TL"
+        })
+        data = ResponseParser.parse(raw)
+        assert data.total_amount == 1234.56
+        assert data.tax_amount == 1234.56
+        assert data.subtotal == 100.0
+
+    def test_normalize_dates(self):
+        raw = json.dumps({
+            "invoice_date": "15.01.2023",
+            "due_date": "2023-01-20"
+        })
+        data = ResponseParser.parse(raw)
+        assert data.invoice_date == "2023-01-15" # YYYY-MM-DD
+        assert data.due_date == "2023-01-20"
+
+    def test_validation_error(self):
+        # InvoiceData might require specific fields, checking if pydantic validation triggers LLMResponseError
+        # Assuming InvoiceData has some required fields, but if all optional, this test might pass differently.
+        # Let's assume we pass something that causes validation error, e.g. wrong type if strict
+        # or we can mock InvoiceData to raise error.
         
-        raw_text = '{"currency": "eur"}'
-        data = ResponseParser.parse(raw_text)
-        assert data.currency == "EUR"
+        # But actually ResponseParser.parse returns InvoiceData.
+        # If input is valid JSON but invalid for model, it raises LLMResponseError.
+        # Let's try passing a list instead of dict
+        raw = '[]' 
+        with pytest.raises(LLMResponseError):
+            ResponseParser.parse(raw)

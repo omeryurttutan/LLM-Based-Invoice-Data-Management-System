@@ -71,10 +71,17 @@ class ResponseParser:
                 val = val.replace("TL", "").replace("TRY", "").strip()
                 # If comma is used as decimal (Turkish format), replace
                 if "," in val and "." in val:
-                    # 1.234,56 -> 1234.56
-                    val = val.replace(".", "").replace(",", ".")
+                    if val.rfind(",") > val.rfind("."):
+                         # TR/EU Format: 1.234,56 -> Remove dot, replace comma with dot
+                         val = val.replace(".", "").replace(",", ".")
+                    else:
+                         # US Format: 1,234.56 -> Remove comma
+                         val = val.replace(",", "")
                 elif "," in val:
-                     # 1234,56 -> 1234.56
+                     # Ambiguous case: 1234,56 or 1,234?
+                     # Standardize on comma being decimal if no dot present? 
+                     # Or assume TR default?
+                     # app defaults to TR logic: 1234,56 -> 1234.56
                      val = val.replace(",", ".")
                 try:
                     return float(val)

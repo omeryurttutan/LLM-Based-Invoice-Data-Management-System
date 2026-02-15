@@ -29,3 +29,4 @@ target-version = ["py311"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+addopts = "--cov=app --cov-report=term-missing --cov-report=html"

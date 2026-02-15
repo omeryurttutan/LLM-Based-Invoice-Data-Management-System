@@ -80,13 +80,12 @@ import { FilterPanel } from '@/components/invoices/filter-panel';
 import { SearchBar } from '@/components/invoices/search-bar';
 import { ActiveFilters } from '@/components/invoices/active-filters';
 import { ExportDialog } from '@/components/invoices/export-dialog';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 
 export default function InvoicesPage() {
   const t = useTranslations('invoices');
   const tCommon = useTranslations('common');
-  const locale = useLocale();
-  const dateLocale = locale === 'tr' ? tr : enUS;
+  const format = useFormatter();
 
   const statusConfig: Record<InvoiceStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
     PENDING: { label: t('status.pending'), variant: 'secondary' },
@@ -259,8 +258,8 @@ export default function InvoicesPage() {
                 <TableRow key={invoice.id} className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(`/invoices/${invoice.id}`)}>
                   <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
                   <TableCell>{invoice.supplierName}</TableCell>
-                  <TableCell>{format(new Date(invoice.invoiceDate), 'd MMM yyyy', { locale: dateLocale })}</TableCell>
-                  <TableCell>{formatCurrency(invoice.totalAmount, invoice.currency)}</TableCell>
+                  <TableCell>{format.dateTime(new Date(invoice.invoiceDate), { dateStyle: 'medium' })}</TableCell>
+                  <TableCell>{format.number(invoice.totalAmount, { style: 'currency', currency: invoice.currency })}</TableCell>
                   <TableCell>
                     {invoice.categoryName ? (
                       <Badge variant="outline">{invoice.categoryName}</Badge>

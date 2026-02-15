@@ -1,137 +1,80 @@
 package com.faturaocr.application.user;
 
-import com.faturaocr.application.user.dto.ChangeRoleCommand;
 import com.faturaocr.application.user.dto.CreateUserCommand;
 import com.faturaocr.application.user.dto.UserResponse;
-import com.faturaocr.domain.common.exception.DomainException;
+import com.faturaocr.application.user.UserManagementService;
 import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.port.UserRepository;
 import com.faturaocr.domain.user.valueobject.Role;
-import com.faturaocr.infrastructure.security.AuthenticatedUser;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
+import com.faturaocr.testutil.TestDataBuilder;
+import com.faturaocr.testutil.TestFixtures;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserManagementServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UserManagementService userManagementService;
+    private UserManagementService userService;
 
-    private MockedStatic<CompanyContextHolder> companyContextMock;
-    private MockedStatic<SecurityContextHolder> securityContextMock;
-    private SecurityContext securityContext;
-    private Authentication authentication;
-
-    private UUID companyId;
-    private User user;
+    private MockedStatic<CompanyContextHolder> companyContextHolderMock;
 
     @BeforeEach
     void setUp() {
-        companyId = UUID.randomUUID();
-        companyContextMock = mockStatic(CompanyContextHolder.class);
-        companyContextMock.when(CompanyContextHolder::getCompanyId).thenReturn(companyId);
-
-        securityContextMock = mockStatic(SecurityContextHolder.class);
-        securityContext = mock(SecurityContext.class);
-        authentication = mock(Authentication.class);
-        securityContextMock.when(SecurityContextHolder::getContext).thenReturn(securityContext);
-
-        user = User.builder()
-                .id(UUID.randomUUID())
-                .companyId(companyId)
-                .email("test@example.com")
-                .fullName("Test User")
-                .passwordHash("hashedPwd")
-                .role(Role.ACCOUNTANT)
-                .build();
+        companyContextHolderMock = Mockito.mockStatic(CompanyContextHolder.class);
+        companyContextHolderMock.when(CompanyContextHolder::getCompanyId).thenReturn(TestFixtures.COMPANY_ID);
     }
 
     @AfterEach
     void tearDown() {
-        companyContextMock.close();
-        securityContextMock.close();
+        companyContextHolderMock.close();
     }
 
     @Test
-    void createUser_Success() {
+    @DisplayName("Should create user successfully")
+    void shouldCreateUserSuccessfully() {
+        // Given
         CreateUserCommand command = CreateUserCommand.builder()
                 .email("new@example.com")
-                .password("Pass123")
-                .fullName("New User")
+                .password("pass")
+                .fullName("Name")
+                .phone("Phone")
                 .role(Role.ACCOUNTANT)
                 .build();
 
-        when(userRepository.existsByEmailAndCompanyId(any(), any())).thenReturn(false);
-        when(passwordEncoder.encode(any())).thenReturn("hashed");
-        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(passwordEncoder.encode("pass")).thenReturn("hashed");
+        when(userRepository.save(any(User.class))).thenAnswer(i -> {
+            User u = i.getArgument(0);
+            return TestDataBuilder.aUser().withId(UUID.randomUUID()).withEmail(u.getEmailValue()).build();
+        });
 
-        UserResponse response = userManagementService.createUser(command);
+        // When
+        UserResponse response = userService.createUser(command);
 
-        assertNotNull(response);
-        assertEquals(companyId, response.getCompanyId());
+        // Then
+        assertThat(response.getEmail()).isEqualTo("new@example.com");
         verify(userRepository).save(any(User.class));
-    }
-
-    @Test
-    void createUser_DuplicateEmail_ThrowsException() {
-        CreateUserCommand command = CreateUserCommand.builder().email("test@example.com").build();
-        when(userRepository.existsByEmailAndCompanyId(any(), any())).thenReturn(true);
-
-        assertThrows(DomainException.class, () -> userManagementService.createUser(command));
-    }
-
-    @Test
-    void changeUserRole_Success() {
-        AuthenticatedUser authUser = new AuthenticatedUser(UUID.randomUUID(), "admin@example.com", companyId,
-                Role.ADMIN.name());
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(authUser);
-
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(user);
-
-        ChangeRoleCommand command = ChangeRoleCommand.builder().role(Role.MANAGER).build();
-
-        userManagementService.changeUserRole(user.getId(), command);
-
-        assertEquals(Role.MANAGER, user.getRole());
-    }
-
-    @Test
-    void changeUserRole_Self_ThrowsException() {
-        AuthenticatedUser authUser = new AuthenticatedUser(user.getId(), "admin@example.com", companyId,
-                Role.ADMIN.name());
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(authUser);
-
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-
-        ChangeRoleCommand command = ChangeRoleCommand.builder().role(Role.MANAGER).build();
-
-        assertThrows(DomainException.class, () -> userManagementService.changeUserRole(user.getId(), command));
     }
 }

@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopSuppliers } from "@/services/dashboard.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useFormatter, useTranslations } from "next-intl";
 
 interface TopSuppliersChartProps {
   data?: TopSuppliers;
@@ -28,12 +29,15 @@ export function TopSuppliersChart({
   currency,
 }: TopSuppliersChartProps) {
   const router = useRouter();
+  const t = useTranslations('dashboard.charts');
+  const tCards = useTranslations('dashboard.cards');
+  const format = useFormatter();
 
   if (loading) {
     return (
       <Card className="col-span-1">
         <CardHeader>
-          <CardTitle>En Çok Çalışılan Tedarikçiler</CardTitle>
+          <CardTitle>{t('topSuppliers')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[300px] flex items-center justify-center">
           <Skeleton className="h-[250px] w-full" />
@@ -46,7 +50,7 @@ export function TopSuppliersChart({
     ? [
       ...data.suppliers,
       {
-        supplierName: "Diğer",
+        supplierName: t('other'),
         totalAmount: data.othersAmount,
         invoiceCount: data.othersCount,
         percentage: 0, // calculate if needed or show different tooltip
@@ -55,16 +59,16 @@ export function TopSuppliersChart({
     : [];
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("tr-TR", {
+    return format.number(amount, {
       style: "currency",
       currency: currency,
       maximumFractionDigits: 0,
-    }).format(amount);
+    });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const tooltipFormatter = (value: any) => {
-    return [formatCurrency(value), "Toplam Tutar"] as [string, string];
+    return [formatCurrency(value), tCards('totalAmount')] as [string, string];
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,7 +81,7 @@ export function TopSuppliersChart({
   return (
     <Card className="col-span-1">
       <CardHeader>
-        <CardTitle>En Çok Çalışılan Tedarikçiler</CardTitle>
+        <CardTitle>{t('topSuppliers')}</CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -116,7 +120,7 @@ export function TopSuppliersChart({
             />
             <Bar dataKey="totalAmount" radius={[0, 4, 4, 0]}>
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.supplierName === "Diğer" ? "#9ca3af" : "#f59e0b"} />
+                <Cell key={`cell-${index}`} fill={entry.supplierName === t('other') ? "#9ca3af" : "#f59e0b"} />
               ))}
             </Bar>
           </BarChart>

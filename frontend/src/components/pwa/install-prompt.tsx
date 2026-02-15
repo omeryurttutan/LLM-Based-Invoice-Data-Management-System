@@ -55,14 +55,14 @@ export function InstallPrompt() {
     if (!showPrompt) return null;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 p-4 z-50 animate-in slide-in-from-bottom duration-500">
-            <div className="bg-background border rounded-lg shadow-lg p-4 flex flex-col gap-4 max-w-sm mx-auto">
+        <div className="fixed bottom-4 left-4 right-4 z-50 animate-in slide-in-from-bottom duration-500 md:left-auto md:right-4 md:w-96">
+            <div className="bg-background border rounded-lg shadow-lg p-4 flex flex-col gap-4">
                 <div className="flex items-start justify-between">
                     <div className="flex gap-3">
-                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-primary/10">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-primary/10 flex-shrink-0">
                             <Image
                                 src="/icons/icon-192x192.png"
-                                alt="App Icon"
+                                alt="Uygulama İkonu"
                                 width={48}
                                 height={48}
                                 className="object-cover"
@@ -70,7 +70,7 @@ export function InstallPrompt() {
                         </div>
                         <div>
                             <h3 className="font-semibold text-foreground">FaturaOCR&apos;u Yükle</h3>
-                            <p className="text-sm text-muted-foreground">Ana ekrana ekleyerek daha hızlı erişin.</p>
+                            <p className="text-sm text-muted-foreground">Ana ekrana ekleyerek daha hızlı erişin ve çevrimdışı kullanın.</p>
                         </div>
                     </div>
                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleDismiss}>

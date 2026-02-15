@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ExtractionPerformance } from "@/services/dashboard.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+import { useFormatter, useTranslations } from "next-intl";
 
 interface ExtractionPerformanceCardProps {
   data?: ExtractionPerformance;
@@ -13,6 +14,9 @@ interface ExtractionPerformanceCardProps {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
+  const t = useTranslations('dashboard.performance');
+  const format = useFormatter();
+
   if (active && payload && payload.length) {
     const d = payload[0].payload;
     return (
@@ -20,7 +24,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <div className="grid grid-cols-2 gap-2">
           <div className="flex flex-col">
             <span className="text-[0.70rem] uppercase text-muted-foreground">
-              Model
+              {t('model')}
             </span>
             <span className="font-bold text-muted-foreground">
               {d.provider}
@@ -28,7 +32,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           </div>
           <div className="flex flex-col">
             <span className="text-[0.70rem] uppercase text-muted-foreground">
-              Başarı
+              {t('success')}
             </span>
             <span className="font-bold text-green-500">
               {d.successCount}
@@ -36,7 +40,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           </div>
           <div className="flex flex-col">
             <span className="text-[0.70rem] uppercase text-muted-foreground">
-              Hata
+              {t('error')}
             </span>
             <span className="font-bold text-red-500">
               {d.errorCount}
@@ -44,10 +48,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           </div>
           <div className="flex flex-col">
             <span className="text-[0.70rem] uppercase text-muted-foreground">
-              Maliyet
+              {t('cost')}
             </span>
             <span className="font-bold">
-              ${d.cost.toFixed(4)}
+              {format.number(d.cost, { style: 'currency', currency: 'USD', minimumFractionDigits: 4 })}
             </span>
           </div>
         </div>
@@ -58,12 +62,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function ExtractionPerformanceCard({ data, loading }: ExtractionPerformanceCardProps) {
+  const t = useTranslations('dashboard.performance');
+
   if (loading) {
     return (
       <Card className="col-span-full">
         <CardHeader>
-          <CardTitle>LLM Çıkarım Performansı</CardTitle>
-          <CardDescription>Yapay zeka modellerinin başarı oranları</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent className="h-[200px] flex items-center justify-center">
           <Skeleton className="h-[150px] w-full" />
@@ -80,8 +86,8 @@ export function ExtractionPerformanceCard({ data, loading }: ExtractionPerforman
   }
 
   const successData = [
-    { name: "Başarılı", value: data.successRate, color: "#22c55e" },
-    { name: "Başarısız", value: 100 - data.successRate, color: "#ef4444" },
+    { name: t('successful'), value: data.successRate, color: "#22c55e" },
+    { name: t('failed'), value: 100 - data.successRate, color: "#ef4444" },
   ];
 
   const providerData = data.byProvider.map(p => ({
@@ -98,8 +104,8 @@ export function ExtractionPerformanceCard({ data, loading }: ExtractionPerforman
   return (
     <Card className="col-span-full">
       <CardHeader>
-        <CardTitle>LLM Çıkarım Performansı</CardTitle>
-        <CardDescription>Yapay zeka modellerinin başarı oranları</CardDescription>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
@@ -128,23 +134,23 @@ export function ExtractionPerformanceCard({ data, loading }: ExtractionPerforman
               {data.successRate}%
             </div>
           </div>
-          <span className="text-sm font-medium mt-2">Başarı Oranı</span>
+          <span className="text-sm font-medium mt-2">{t('successRate')}</span>
         </div>
 
         {/* Metric 2: Stats Grid */}
         <div className="grid grid-cols-1 gap-4 text-center">
           <div className="flex flex-col p-4 bg-muted rounded-lg">
             <span className="text-2xl font-bold">{data.totalExtractions}</span>
-            <span className="text-xs text-muted-foreground w-full">Toplam Çıkarım</span>
+            <span className="text-xs text-muted-foreground w-full">{t('totalExtractions')}</span>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col p-4 bg-muted rounded-lg">
               <span className="text-lg font-bold">%{data.averageConfidence}</span>
-              <span className="text-xs text-muted-foreground">Ort. Güven</span>
+              <span className="text-xs text-muted-foreground">{t('avgConfidence')}</span>
             </div>
             <div className="flex flex-col p-4 bg-muted rounded-lg">
               <span className="text-lg font-bold">{data.averageDuration}sn</span>
-              <span className="text-xs text-muted-foreground">Ort. Süre</span>
+              <span className="text-xs text-muted-foreground">{t('avgDuration')}</span>
             </div>
           </div>
         </div>
@@ -166,7 +172,7 @@ export function ExtractionPerformanceCard({ data, loading }: ExtractionPerforman
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <p className="text-center text-xs text-muted-foreground mt-2">Sağlayıcı Bazlı Denemeler</p>
+          <p className="text-center text-xs text-muted-foreground mt-2">{t('providerAttempts')}</p>
         </div>
       </CardContent>
     </Card>

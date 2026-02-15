@@ -14,9 +14,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusTimeline } from "@/services/dashboard.service";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format, parseISO } from "date-fns";
-import { tr } from "date-fns/locale";
 import { useRouter } from "next/navigation";
+import { useFormatter, useTranslations } from "next-intl";
 
 interface StatusTimelineChartProps {
   data?: StatusTimeline[];
@@ -25,12 +24,15 @@ interface StatusTimelineChartProps {
 
 export function StatusTimelineChart({ data, loading }: StatusTimelineChartProps) {
   const router = useRouter();
+  const t = useTranslations('dashboard.charts');
+  const tStatus = useTranslations('common.status');
+  const format = useFormatter();
 
   if (loading) {
     return (
       <Card className="col-span-full">
         <CardHeader>
-          <CardTitle>Durum Zaman Çizelgesi</CardTitle>
+          <CardTitle>{t('statusTimeline')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[300px] flex items-center justify-center">
           <Skeleton className="h-[250px] w-full" />
@@ -50,7 +52,7 @@ export function StatusTimelineChart({ data, loading }: StatusTimelineChartProps)
   return (
     <Card className="col-span-full">
       <CardHeader>
-        <CardTitle>Durum Zaman Çizelgesi (Son 30 Gün)</CardTitle>
+        <CardTitle>{t('statusTimeline')}</CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -68,21 +70,21 @@ export function StatusTimelineChart({ data, loading }: StatusTimelineChartProps)
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis
               dataKey="date"
-              tickFormatter={(value) => format(parseISO(value), 'dd MMM', { locale: tr })}
+              tickFormatter={(value) => format.dateTime(new Date(value), { day: '2-digit', month: 'short' })}
               fontSize={12}
               tickLine={false}
               axisLine={false}
             />
             <YAxis fontSize={12} tickLine={false} axisLine={false} />
             <Tooltip
-              labelFormatter={(value) => format(parseISO(value), 'dd MMMM yyyy', { locale: tr })}
+              labelFormatter={(value) => format.dateTime(new Date(value), { day: '2-digit', month: 'long', year: 'numeric' })}
               contentStyle={{ borderRadius: "8px" }}
             />
             <Legend />
             <Area
               type="monotone"
               dataKey="created"
-              name="Oluşturulan"
+              name={tStatus('created')} // Assuming 'created' exists or map to correct status
               stackId="1"
               stroke="#3b82f6"
               fill="#3b82f6"
@@ -91,7 +93,7 @@ export function StatusTimelineChart({ data, loading }: StatusTimelineChartProps)
             <Area
               type="monotone"
               dataKey="verified"
-              name="Onaylanan"
+              name={tStatus('verified')}
               stackId="1"
               stroke="#22c55e"
               fill="#22c55e"
@@ -100,7 +102,7 @@ export function StatusTimelineChart({ data, loading }: StatusTimelineChartProps)
             <Area
               type="monotone"
               dataKey="rejected"
-              name="Reddedilen"
+              name={tStatus('rejected')}
               stackId="1"
               stroke="#ef4444"
               fill="#ef4444"

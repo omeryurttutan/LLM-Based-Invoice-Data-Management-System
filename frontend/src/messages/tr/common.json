@@ -34,7 +34,8 @@
         "processing": "İşleniyor",
         "active": "Aktif",
         "inactive": "Pasif",
-        "locked": "Kilitli"
+        "locked": "Kilitli",
+        "created": "Oluşturuldu"
     },
     "messages": {
         "success": {
@@ -73,7 +74,8 @@
         "noData": "Veri bulunamadı",
         "loading": "Yükleniyor...",
         "showing": "{from}-{to} arası gösteriliyor, toplam {total}",
-        "rowsPerPage": "Sayfa başına satır"
+        "rowsPerPage": "Sayfa başına satır",
+        "count": "Adet"
     },
     "time": {
         "justNow": "Az önce",

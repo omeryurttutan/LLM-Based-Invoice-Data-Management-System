@@ -16,6 +16,7 @@ import { MonthlyTrend } from "@/services/dashboard.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { format, parseISO, endOfMonth } from "date-fns";
+import { useFormatter, useTranslations } from "next-intl";
 
 interface MonthlyTrendChartProps {
   data?: MonthlyTrend[];
@@ -30,11 +31,14 @@ export function MonthlyTrendChart({
 }: MonthlyTrendChartProps) {
   const router = useRouter();
 
+  const t = useTranslations('dashboard.charts');
+  const formatNumber = useFormatter();
+
   if (loading) {
     return (
       <Card className="col-span-1">
         <CardHeader>
-          <CardTitle>Aylık Trend</CardTitle>
+          <CardTitle>{t('monthlyTrend')}</CardTitle>
         </CardHeader>
         <CardContent className="h-[300px] flex items-center justify-center">
           <Skeleton className="h-[250px] w-full" />
@@ -44,11 +48,11 @@ export function MonthlyTrendChart({
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("tr-TR", {
+    return formatNumber.number(amount, {
       style: "currency",
       currency: currency,
       maximumFractionDigits: 0,
-    }).format(amount);
+    });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,7 +72,7 @@ export function MonthlyTrendChart({
   return (
     <Card className="col-span-1">
       <CardHeader>
-        <CardTitle>Aylık Trend</CardTitle>
+        <CardTitle>{t('monthlyTrend')}</CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -87,10 +91,10 @@ export function MonthlyTrendChart({
             <XAxis dataKey="label" fontSize={12} tickLine={false} axisLine={false} />
             <YAxis
               tickFormatter={(value) =>
-                new Intl.NumberFormat("tr-TR", {
+                formatNumber.number(value, {
                   notation: "compact",
                   compactDisplay: "short",
-                }).format(value)
+                })
               }
               fontSize={12}
               tickLine={false}
@@ -104,7 +108,7 @@ export function MonthlyTrendChart({
             <Line
               type="monotone"
               dataKey="totalAmount"
-              name="Toplam Tutar"
+              name={useTranslations('dashboard.cards')('totalAmount')}
               stroke="#2563eb"
               activeDot={{ r: 8 }}
               strokeWidth={2}
@@ -112,7 +116,7 @@ export function MonthlyTrendChart({
             <Line
               type="monotone"
               dataKey="verifiedAmount"
-              name="Onaylanan Tutar"
+              name={useTranslations('common.status')('verified')}
               stroke="#16a34a"
               strokeDasharray="5 5"
               strokeWidth={2}

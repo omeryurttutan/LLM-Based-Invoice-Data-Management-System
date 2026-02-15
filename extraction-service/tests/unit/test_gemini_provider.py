@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from google.api_core import exceptions
 from app.services.llm.providers.gemini_provider import GeminiProvider
-from app.services.llm.base_provider import LLMAuthenticationError, LLMTimeoutError, LLMServerError
+from app.services.llm.base_provider import LLMAuthenticationError, LLMTimeoutError, LLMServerError, LLMRateLimitError, LLMResponseParseError
 
 class TestGeminiProvider:
     
@@ -15,11 +15,11 @@ class TestGeminiProvider:
             return provider
 
     @patch("google.generativeai.GenerativeModel")
-    def test_generate_success(self, mock_model_cls, provider):
+    def test_generate_success(self, mock_model_cls, provider, mock_gemini_response):
         # Setup mock
         mock_model = MagicMock()
         mock_response = MagicMock()
-        mock_response.text = '{"invoice_number": "123"}'
+        mock_response.text = mock_gemini_response
         mock_model.generate_content.return_value = mock_response
         mock_model_cls.return_value = mock_model
         
@@ -27,7 +27,7 @@ class TestGeminiProvider:
         result = provider.generate(b"fake_image_bytes", "fake_prompt")
         
         # Verify
-        assert result == '{"invoice_number": "123"}'
+        assert result == mock_gemini_response
         mock_model.generate_content.assert_called_once()
 
     @patch("google.generativeai.GenerativeModel")
@@ -39,6 +39,17 @@ class TestGeminiProvider:
         
         # Execute & Verify
         with pytest.raises(LLMAuthenticationError):
+            provider.generate(b"bytes", "prompt")
+
+    @patch("google.generativeai.GenerativeModel")
+    def test_generate_rate_limit_error(self, mock_model_cls, provider):
+        # Setup mock
+        mock_model = MagicMock()
+        mock_model.generate_content.side_effect = exceptions.ResourceExhausted("Rate Limit")
+        mock_model_cls.return_value = mock_model
+        
+        # Execute & Verify
+        with pytest.raises(LLMRateLimitError):
             provider.generate(b"bytes", "prompt")
 
     @patch("google.generativeai.GenerativeModel")
