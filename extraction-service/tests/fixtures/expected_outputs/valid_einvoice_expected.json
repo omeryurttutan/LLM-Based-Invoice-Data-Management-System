@@ -1,0 +1,23 @@
+{
+  "fatura_no": "GIB2024000000001",
+  "tarih": "2023-10-27",
+  "gonderici_vkn": "1234567890",
+  "gonderici_unvan": "Test Tedarikçi A.Ş.",
+  "alici_vkn": "9876543210",
+  "alici_unvan": "Alıcı Firma Ltd. Şti.",
+  "vergi_toplam": 180.00,
+  "genel_toplam": 1180.00,
+  "ara_toplam": 1000.00,
+  "para_birimi": "TRY",
+  "fatura_tipi": "SATIS",
+  "senaryo": "TICARIFATURA",
+  "ettn": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "kalemler": [
+    {
+      "aciklama": "Örnek Ürün",
+      "miktar": 10.0,
+      "birim_fiyat": 100.00,
+      "toplam_tutar": 1000.00
+    }
+  ]
+}

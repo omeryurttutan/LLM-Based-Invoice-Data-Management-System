@@ -23,7 +23,18 @@ async def lifespan(app: FastAPI):
     logger.info("service_startup", version=settings.APP_VERSION, config=settings.model_dump(exclude={"GEMINI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"}))
     
     # Start RabbitMQ Consumer
+    print("DEBUG: Lifespan starting consumer...")
+    from app.messaging.consumer import ExtractionConsumer as EC_Class
+    print(f"DEBUG: ExtractionConsumer class is: {EC_Class}")
     consumer = ExtractionConsumer()
+    print(f"DEBUG: Consumer instance: {consumer}, type: {type(consumer)}")
+    
+    # Check if patched
+    if hasattr(consumer, 'start') and not isinstance(consumer, EC_Class):
+         print("DEBUG: Consumer seems to be a Mock!")
+    else:
+         print("DEBUG: Consumer seems REAL!")
+
     consumer.start()
     app.state.consumer = consumer # Store in app state for health checks
     logger.info("consumer_background_thread_started")
