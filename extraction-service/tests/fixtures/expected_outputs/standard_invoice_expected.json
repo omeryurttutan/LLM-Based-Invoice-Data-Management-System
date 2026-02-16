@@ -1,0 +1,20 @@
+{
+  "fatura_no": "GIB2024000000001",
+  "tarih": "2024-01-01",
+  "gonderici_vkn": "1234567890",
+  "gonderici_unvan": "Tedarikçi Firma A.Ş.",
+  "gonderici_adres": null,
+  "alici_vkn": "9876543210",
+  "alici_unvan": "Müşteri Ltd. Şti.",
+  "vergi_toplam": 200.00,
+  "genel_toplam": 1200.00,
+  "para_birimi": "TRY",
+  "kalemler": [
+    {
+      "aciklama": "Teslimat Hizmeti",
+      "miktar": 10.0,
+      "birim_fiyat": 100.00,
+      "toplam_tutar": 1000.00
+    }
+  ]
+}

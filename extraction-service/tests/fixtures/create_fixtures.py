@@ -1,19 +1,19 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 import os
+from reportlab.pdfgen import canvas
 
-def create_image(filename, text="INVOICE", size=(800, 1000), color="white"):
-    img = Image.new('RGB', size, color=color)
-    d = ImageDraw.Draw(img)
-    # Draw huge text
-    d.text((10,10), text, fill=(0,0,0))
-    
-    # Ensure directory exists
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    img.save(filename)
-    print(f"Created {filename}")
+fixtures_dir = "/home/omer/Desktop/fatura-project/Fatura-OCR/extraction-service/tests/fixtures/sample_invoices"
+os.makedirs(fixtures_dir, exist_ok=True)
 
-base_path = "/home/omer/Desktop/fatura-project/Fatura-OCR/extraction-service/tests/fixtures/sample_invoices"
+# Create receipt_image.png
+img = Image.new('RGB', (100, 200), color='white')
+img.save(os.path.join(fixtures_dir, "receipt_image.png"), format='PNG')
 
-create_image(os.path.join(base_path, "standard_invoice.jpg"), "Standard Invoice")
-create_image(os.path.join(base_path, "low_quality_invoice.jpg"), "Low Quality Invoice", size=(200, 250))
-create_image(os.path.join(base_path, "rotated_invoice.jpg"), "Rotated Invoice")
+# Create multi_page_invoice.pdf
+c = canvas.Canvas(os.path.join(fixtures_dir, "multi_page_invoice.pdf"))
+c.drawString(100, 750, "Page 1")
+c.showPage()
+c.drawString(100, 750, "Page 2")
+c.save()
+
+print("Created binary fixtures")

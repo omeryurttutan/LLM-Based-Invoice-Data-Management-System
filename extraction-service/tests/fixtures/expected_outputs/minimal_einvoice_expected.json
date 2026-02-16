@@ -1,0 +1,13 @@
+{
+  "fatura_no": "GIB2024000000003",
+  "tarih": "2024-01-01",
+  "gonderici_vkn": "11111111111",
+  "gonderici_unvan": "Tedarikçi",
+  "alici_vkn": "2222222222",
+  "alici_unvan": "Müşteri",
+  "vergi_toplam": 0.00,
+  "genel_toplam": 100.00,
+  "ara_toplam": 100.00,
+  "para_birimi": "TRY",
+  "kalemler": []
+}

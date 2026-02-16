@@ -10,6 +10,7 @@ from app.models.extraction import ExtractionResponse
 from app.models.invoice_data import InvoiceData
 from app.models.validation import ValidationResult
 from app.core.logging import logger
+from app.core.exceptions import ExtractionServiceException
 from app.services.llm.base_provider import LLMError, LLMTimeoutError, LLMRateLimitError
 
 router = APIRouter()
@@ -62,6 +63,8 @@ async def extract_invoice(
         raise HTTPException(status_code=429, detail=str(e))
     except LLMError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except ExtractionServiceException:
+        raise
     except Exception as e:
         # Preprocessing errors already raise HTTPExceptions in pipeline/service? 
         # Actually pipeline raises ValueError/etc. Service should handle or let bubble.
