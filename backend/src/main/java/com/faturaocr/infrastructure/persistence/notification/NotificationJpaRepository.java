@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Repository
-public interface NotificationRepository extends JpaRepository<Notification, UUID> {
+public interface NotificationJpaRepository extends JpaRepository<Notification, UUID> {
 
     Page<Notification> findAllByUserId(UUID userId, Pageable pageable);
 

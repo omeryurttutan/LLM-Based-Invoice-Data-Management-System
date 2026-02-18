@@ -156,8 +156,9 @@ class ExtractionService:
         Internal method to handle LLM interaction after image is ready.
         """
         # 1. LLM Extraction with Fallback
+        # 1. LLM Extraction with Fallback
         prompt = self.prompt_manager.get_prompt()
-        llm_response_text, provider_name, fallback_logs = await self.fallback_chain.generate_with_fallback(image_data, prompt)
+        llm_response_text, provider_name, fallback_logs, usage = await self.fallback_chain.generate_with_fallback(image_data, prompt)
         
         # 2. Parse Response
         try:
@@ -177,5 +178,7 @@ class ExtractionService:
             fallback_attempts=fallback_logs,
             validation_result=validation_result,
             confidence_score=validation_result.confidence_score,
-            suggested_status=validation_result.suggested_status
+            suggested_status=validation_result.suggested_status,
+            input_tokens=usage.get("input_tokens") if usage else None,
+            output_tokens=usage.get("output_tokens") if usage else None
         )

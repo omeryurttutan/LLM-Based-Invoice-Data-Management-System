@@ -1,6 +1,7 @@
 import logging
 import sys
 import structlog
+import os
 from app.config.settings import settings
 
 def configure_logging():
@@ -48,9 +49,21 @@ def configure_logging():
         )
 
     # Configure standard library logging
+    handlers = [logging.StreamHandler(sys.stdout)]
+    
+    # Add File Handler if logs directory exists/is configured
+    log_file_path = "/var/log/extraction-service/extraction.log"
+    # Ensure directory exists or use a local one for dev
+    if not os.path.exists("/var/log/extraction-service"):
+        # Fallback for dev/local
+        log_file_path = "extraction.log"
+        
+    file_handler = logging.FileHandler(log_file_path)
+    handlers.append(file_handler)
+
     logging.basicConfig(
         format="%(message)s",
-        stream=sys.stdout,
+        handlers=handlers,
         level=log_level,
     )
     

@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.faturaocr.infrastructure.persistence.notification.NotificationRepository;
+import com.faturaocr.domain.notification.port.NotificationRepository;
 import com.faturaocr.domain.notification.entity.Notification;
 import com.faturaocr.domain.notification.enums.NotificationType;
 import com.faturaocr.domain.notification.enums.NotificationSeverity;

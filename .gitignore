@@ -42,3 +42,9 @@ extraction-service/.venv/
 coverage/
 .coverage
 htmlcov/
+
+# Deployment & Secrets
+.env.staging
+.env.prod
+nginx/ssl/
+backups/

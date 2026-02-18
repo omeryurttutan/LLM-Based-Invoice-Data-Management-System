@@ -5,14 +5,17 @@
 You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data Management System), a graduation project for a Turkish university.
 
 ### Project Overview
+
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid — Spring Boot (8080), Python FastAPI (8000), Next.js (3000)
 
 ### Current State (Phases 0-37 Completed)
+
 All features implemented and tested (unit + integration + E2E). The system is functional but has not been explicitly optimized for performance.
 
 ### Existing Infrastructure
+
 - **PostgreSQL 15**: Indexes created in Phase 3 (email, status, invoice_date, company_id composite)
 - **Redis 7**: Used for JWT tokens (Phase 4), rate limiting (Phase 32), and basic dashboard caching (Phase 26)
 - **RabbitMQ 3**: Async extraction pipeline
@@ -21,6 +24,7 @@ All features implemented and tested (unit + integration + E2E). The system is fu
 - **Phase 26**: Dashboard endpoints with 60-second Redis cache
 
 ### Phase Assignment
+
 - **Assigned To**: ÖMER (Backend Developer)
 - **Estimated Duration**: 2-3 days
 - **Parallel**: FURKAN works on Phase 38-B (Frontend performance) simultaneously
@@ -44,6 +48,7 @@ Optimize backend performance across three layers:
 **1.1 Enable Slow Query Logging:**
 
 Configure PostgreSQL to log slow queries:
+
 - Set `log_min_duration_statement = 200` (log queries taking > 200ms)
 - Or configure Spring Boot: `spring.jpa.properties.hibernate.generate_statistics=true` to log query timing
 - Add a `PerformanceInterceptor` or use `spring.jpa.show-sql=true` with timing in development
@@ -52,18 +57,18 @@ Configure PostgreSQL to log slow queries:
 
 Identify the most frequently used queries and analyze their execution plans:
 
-| Query | Expected Frequency | Target Time |
-|---|---|---|
-| Invoice list with filters (Phase 23) | Very High | < 100ms |
-| Invoice count by status (dashboard) | High | < 50ms |
-| Invoice monthly trend (dashboard) | High | < 100ms |
-| Top suppliers aggregation (dashboard) | High | < 100ms |
-| Unread notification count | Very High | < 20ms |
-| Audit log query with filters | Medium | < 200ms |
-| Template lookup by supplier tax hash | Medium | < 50ms |
-| Rule evaluation query | Medium | < 50ms |
-| User lookup by email | High | < 20ms |
-| Category list by company | High | < 20ms |
+| Query                                 | Expected Frequency | Target Time |
+| ------------------------------------- | ------------------ | ----------- |
+| Invoice list with filters (Phase 23)  | Very High          | < 100ms     |
+| Invoice count by status (dashboard)   | High               | < 50ms      |
+| Invoice monthly trend (dashboard)     | High               | < 100ms     |
+| Top suppliers aggregation (dashboard) | High               | < 100ms     |
+| Unread notification count             | Very High          | < 20ms      |
+| Audit log query with filters          | Medium             | < 200ms     |
+| Template lookup by supplier tax hash  | Medium             | < 50ms      |
+| Rule evaluation query                 | Medium             | < 50ms      |
+| User lookup by email                  | High               | < 20ms      |
+| Category list by company              | High               | < 20ms      |
 
 For each query: run EXPLAIN ANALYZE, check if indexes are used, identify sequential scans.
 
@@ -123,6 +128,7 @@ Common N+1 scenarios in this project:
 **2.3 Pagination + JOIN FETCH Caution:**
 
 `JOIN FETCH` with `Pageable` causes "HHH90003004: firstResult/maxResults specified with collection fetch" warning. Solutions:
+
 - Use `@EntityGraph` instead (works better with pagination)
 - Or fetch IDs first (paginated), then load entities with `JOIN FETCH` by IDs (two-query approach)
 
@@ -135,26 +141,28 @@ Dashboard endpoints are cached with 60-second TTL per company + params.
 
 **3.2 Expand Caching to More Endpoints:**
 
-| Data | Cache Key Pattern | TTL | Invalidation |
-|---|---|---|---|
-| Category list (per company) | `categories:{companyId}` | 5 minutes | On category CRUD |
-| Invoice count by status | `invoice-counts:{companyId}` | 30 seconds | On invoice status change |
-| Unread notification count | `unread-count:{userId}` | 10 seconds | On new notification / mark read |
-| Template list (per company) | `templates:{companyId}` | 5 minutes | On template update |
-| Active rules (per company) | `rules:{companyId}:active` | 5 minutes | On rule CRUD |
-| User profile | `user-profile:{userId}` | 10 minutes | On profile update |
-| Company info | `company:{companyId}` | 10 minutes | On company update |
+| Data                        | Cache Key Pattern            | TTL        | Invalidation                    |
+| --------------------------- | ---------------------------- | ---------- | ------------------------------- |
+| Category list (per company) | `categories:{companyId}`     | 5 minutes  | On category CRUD                |
+| Invoice count by status     | `invoice-counts:{companyId}` | 30 seconds | On invoice status change        |
+| Unread notification count   | `unread-count:{userId}`      | 10 seconds | On new notification / mark read |
+| Template list (per company) | `templates:{companyId}`      | 5 minutes  | On template update              |
+| Active rules (per company)  | `rules:{companyId}:active`   | 5 minutes  | On rule CRUD                    |
+| User profile                | `user-profile:{userId}`      | 10 minutes | On profile update               |
+| Company info                | `company:{companyId}`        | 10 minutes | On company update               |
 
 **3.3 Cache Invalidation Strategy:**
 
 Two approaches (choose or combine):
 
 **Event-Based Invalidation:**
+
 - When an entity is created/updated/deleted, explicitly delete related cache keys
 - Use Spring `@CacheEvict` or manual `redisTemplate.delete(key)`
 - More complex but data is always fresh
 
 **TTL-Based Expiration:**
+
 - Set short TTLs (10-60 seconds) and let them expire naturally
 - Simpler to implement, slight staleness acceptable
 - Good for: dashboard data, counts, non-critical lists
@@ -189,10 +197,10 @@ spring:
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
-      connection-timeout: 20000     # 20 seconds
-      idle-timeout: 300000          # 5 minutes
-      max-lifetime: 1200000         # 20 minutes
-      leak-detection-threshold: 60000  # 60 seconds (detect connection leaks)
+      connection-timeout: 20000 # 20 seconds
+      idle-timeout: 300000 # 5 minutes
+      max-lifetime: 1200000 # 20 minutes
+      leak-detection-threshold: 60000 # 60 seconds (detect connection leaks)
 ```
 
 **4.2 Redis Connection Pool (Lettuce):**
@@ -266,15 +274,18 @@ Verify all Phase 26 dashboard queries follow this pattern.
 This section requires coordination with FURKAN. Test the Python extraction service under concurrent load:
 
 **6.1 Concurrent Request Behavior:**
+
 - Send 5 concurrent extraction requests
 - Verify all complete without error
 - Measure: total time, per-request time, resource usage
 
 **6.2 LLM API Rate Limit Handling:**
+
 - If multiple requests hit the LLM API simultaneously, rate limits may trigger
 - Verify the fallback chain handles 429 correctly under load
 
 **6.3 RabbitMQ Queue Backlog:**
+
 - Queue 20 messages rapidly
 - Verify consumer processes all without crashing
 - Measure: queue drain time, memory usage
@@ -301,6 +312,7 @@ Add lightweight performance monitoring:
 **GET /api/v1/admin/performance/health** (ADMIN only):
 
 Returns:
+
 - Database connection pool stats (active, idle, total, waiting)
 - Redis connection pool stats
 - Average query time (last 100 queries)
@@ -338,15 +350,18 @@ The result file must include:
 ## DEPENDENCIES
 
 ### Requires (must be completed first)
+
 - **All feature phases (0-34)**: All code implemented
 - **Phase 35-37**: Tests pass (don't break tests during optimization)
 - **Phase 36**: Integration test baseline metrics
 
 ### Required By
+
 - **Phase 39**: Deployment (optimized application for production)
 - **Phase 40**: Monitoring (performance endpoints feed monitoring)
 
 ---
+
 ## VERIFICATION CHECKLIST
 
 Before marking this phase as complete, verify every item:
@@ -374,6 +389,7 @@ Before marking this phase as complete, verify every item:
 - [ ] GET /api/v1/admin/performance/health endpoint created and returns all metrics
 - [ ] All existing tests still pass (no regressions)
 - [ ] Result file created at docs/OMER/step_results/faz_38a_result.md
+
 ---
 
 ## SUCCESS CRITERIA

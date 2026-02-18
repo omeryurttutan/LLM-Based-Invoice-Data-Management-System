@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("/api/v1/consent")
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class ConsentController {
 
     @PostMapping
     @Operation(summary = "Record user consent", description = "Grant or revoke consent for a specific type")
+    @ApiResponse(responseCode = "200", description = "Consent recorded successfully")
     public ResponseEntity<Void> recordConsent(@RequestBody ConsentRequest request, HttpServletRequest httpRequest) {
         UUID userId = SecurityUtils.getCurrentUserId();
         UUID companyId = SecurityUtils.getCurrentCompanyId();
@@ -42,12 +45,14 @@ public class ConsentController {
 
     @GetMapping
     @Operation(summary = "Get current consents", description = "Get current consent status for all types")
+    @ApiResponse(responseCode = "200", description = "Current consents retrieved")
     public ResponseEntity<Map<ConsentType, Boolean>> getCurrentConsents() {
         return ResponseEntity.ok(consentService.getCurrentConsents(SecurityUtils.getCurrentUserId()));
     }
 
     @GetMapping("/history")
     @Operation(summary = "Get consent history", description = "Get full history of consent changes for current user")
+    @ApiResponse(responseCode = "200", description = "Consent history retrieved")
     public ResponseEntity<List<UserConsent>> getConsentHistory() {
         return ResponseEntity.ok(consentService.getConsentHistory(SecurityUtils.getCurrentUserId()));
     }

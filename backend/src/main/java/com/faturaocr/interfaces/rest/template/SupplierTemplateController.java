@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 @RequestMapping("/api/v1/templates")
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class SupplierTemplateController {
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
     @Operation(summary = "List supplier templates")
+    @ApiResponse(responseCode = "200", description = "List of templates retrieved")
     public ResponseEntity<Page<SupplierTemplateResponse>> listTemplates(
             @PageableDefault(size = 20, sort = "updatedAt") Pageable pageable) {
         UUID companyId = CompanyContextHolder.getCompanyId();
@@ -39,6 +43,10 @@ public class SupplierTemplateController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
     @Operation(summary = "Get template details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Template details retrieved"),
+            @ApiResponse(responseCode = "404", description = "Template not found")
+    })
     public ResponseEntity<SupplierTemplateResponse> getTemplate(@PathVariable Long id) {
         UUID companyId = CompanyContextHolder.getCompanyId();
         SupplierTemplate template = service.getTemplate(id, companyId);
@@ -48,6 +56,10 @@ public class SupplierTemplateController {
     @PutMapping("/{id}/default-category")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     @Operation(summary = "Set default category for a template")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Default category updated"),
+            @ApiResponse(responseCode = "404", description = "Template or category not found")
+    })
     public ResponseEntity<SupplierTemplateResponse> updateDefaultCategory(
             @PathVariable Long id,
             @Valid @RequestBody UpdateDefaultCategoryRequest request) {
@@ -59,6 +71,10 @@ public class SupplierTemplateController {
     @PatchMapping("/{id}/toggle")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     @Operation(summary = "Toggle template active status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Toggle successful"),
+            @ApiResponse(responseCode = "404", description = "Template not found")
+    })
     public ResponseEntity<SupplierTemplateResponse> toggleActive(@PathVariable Long id) {
         UUID companyId = CompanyContextHolder.getCompanyId();
         SupplierTemplate template = service.toggleActive(id, companyId);

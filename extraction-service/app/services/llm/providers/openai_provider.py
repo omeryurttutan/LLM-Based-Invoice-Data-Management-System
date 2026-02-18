@@ -1,7 +1,7 @@
 import base64
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import time
-from openai import OpenAI, APIError, APIConnectionError, RateLimitError, AuthenticationError, APITimeoutError
+from openai import AsyncOpenAI, APIError, APIConnectionError, RateLimitError, AuthenticationError, APITimeoutError
 
 from app.config.settings import settings
 from app.core.logging import logger
@@ -26,7 +26,7 @@ class OpenAIProvider(BaseLLMProvider):
         if not self.api_key:
             logger.warning("openai_api_key_missing", message="OPENAI_API_KEY is not set.")
             
-        self.client = OpenAI(api_key=self.api_key)
+        self.client = AsyncOpenAI(api_key=self.api_key)
         self.model_name = settings.OPENAI_MODEL
         
     @property
@@ -43,7 +43,7 @@ class OpenAIProvider(BaseLLMProvider):
         retry=retry_if_exception_type((APIConnectionError, RateLimitError, APITimeoutError, APIError)),
         reraise=True
     )
-    def generate(self, image_bytes: bytes, prompt: str) -> str:
+    async def generate(self, image_bytes: bytes, prompt: str) -> tuple[str, dict]:
         if not self.api_key:
             raise LLMAuthenticationError("OpenAI API key is missing.")
 
@@ -55,7 +55,7 @@ class OpenAIProvider(BaseLLMProvider):
 
             logger.info("llm_request_sent", provider=self.provider_name, model=self.model_name)
 
-            response = self.client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 model=self.model_name,
                 messages=[
                     {
@@ -83,7 +83,12 @@ class OpenAIProvider(BaseLLMProvider):
             duration = (time.time() - start_time) * 1000
             logger.info("llm_response_received", provider=self.provider_name, duration_ms=duration)
             
-            return response.choices[0].message.content
+            usage = {
+                "input_tokens": response.usage.prompt_tokens,
+                "output_tokens": response.usage.completion_tokens
+            }
+            
+            return response.choices[0].message.content, usage
 
         except AuthenticationError as e:
             logger.error("llm_auth_error", error=str(e))

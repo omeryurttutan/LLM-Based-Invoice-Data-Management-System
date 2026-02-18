@@ -14,6 +14,7 @@ const config: Config = {
     setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
+        '^msw/node$': '<rootDir>/node_modules/msw/lib/node/index.js',
     },
     transformIgnorePatterns: [
         '/node_modules/(?!(msw|@mswjs)/)'

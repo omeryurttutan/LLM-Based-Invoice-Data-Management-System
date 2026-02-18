@@ -50,12 +50,43 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.APP_NAME,
-    description="LLM tabanlı fatura görüntülerinden veri çıkarım API'si",
+    description="""
+    Fatura OCR Extraction Service API
+    
+    This service provides:
+    - AI-powered invoice data extraction
+    - Image preprocessing and OCR
+    - Format validation and normalization
+    - Support for PDF, PNG, JPEG, and Base64 inputs
+    """,
     version=settings.APP_VERSION,
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
+    contact={
+        "name": "Fatura OCR Team",
+        "url": "https://faturaocr.com",
+        "email": "support@faturaocr.com",
+    },
+    license_info={
+        "name": "Private",
+        "url": "https://faturaocr.com/license",
+    },
+    openapi_tags=[
+        {
+            "name": "Extraction",
+            "description": "Invoice data extraction and validation endpoints",
+        },
+        {
+            "name": "Health",
+            "description": "Service health and dependency checks",
+        },
+        {
+            "name": "Preprocessing",
+            "description": "Image preprocessing operations",
+        },
+    ]
 )
 
 # Security Middleware

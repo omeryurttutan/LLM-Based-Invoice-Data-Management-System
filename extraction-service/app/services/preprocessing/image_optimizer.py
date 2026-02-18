@@ -15,13 +15,13 @@ class ImageOptimizer:
         if max(img.width, img.height) <= max_dimension:
             return img, False
 
-        # Calculate new dimensions
-        ratio = max_dimension / max(img.width, img.height)
-        new_width = int(img.width * ratio)
-        new_height = int(img.height * ratio)
-        
         try:
-            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            # Use thumbnail for faster, aspect-ratio preserving resize
+            # Thumbnail modifies in-place, so we copy first if we want to be safe, 
+            # though in this pipeline we own the image.
+            # But let's be safe and copy to avoid side effects if the caller reuses the original image.
+            img = img.copy()
+            img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
             return img, True
         except Exception as e:
             logger.warning("resize_failed", error=str(e))

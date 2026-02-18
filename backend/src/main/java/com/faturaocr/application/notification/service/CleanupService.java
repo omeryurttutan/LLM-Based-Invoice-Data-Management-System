@@ -1,6 +1,6 @@
 package com.faturaocr.application.notification.service;
 
-import com.faturaocr.infrastructure.persistence.notification.NotificationRepository;
+import com.faturaocr.domain.notification.port.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

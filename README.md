@@ -1,142 +1,113 @@
-# 🧾 Fatura OCR ve Veri Yönetim Sistemi
+# Fatura OCR ve Veri Yönetim Sistemi (Invoice OCR and Data Management System)
 
-[![CI Pipeline](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg)](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml)
-[![Backend](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg?branch=main&event=push&label=Backend)](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml)
+![Build Status](https://github.com/MFurkanAkdag/Fatura-OCR/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-LLM tabanlı görüntü analizi ile fatura verilerini otomatik çıkaran, kurumsal ölçekte tasarlanmış modern bir muhasebe otomasyon sistemi.
+**Fatura OCR ve Veri Yönetim Sistemi** is an enterprise-grade invoice automation platform that leverages Large Language Models (LLMs) to extract structured data from invoice images and PDFs. It eliminates manual data entry, validates extracted information with high precision, and integrates seamlessly with major Turkish accounting software.
 
-Bu proje, geleneksel OCR + regex + post-processing yaklaşımı yerine, doğrudan görüntüden yapılandırılmış veri çıkarımı yapan **LLM tabanlı hibrit bir mimari** sunar.
+## 🏗️ Architecture
 
-Sistem; fatura görsellerini (PDF, JPEG, PNG) ve GİB e-Fatura XML dosyalarını işleyerek muhasebe süreçlerindeki manuel veri girişini %80+ oranında azaltmayı hedefler.
+The system follows a hybrid microservices architecture:
 
----
+- **Backend:** Java 17, Spring Boot 3.2 (Business Logic, Auth, Data)
+- **Frontend:** Next.js 14, React 19, TypeScript (Responsive PWA)
+- **Extraction Service:** Python 3.11, FastAPI (AI/LLM Processing)
+- **Infrastructure:** PostgreSQL, Redis, RabbitMQ, Docker, Nginx
 
-## 🚀 Temel Yaklaşım
+## ✨ Key Features
 
-> Görüntüyü OCR’a çevir, regex ile parçala, düzelt, doğrula… ❌
-> Görüntüyü LLM’e gönder, yapılandırılmış JSON al… ✅
+- **AI-Powered Extraction:** Uses Gemini 1.5 Flash, GPT-4o, and Claude 3.5 Haiku to extract data with >95% accuracy.
+- **Multi-Format Support:** Processes JPEG, PNG, PDF, and UBL-TR e-Invoice XML files.
+- **Smart Validation:** Confidence scoring system highlights low-certainty fields for manual review.
+- **Supplier Learning:** Automatically learns and applies category rules based on supplier history.
+- **Accounting Integration:** Exports verified data to Logo, Mikro, Netsis, and Luca formats.
+- **Enterprise Security:** Role-Based Access Control (RBAC), KVKK (GDPR) compliance, and full audit trails.
+- **Real-time Notifications:** WebSocket-based in-app alerts, emails, and web push notifications.
+- **Interactive Dashboard:** Visual analytics for spending trends, top suppliers, and category distribution.
 
-Bu projede fatura analizi için klasik OCR pipeline'ı yerine:
+## 🚀 Quick Start
 
-**Gemini 3 Flash → GPT-5.2 → Claude Haiku 4.5** fallback zincirine sahip
-LLM tabanlı veri çıkarım servisi kullanılmıştır.
+Get the development environment running in 5 minutes.
 
-Bu sayede:
+### Prerequisites
 
-- Farklı fatura formatlarına otomatik adaptasyon
-- Çok daha düşük geliştirme maliyeti
-- Daha yüksek doğruluk oranı
-- Sürekli iyileştirilebilir prompt tabanlı sistem
-
----
-
-## 🏗️ Sistem Mimarisi
-
-Hibrit mimari yaklaşımı:
-
-- **Spring Boot (Java 17)** → Ana iş mantığı (Modüler Monolit, Hexagonal Architecture)
-- **Python FastAPI** → LLM tabanlı veri çıkarım mikroservisi
-- **Next.js 14 PWA** → Web + Mobil uyumlu kullanıcı arayüzü
-- **PostgreSQL + Redis + RabbitMQ**
-- Docker container'ları ile ayrık deploy edilebilir servisler
-
----
-
-## ✨ Öne Çıkan Özellikler
-
-- 📤 Tekli ve toplu fatura yükleme (PDF, PNG, JPEG, XML)
-- 🤖 LLM ile otomatik veri çıkarımı
-- 🧠 Güven skoru algoritması ve manuel doğrulama kuyruğu
-- 🧾 E-Fatura XML parse desteği (LLM çağrısı olmadan)
-- 🗂️ Gelişmiş filtreleme, arama ve raporlama
-- 📊 Dashboard ve veri görselleştirme
-- 📁 XLSX, CSV ve muhasebe yazılımı formatlarında export (Logo, Mikro, Netsis, Luca)
-- 🔔 Gerçek zamanlı bildirim sistemi
-- 🧾 Audit log ve versiyon geçmişi
-- 🔐 JWT, RBAC, KVKK uyumlu güvenlik mimarisi
-- 📱 Progressive Web App (PWA) desteği
-
----
-
-## 🧩 Teknoloji Yığını
-
-| Katman      | Teknolojiler                                             |
-| ----------- | -------------------------------------------------------- |
-| Backend     | Java 17, Spring Boot 3, Spring Security, JPA, PostgreSQL |
-| LLM Servisi | Python 3.11, FastAPI, Gemini, GPT-5.2, Claude            |
-| Frontend    | Next.js 14, React 19, TypeScript, Tailwind, Shadcn       |
-| Messaging   | RabbitMQ                                                 |
-| Cache       | Redis                                                    |
-| DevOps      | Docker, GitHub Actions                                   |
-
----
-
-## 🧠 Neden LLM Tabanlı Yaklaşım?
-
-Geleneksel OCR sistemlerinde:
-
-- Yüzlerce satır regex
-- Sürekli format bakımı
-- Karmaşık doğrulama katmanları
-
-Bu projede:
-
-- Tek API çağrısı
-- JSON schema validation
-- Prompt optimizasyonu ile sürekli gelişim
-
----
-
-## 🔒 Güvenlik
-
-- JWT tabanlı stateless authentication
-- RBAC yetkilendirme
-- BCrypt şifreleme (strength 12)
-- AES-256 veri şifreleme
-- KVKK uyumlu veri saklama
-- Soft delete + audit log
-
----
-
-## 📦 Deployment
-
-### Gereksinimler
-
-- Java 17
-- Node.js 20+
-- Python 3.11+
 - Docker & Docker Compose
+- API Keys for Gemini (Required), OpenAI/Anthropic (Optional)
 
-### Hızlı Başlangıç (Docker ile)
+### Installation
 
-1. `.env.example` dosyasını `.env` olarak kopyalayın
-2. `docker-compose up -d --build` komutunu çalıştırın
-3. Servislerin başlamasını bekleyin
+1. **Clone the repository**
 
-### Servis URL Tablosu
+   ```bash
+   git clone https://github.com/MFurkanAkdag/Fatura-OCR.git
+   cd Fatura-OCR
+   ```
 
-Aşağıdaki host portları, mevcut diğer projelerle çakışmayı önlemek için özel olarak ayarlanmıştır.
+2. **Configure Environment**
+   Copy the example environment file and fill in your API keys.
 
-| Servis             | Lokal URL              | Docker Internal |
-| ------------------ | ---------------------- | --------------- |
-| Backend            | http://localhost:8082  | 8080            |
-| Frontend           | http://localhost:3001  | 3000            |
-| Extraction Service | http://localhost:8001  | 8000            |
-| PostgreSQL         | localhost:5436         | 5432            |
-| Redis              | localhost:6380         | 6379            |
-| RabbitMQ (AMQP)    | localhost:5673         | 5672            |
-| RabbitMQ UI        | http://localhost:15673 | 15672           |
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your GEMINI_API_KEY
+   ```
 
----
+3. **Start the Stack**
 
-## 🎯 Proje Hedefi
+   ```bash
+   docker compose up -d
+   ```
 
-Muhasebe ofislerinde saatler süren manuel fatura girişini saniyelere indiren,
-ölçeklenebilir ve kurumsal düzeyde bir otomasyon altyapısı sunmak.
+4. **Access the Application**
+   - **Frontend:** [http://localhost:3000](http://localhost:3000)
+   - **Backend API:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+   - **RabbitMQ:** [http://localhost:15672](http://localhost:15672) (guest/guest)
 
----
+## 📂 Project Structure
 
-## 👨‍💻 Geliştiriciler
+```
+fatura-ocr-system/
+├── backend/                # Spring Boot application
+├── frontend/               # Next.js web application
+├── extraction-service/     # Python FastAPI AI service
+├── infrastructure/         # Docker compose and config
+├── docs/                   # Documentation
+│   ├── user-guide/         # User & Admin guides (Turkish)
+│   ├── deployment/         # Runbook & Troubleshooting (English)
+│   └── architecture/       # System design docs (English)
+└── scripts/                # Utility scripts
+```
 
-- Muhammed Furkan Akdağ (AI/LLM)
-- Ömer Talha Yurttutan (Web)
+## 📚 Documentation
+
+- **[End-User Guide (Turkish)](docs/user-guide/kullanici-kilavuzu.md):** For accountants and managers.
+- **[Admin Guide (Turkish)](docs/user-guide/admin-kilavuzu.md):** For system administrators.
+- **[Deployment Runbook](docs/deployment/deployment-runbook.md):** For DevOps and operations.
+- **[Troubleshooting Guide](docs/deployment/troubleshooting.md):** Solutions for common issues.
+- **[Architecture Overview](docs/architecture/architecture-overview.md):** High-level system design.
+
+## 🛠️ Development
+
+### Running Tests
+
+- **Backend:** `cd backend && ./mvnw test`
+- **Frontend:** `cd frontend && npm test`
+- **Extraction:** `cd extraction-service && pytest`
+
+### Branch Strategy
+
+- `main`: Production-ready code.
+- `develop`: Integration branch.
+- `feature/*`: New features.
+
+## 👥 Team
+
+- **Muhammed Furkan Akdağ** - AI/LLM & Frontend
+- **Ömer Talha Yurttutan** - Backend & Infrastructure
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+Special thanks to our advisors and the open-source community for the tools that made this project possible.

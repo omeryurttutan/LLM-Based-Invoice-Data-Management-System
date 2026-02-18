@@ -69,7 +69,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { useInvoices, useDeleteInvoice, useVerifyInvoice, useRejectInvoice, useReopenInvoice } from '@/hooks/use-invoices';
+import { useQueryClient } from '@tanstack/react-query';
+import { useInvoices, useDeleteInvoice, useVerifyInvoice, useRejectInvoice, useReopenInvoice, invoiceKeys } from '@/hooks/use-invoices';
+import { invoiceService } from '@/services/invoice-service';
 import { InvoiceStatus, InvoiceListItem } from '@/types/invoice';
 import { useAuthStore } from '@/stores/auth-store';
 import { formatCurrency } from '@/lib/utils';
@@ -79,13 +81,19 @@ import { useInvoiceFilters } from '@/hooks/use-invoice-filters';
 import { FilterPanel } from '@/components/invoices/filter-panel';
 import { SearchBar } from '@/components/invoices/search-bar';
 import { ActiveFilters } from '@/components/invoices/active-filters';
-import { ExportDialog } from '@/components/invoices/export-dialog';
+import dynamic from 'next/dynamic';
+
+const ExportDialog = dynamic(
+    () => import('@/components/invoices/export-dialog').then((mod) => mod.ExportDialog),
+    { ssr: false }
+);
 import { useTranslations, useFormatter } from 'next-intl';
 
 export default function InvoicesPage() {
   const t = useTranslations('invoices');
   const tCommon = useTranslations('common');
   const format = useFormatter();
+  const queryClient = useQueryClient();
 
   const statusConfig: Record<InvoiceStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
     PENDING: { label: t('status.pending'), variant: 'secondary' },
@@ -255,7 +263,17 @@ export default function InvoicesPage() {
               </TableRow>
             ) : (
               invoicesData?.content.map((invoice: InvoiceListItem) => (
-                <TableRow key={invoice.id} className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(`/invoices/${invoice.id}`)}>
+                <TableRow 
+                  key={invoice.id} 
+                  className="cursor-pointer hover:bg-muted/50" 
+                  onClick={() => router.push(`/invoices/${invoice.id}`)}
+                  onMouseEnter={() => {
+                    queryClient.prefetchQuery({
+                      queryKey: invoiceKeys.detail(invoice.id),
+                      queryFn: () => invoiceService.getInvoice(invoice.id)
+                    });
+                  }}
+                >
                   <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
                   <TableCell>{invoice.supplierName}</TableCell>
                   <TableCell>{format.dateTime(new Date(invoice.invoiceDate), { dateStyle: 'medium' })}</TableCell>

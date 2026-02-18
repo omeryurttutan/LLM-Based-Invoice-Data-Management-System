@@ -13,15 +13,35 @@ import {
   useStatusTimeline,
   useExtractionPerformance,
 } from "@/hooks/use-dashboard";
+import dynamic from 'next/dynamic';
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
-import { CategoryDistributionChart } from "@/components/dashboard/CategoryDistributionChart";
-import { MonthlyTrendChart } from "@/components/dashboard/MonthlyTrendChart";
-import { TopSuppliersChart } from "@/components/dashboard/TopSuppliersChart";
 import { PendingActionsList } from "@/components/dashboard/PendingActionsList";
-import { StatusTimelineChart } from "@/components/dashboard/StatusTimelineChart";
-import { ExtractionPerformanceCard } from "@/components/dashboard/ExtractionPerformanceCard";
-import { SystemHealthPanel } from "@/components/dashboard/SystemHealthPanel";
+
+const CategoryDistributionChart = dynamic(
+  () => import("@/components/dashboard/CategoryDistributionChart").then((mod) => mod.CategoryDistributionChart),
+  { ssr: false }
+);
+const MonthlyTrendChart = dynamic(
+  () => import("@/components/dashboard/MonthlyTrendChart").then((mod) => mod.MonthlyTrendChart),
+  { ssr: false }
+);
+const TopSuppliersChart = dynamic(
+  () => import("@/components/dashboard/TopSuppliersChart").then((mod) => mod.TopSuppliersChart),
+  { ssr: false }
+);
+const StatusTimelineChart = dynamic(
+  () => import("@/components/dashboard/StatusTimelineChart").then((mod) => mod.StatusTimelineChart),
+  { ssr: false }
+);
+const ExtractionPerformanceCard = dynamic(
+  () => import("@/components/dashboard/ExtractionPerformanceCard").then((mod) => mod.ExtractionPerformanceCard),
+  { ssr: false }
+);
+const SystemHealthPanel = dynamic(
+  () => import("@/components/dashboard/SystemHealthPanel").then((mod) => mod.SystemHealthPanel),
+  { ssr: false }
+);
 
 export default function DashboardPage() {
   // State

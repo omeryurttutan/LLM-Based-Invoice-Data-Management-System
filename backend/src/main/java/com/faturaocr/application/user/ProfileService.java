@@ -21,13 +21,14 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "user-profile", key = "#userId")
     public UserProfileResponse getProfile(UUID userId) {
         User user = getUser(userId);
         return UserProfileResponse.fromDomain(user);
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "user-profile", key = "#userId")
     public UserProfileResponse updateProfile(UUID userId, UpdateProfileCommand command) {
         User user = getUser(userId);
 
@@ -71,6 +72,7 @@ public class ProfileService {
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "user-profile", key = "#userId")
     public void changePassword(UUID userId, ChangePasswordCommand command) {
         User user = getUser(userId);
 

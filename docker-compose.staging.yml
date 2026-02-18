@@ -1,0 +1,94 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: backend_staging
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging
+    env_file:
+      - .env.staging
+    ports:
+      - "8080:8080"
+    networks:
+      - staging_net
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: frontend_staging
+    env_file:
+      - .env.staging
+    ports:
+      - "3000:3000"
+    networks:
+      - staging_net
+    restart: unless-stopped
+
+  extraction-service:
+    build:
+      context: ./extraction-service
+      dockerfile: Dockerfile.prod
+    container_name: extraction_service_staging
+    env_file:
+      - .env.staging
+    ports:
+      - "8000:8000"
+    networks:
+      - staging_net
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_staging
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    networks:
+      - staging_net
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_staging
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_staging_data:/data
+    networks:
+      - staging_net
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq_staging
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "15672:15672" # Expose management for staging
+      - "5672:5672"
+    volumes:
+      - rabbitmq_staging_data:/var/lib/rabbitmq
+    networks:
+      - staging_net
+    restart: unless-stopped
+
+networks:
+  staging_net:
+    driver: bridge
+
+volumes:
+  postgres_staging_data:
+  redis_staging_data:
+  rabbitmq_staging_data:

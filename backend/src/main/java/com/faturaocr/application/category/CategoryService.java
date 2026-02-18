@@ -26,6 +26,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final InvoiceRepository invoiceRepository; // To check usage before delete
 
+    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
     @Auditable(action = AuditActionType.CREATE, entityType = "CATEGORY")
     public CategoryResponse createCategory(CreateCategoryCommand command) {
         UUID companyId = CompanyContextHolder.getCompanyId();
@@ -56,6 +57,7 @@ public class CategoryService {
         return mapToResponse(savedCategory);
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
     @Auditable(action = AuditActionType.UPDATE, entityType = "CATEGORY")
     public CategoryResponse updateCategory(UUID id, UpdateCategoryCommand command) {
         UUID companyId = CompanyContextHolder.getCompanyId();
@@ -98,8 +100,8 @@ public class CategoryService {
         return mapToResponse(getCategoryOrThrow(id));
     }
 
-    public List<CategoryResponse> listCategories(boolean includeInactive) {
-        UUID companyId = CompanyContextHolder.getCompanyId();
+    @org.springframework.cache.annotation.Cacheable(value = "categories", key = "#companyId")
+    public List<CategoryResponse> listCategories(UUID companyId, boolean includeInactive) {
         List<Category> categories;
         if (includeInactive) {
             categories = categoryRepository.findAllByCompanyId(companyId);
@@ -109,6 +111,7 @@ public class CategoryService {
         return categories.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
     @Auditable(action = AuditActionType.DELETE, entityType = "CATEGORY")
     public void deleteCategory(UUID id) {
         getCategoryOrThrow(id); // Verify exists and belongs to company

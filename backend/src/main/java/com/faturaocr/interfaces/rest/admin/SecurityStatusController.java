@@ -72,6 +72,7 @@ public class SecurityStatusController extends BaseController {
 
     @GetMapping("/status")
     @Operation(summary = "Get current security configuration status")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Security status retrieved")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getSecurityStatus() {
         Map<String, Object> status = new HashMap<>();
 

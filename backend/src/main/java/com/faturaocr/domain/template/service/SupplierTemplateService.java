@@ -210,6 +210,7 @@ public class SupplierTemplateService {
                 .filter(t -> t.isActive() && t.getSampleCount() >= minSamplesForSuggestion);
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = "supplier-templates", key = "#companyId")
     public Page<SupplierTemplate> listTemplates(UUID companyId, Pageable pageable) {
         return repository.findAllByCompanyId(companyId, pageable);
     }
@@ -219,11 +220,14 @@ public class SupplierTemplateService {
                 .orElseThrow(() -> new RuntimeException("Template not found"));
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "supplier-templates", key = "#companyId")
     public SupplierTemplate updateDefaultCategory(Long id, UUID companyId, UUID categoryId) {
         SupplierTemplate template = getTemplate(id, companyId);
         template.setDefaultCategoryId(categoryId);
         return repository.save(template);
     }
+
+    // ... applyTemplateToInvoice ...
 
     @Transactional
     public void applyTemplateToInvoice(Invoice invoice) {
@@ -288,6 +292,7 @@ public class SupplierTemplateService {
         }
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "supplier-templates", key = "#companyId")
     public SupplierTemplate toggleActive(Long id, UUID companyId) {
         SupplierTemplate template = getTemplate(id, companyId);
         template.setActive(!template.isActive());

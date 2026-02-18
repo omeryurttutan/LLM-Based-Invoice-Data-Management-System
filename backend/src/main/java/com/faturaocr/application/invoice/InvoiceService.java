@@ -39,7 +39,7 @@ import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaRepository;
 import com.faturaocr.infrastructure.persistence.invoice.InvoiceSpecification;
 import com.faturaocr.infrastructure.security.AuthenticatedUser;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
-import com.faturaocr.interfaces.rest.invoice.dto.InvoiceFilterRequest;
+import com.faturaocr.application.invoice.dto.InvoiceFilterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,6 +75,11 @@ public class InvoiceService {
     private final RuleEngine ruleEngine;
 
     @Auditable(action = AuditActionType.CREATE, entityType = "INVOICE")
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "dashboard-stats", "dashboard-categories", "dashboard-trends",
+            "dashboard-suppliers", "dashboard-pending", "dashboard-timeline",
+            "dashboard-extraction", "invoice-counts", "invoice-filter-options"
+    }, allEntries = true)
     public InvoiceResponse createInvoice(CreateInvoiceCommand command, boolean forceDuplicate) {
         UUID companyId = CompanyContextHolder.getCompanyId();
         UUID userId = getCurrentUserId();
@@ -184,7 +189,19 @@ public class InvoiceService {
         }
         @SuppressWarnings("null")
         Page<InvoiceJpaEntity> page = invoiceJpaRepository.findAll(spec, pageable);
-        return page.map(mapper::mapJpaToListResponse);
+
+        // Bulk fetch categories to avoid N+1
+        java.util.Set<UUID> categoryIds = page.getContent().stream()
+                .map(InvoiceJpaEntity::getCategoryId)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        java.util.Map<UUID, String> categoryNameMap = new java.util.HashMap<>();
+        if (!categoryIds.isEmpty()) {
+            categoryRepository.findAllById(categoryIds).forEach(c -> categoryNameMap.put(c.getId(), c.getName()));
+        }
+
+        return page.map(invoice -> mapper.mapJpaToListResponse(invoice, categoryNameMap));
     }
 
     public Page<InvoiceListResponse> listInvoices(Pageable pageable) {
@@ -197,6 +214,7 @@ public class InvoiceService {
         return invoiceJpaRepository.findDistinctSupplierNames(companyId, search, Pageable.ofSize(50));
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = "invoice-filter-options", key = "#root.target.getCompanyId()")
     public FilterOptionsResponse getFilterOptions() {
         UUID companyId = CompanyContextHolder.getCompanyId();
 
@@ -244,12 +262,22 @@ public class InvoiceService {
                 .build();
     }
 
+    // Helper for SpEL
+    public UUID getCompanyId() {
+        return CompanyContextHolder.getCompanyId();
+    }
+
     public InvoiceDetailResponse getInvoiceById(UUID id) {
         Invoice invoice = getInvoiceOrThrow(id);
         return mapper.mapToDetailResponse(invoice);
     }
 
     @Auditable(action = AuditActionType.UPDATE, entityType = "INVOICE")
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "dashboard-stats", "dashboard-categories", "dashboard-trends",
+            "dashboard-suppliers", "dashboard-pending", "dashboard-timeline",
+            "dashboard-extraction", "invoice-counts", "invoice-filter-options"
+    }, allEntries = true)
     public InvoiceResponse updateInvoice(UUID id, UpdateInvoiceCommand command) {
         Invoice invoice = getInvoiceOrThrow(id);
         UUID companyId = CompanyContextHolder.getCompanyId();
@@ -318,6 +346,11 @@ public class InvoiceService {
     }
 
     @Auditable(action = AuditActionType.DELETE, entityType = "INVOICE")
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "dashboard-stats", "dashboard-categories", "dashboard-trends",
+            "dashboard-suppliers", "dashboard-pending", "dashboard-timeline",
+            "dashboard-extraction", "invoice-counts", "invoice-filter-options"
+    }, allEntries = true)
     public void deleteInvoice(UUID id) {
         Invoice invoice = getInvoiceOrThrow(id);
         if (invoice.getStatus() == InvoiceStatus.VERIFIED) {
@@ -327,6 +360,11 @@ public class InvoiceService {
     }
 
     @Auditable(action = AuditActionType.VERIFY, entityType = "INVOICE")
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "dashboard-stats", "dashboard-categories", "dashboard-trends",
+            "dashboard-suppliers", "dashboard-pending", "dashboard-timeline",
+            "dashboard-extraction", "invoice-counts", "invoice-filter-options"
+    }, allEntries = true)
     public InvoiceResponse verifyInvoice(UUID id, VerifyInvoiceCommand command) {
         Invoice invoice = getInvoiceOrThrow(id);
         if (invoice.getStatus() != InvoiceStatus.PENDING) {
@@ -348,20 +386,6 @@ public class InvoiceService {
         // Run automation rules after verification
         ruleEngine.evaluateAndExecute(TriggerPoint.AFTER_VERIFICATION, invoice);
 
-        // Save again if rules modified something?
-        // ruleEngine modifies the entity object. But strict JPA might need save?
-        // If evaluateAndExecute is transactional and modifies the attached entity, it
-        // might flush automatically.
-        // But InvoiceService method is also transactional (by class or method?).
-        // @ApplicationService custom annotation likely has @Transactional?
-        // Let's assume explicit save is safer if rules modify it.
-        // Actually, if ruleEngine works on 'invoice' object and we are in transaction,
-        // dirty checking works.
-        // But let's add specific save if rules modified it?
-        // Or just let the transaction commit handle it.
-        // However, we just called save(invoice) above.
-        // Best to call rule execution BEFORE save, or save AGAIN.
-        // Let's call save again to be sure if changes happened.
         invoiceRepository.save(invoice);
 
         // Notify verification
@@ -384,6 +408,11 @@ public class InvoiceService {
     }
 
     @Auditable(action = AuditActionType.REJECT, entityType = "INVOICE")
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "dashboard-stats", "dashboard-categories", "dashboard-trends",
+            "dashboard-suppliers", "dashboard-pending", "dashboard-timeline",
+            "dashboard-extraction", "invoice-counts", "invoice-filter-options"
+    }, allEntries = true)
     public InvoiceResponse rejectInvoice(UUID id, RejectInvoiceCommand command) {
         Invoice invoice = getInvoiceOrThrow(id);
         if (invoice.getStatus() != InvoiceStatus.PENDING) {
@@ -420,6 +449,11 @@ public class InvoiceService {
         return InvoiceResponse.builder().id(id).message("Invoice rejected").build();
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "dashboard-stats", "dashboard-categories", "dashboard-trends",
+            "dashboard-suppliers", "dashboard-pending", "dashboard-timeline",
+            "dashboard-extraction", "invoice-counts", "invoice-filter-options"
+    }, allEntries = true)
     public InvoiceResponse reopenInvoice(UUID id) {
         Invoice invoice = getInvoiceOrThrow(id);
         if (invoice.getStatus() != InvoiceStatus.REJECTED) {
@@ -437,6 +471,11 @@ public class InvoiceService {
     }
 
     @Auditable(action = AuditActionType.UPDATE, entityType = "INVOICE")
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "dashboard-stats", "dashboard-categories", "dashboard-trends",
+            "dashboard-suppliers", "dashboard-pending", "dashboard-timeline",
+            "dashboard-extraction", "invoice-counts", "invoice-filter-options"
+    }, allEntries = true)
     public InvoiceResponse revertInvoice(UUID id, Integer versionNumber) {
         Invoice currentInvoice = getInvoiceOrThrow(id);
 
@@ -561,6 +600,12 @@ public class InvoiceService {
                 totalAmount = totalAmount.add(subtotal).add(tax);
             }
         }
+
+        DuplicateCheckResult.DuplicateCheckResultBuilder builder = DuplicateCheckResult.builder();
+
+        // Fix builder issue if DuplicateCheckRequest is used in service arg but
+        // DuplicateCheckResult is return type.
+        // Wait, DuplicateCheckResult is correct.
 
         DuplicateCheckRequest dupRequest = DuplicateCheckRequest.builder()
                 .invoiceNumber(invoiceNumber)

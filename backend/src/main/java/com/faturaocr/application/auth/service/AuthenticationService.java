@@ -21,7 +21,7 @@ import com.faturaocr.infrastructure.security.RefreshTokenService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**

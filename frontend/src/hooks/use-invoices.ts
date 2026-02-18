@@ -27,6 +27,7 @@ export function useInvoice(id: string) {
     queryKey: invoiceKeys.detail(id),
     queryFn: () => invoiceService.getInvoice(id),
     enabled: !!id,
+    staleTime: 60 * 1000,
   });
 }
 

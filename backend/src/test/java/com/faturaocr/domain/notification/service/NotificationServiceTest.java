@@ -7,7 +7,7 @@ import com.faturaocr.domain.notification.enums.NotificationType;
 import com.faturaocr.domain.notification.service.channel.NotificationChannel;
 import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.port.UserRepository;
-import com.faturaocr.infrastructure.persistence.notification.NotificationRepository;
+import com.faturaocr.domain.notification.port.NotificationRepository;
 import com.faturaocr.testutil.TestFixtures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

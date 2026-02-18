@@ -2,6 +2,7 @@ import React from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface ImageViewerProps {
   url: string;
@@ -54,12 +55,15 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({ url, alt }) => {
                 wrapperStyle={{ width: "100%", height: "100%" }}
                 contentStyle={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={url}
-                  alt={alt}
-                  className="max-w-full max-h-full object-contain shadow-lg"
-                />
+                <div className="relative w-full h-full">
+                   <Image
+                      src={url}
+                      alt={alt}
+                      fill
+                      className="object-contain shadow-lg"
+                      unoptimized 
+                    />
+                </div>
               </TransformComponent>
             </div>
           </>

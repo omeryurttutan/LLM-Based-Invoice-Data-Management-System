@@ -1,7 +1,7 @@
 import base64
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import time
-from anthropic import Anthropic, APIConnectionError, RateLimitError, AuthenticationError, APITimeoutError, APIError
+from anthropic import AsyncAnthropic, APIConnectionError, RateLimitError, AuthenticationError, APITimeoutError, APIError
 
 from app.config.settings import settings
 from app.core.logging import logger
@@ -25,7 +25,7 @@ class AnthropicProvider(BaseLLMProvider):
         if not self.api_key:
             logger.warning("anthropic_api_key_missing", message="ANTHROPIC_API_KEY is not set.")
             
-        self.client = Anthropic(api_key=self.api_key)
+        self.client = AsyncAnthropic(api_key=self.api_key)
         self.model_name = settings.ANTHROPIC_MODEL
         
     @property
@@ -42,7 +42,7 @@ class AnthropicProvider(BaseLLMProvider):
         retry=retry_if_exception_type((APIConnectionError, RateLimitError, APITimeoutError, APIError)),
         reraise=True
     )
-    def generate(self, image_bytes: bytes, prompt: str) -> str:
+    async def generate(self, image_bytes: bytes, prompt: str) -> tuple[str, dict]:
         if not self.api_key:
             raise LLMAuthenticationError("Anthropic API key is missing.")
 
@@ -55,7 +55,7 @@ class AnthropicProvider(BaseLLMProvider):
 
             # Anthropic system prompt is a top level param
             # User message contains content blocks
-            response = self.client.messages.create(
+            response = await self.client.messages.create(
                 model=self.model_name,
                 max_tokens=settings.ANTHROPIC_MAX_TOKENS,
                 temperature=settings.ANTHROPIC_TEMPERATURE,
@@ -85,7 +85,12 @@ class AnthropicProvider(BaseLLMProvider):
             duration = (time.time() - start_time) * 1000
             logger.info("llm_response_received", provider=self.provider_name, duration_ms=duration)
             
-            return response.content[0].text
+            usage = {
+                "input_tokens": response.usage.input_tokens,
+                "output_tokens": response.usage.output_tokens
+            }
+            
+            return response.content[0].text, usage
 
         except AuthenticationError as e:
             logger.error("llm_auth_error", error=str(e))

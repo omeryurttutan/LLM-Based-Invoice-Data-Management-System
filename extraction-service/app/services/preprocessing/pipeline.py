@@ -119,15 +119,18 @@ class PreprocessingPipeline:
                         metadata.was_enhanced = True
                         steps.append("enhancement")
 
-                # 5. Resize
-                img, resized = ImageOptimizer.resize_image(img, options.max_dimension)
-                if resized:
-                     metadata.was_resized = True
-                     steps.append("resize")
+            # 5. Resize
+            step_start = time.time()
+            img, resized = ImageOptimizer.resize_image(img, options.max_dimension)
+            if resized:
+                 metadata.was_resized = True
+                 steps.append("resize")
+            logger.debug("step_completed", step="resize", duration_ms=int((time.time() - step_start) * 1000))
 
             metadata.final_dimensions = img.size
 
             # 6. Optimize & Convert Format
+            step_start = time.time()
             final_bytes, compression_ratio = ImageOptimizer.optimize_image(
                 img, 
                 target_format=options.target_format,
@@ -136,9 +139,12 @@ class PreprocessingPipeline:
             )
             metadata.compression_ratio = compression_ratio
             steps.append("optimize")
+            logger.debug("step_completed", step="optimize", duration_ms=int((time.time() - step_start) * 1000))
 
             # 7. Base64 Encode
+            step_start = time.time()
             b64_string = Base64Encoder.encode(final_bytes)
+            logger.debug("step_completed", step="base64", duration_ms=int((time.time() - step_start) * 1000))
             
             processing_time = int((time.time() - start_time) * 1000)
             metadata.processing_steps = steps

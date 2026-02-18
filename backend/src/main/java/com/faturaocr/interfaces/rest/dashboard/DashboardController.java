@@ -11,6 +11,7 @@ import com.faturaocr.application.dashboard.dto.TopSuppliersResponse;
 import com.faturaocr.domain.invoice.valueobject.Currency;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -40,6 +41,7 @@ public class DashboardController {
     @GetMapping("/stats")
     @PreAuthorize("hasAuthority('REPORT_VIEW')")
     @Operation(summary = "Get dashboard summary statistics")
+    @ApiResponse(responseCode = "200", description = "Statistics retrieved successfully")
     public ResponseEntity<DashboardStatsResponse> getStats(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
@@ -50,6 +52,7 @@ public class DashboardController {
     @GetMapping("/categories")
     @PreAuthorize("hasAuthority('REPORT_VIEW')")
     @Operation(summary = "Get category distribution")
+    @ApiResponse(responseCode = "200", description = "Category distribution retrieved successfully")
     public ResponseEntity<List<CategoryDistributionResponse>> getCategoryDistribution(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
@@ -60,6 +63,7 @@ public class DashboardController {
     @GetMapping("/monthly-trend")
     @PreAuthorize("hasAuthority('REPORT_VIEW')")
     @Operation(summary = "Get monthly invoice trends")
+    @ApiResponse(responseCode = "200", description = "Monthly trends retrieved successfully")
     public ResponseEntity<List<MonthlyTrendResponse>> getMonthlyTrend(
             @RequestParam(required = false, defaultValue = "12") int months,
             @RequestParam(required = false, defaultValue = "TRY") Currency currency) {
@@ -69,6 +73,7 @@ public class DashboardController {
     @GetMapping("/top-suppliers")
     @PreAuthorize("hasAuthority('REPORT_VIEW')")
     @Operation(summary = "Get top suppliers")
+    @ApiResponse(responseCode = "200", description = "Top suppliers retrieved successfully")
     public ResponseEntity<TopSuppliersResponse> getTopSuppliers(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
@@ -80,6 +85,7 @@ public class DashboardController {
     @GetMapping("/pending-actions")
     @PreAuthorize("hasAuthority('REPORT_VIEW')")
     @Operation(summary = "Get pending invoices for action")
+    @ApiResponse(responseCode = "200", description = "Pending actions retrieved successfully")
     public ResponseEntity<PendingActionsResponse> getPendingActions(
             @RequestParam(required = false, defaultValue = "10") int limit) {
         return ResponseEntity.ok(dashboardService.getPendingActions(getCompanyId(), limit));
@@ -88,6 +94,7 @@ public class DashboardController {
     @GetMapping("/status-timeline")
     @PreAuthorize("hasAuthority('REPORT_VIEW')")
     @Operation(summary = "Get daily status changes timeline")
+    @ApiResponse(responseCode = "200", description = "Status timeline retrieved successfully")
     public ResponseEntity<List<StatusTimelineResponse>> getStatusTimeline(
             @RequestParam(required = false, defaultValue = "30") int days) {
         return ResponseEntity.ok(dashboardService.getStatusTimeline(getCompanyId(), days));
@@ -96,6 +103,8 @@ public class DashboardController {
     @GetMapping("/extraction-performance")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     @Operation(summary = "Get LLM extraction performance metrics")
+    @ApiResponse(responseCode = "200", description = "Performance metrics retrieved successfully")
+    @ApiResponse(responseCode = "403", description = "Access denied")
     public ResponseEntity<ExtractionPerformanceResponse> getExtractionPerformance(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {

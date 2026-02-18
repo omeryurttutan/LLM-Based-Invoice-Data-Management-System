@@ -21,4 +21,8 @@ const withPWA = require('@ducanh2912/next-pwa').default({
   }
 })
 
-module.exports = withPWA(withNextIntl(nextConfig))
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
+module.exports = withBundleAnalyzer(withPWA(withNextIntl(nextConfig)))

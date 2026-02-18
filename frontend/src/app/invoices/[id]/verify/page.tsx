@@ -4,10 +4,25 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { notFound, useRouter } from 'next/navigation';
 import { invoiceService } from '@/services/invoice-service';
-import { VerificationLayout } from '@/components/invoice/verification/verification-layout';
-import { DocumentViewer } from '@/components/invoice/verification/document-viewer';
-import { VerificationForm } from '@/components/invoice/verification/verification-form';
+
+import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
+
+const VerificationLayout = dynamic(
+  () => import('@/components/invoice/verification/verification-layout').then((mod) => mod.VerificationLayout),
+  {
+    ssr: false,
+    loading: () => <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  }
+);
+const DocumentViewer = dynamic(
+  () => import('@/components/invoice/verification/document-viewer').then((mod) => mod.DocumentViewer),
+  { ssr: false }
+);
+const VerificationForm = dynamic(
+  () => import('@/components/invoice/verification/verification-form').then((mod) => mod.VerificationForm),
+  { ssr: false }
+);
 import { Button } from '@/components/ui/button';
 
 interface VerifyPageProps {

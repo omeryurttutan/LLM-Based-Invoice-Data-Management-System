@@ -168,6 +168,7 @@ public class InvoiceJpaEntity extends BaseJpaEntity {
     private LocalDateTime rejectedAt;
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.BatchSize(size = 50)
     private List<InvoiceItemJpaEntity> items = new ArrayList<>();
 
     public void addItem(InvoiceItemJpaEntity item) {

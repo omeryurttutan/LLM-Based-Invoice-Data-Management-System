@@ -59,7 +59,7 @@ class GeminiProvider(BaseLLMProvider):
         retry=retry_if_exception_type((exceptions.ResourceExhausted, exceptions.ServiceUnavailable, exceptions.InternalServerError)),
         reraise=True
     )
-    def generate(self, image_bytes: bytes, prompt: str) -> str:
+    async def generate(self, image_bytes: bytes, prompt: str) -> tuple[str, dict]:
         if not self.api_key:
             raise LLMAuthenticationError("Gemini API key is missing.")
 
@@ -72,13 +72,6 @@ class GeminiProvider(BaseLLMProvider):
             )
             
             # Create content parts
-            # google-generativeai supports passing bytes directly if wrapped in a dict with mime_type
-            # However, simpler to pass image object if using PIL, but here we have bytes.
-            # The SDK accepts a list of parts. For image bytes: 
-            # {"mime_type": "image/jpeg", "data": image_bytes}
-            # We'll assume jpeg/png based on detection or just generic image/jpeg for now, 
-            # or better: we rely on the preprocessing to output standardized format (likely JPEG).
-            
             image_part = {
                 "mime_type": "image/jpeg", 
                 "data": image_bytes
@@ -88,7 +81,7 @@ class GeminiProvider(BaseLLMProvider):
             
             logger.info("llm_request_sent", provider=self.provider_name, model=self.model_name)
             
-            response = model.generate_content(
+            response = await model.generate_content_async(
                 contents,
                 request_options={"timeout": settings.GEMINI_TIMEOUT}
             )
@@ -96,7 +89,12 @@ class GeminiProvider(BaseLLMProvider):
             duration = (time.time() - start_time) * 1000
             logger.info("llm_response_received", provider=self.provider_name, duration_ms=duration)
             
-            return response.text
+            usage = {
+                "input_tokens": response.usage_metadata.prompt_token_count,
+                "output_tokens": response.usage_metadata.candidates_token_count
+            }
+            
+            return response.text, usage
 
         except exceptions.InvalidArgument as e:
             # Usually API key issue or bad request
