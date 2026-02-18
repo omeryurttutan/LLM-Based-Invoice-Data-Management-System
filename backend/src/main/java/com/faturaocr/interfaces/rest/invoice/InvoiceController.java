@@ -20,7 +20,7 @@ import com.faturaocr.interfaces.rest.invoice.dto.VerifyInvoiceRequest;
 import com.faturaocr.application.invoice.dto.RejectInvoiceCommand;
 import com.faturaocr.application.invoice.dto.VerifyInvoiceCommand;
 import com.faturaocr.application.invoice.dto.FilterOptionsResponse;
-import com.faturaocr.interfaces.rest.invoice.dto.InvoiceFilterRequest; // Added import
+import com.faturaocr.application.invoice.dto.InvoiceFilterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -59,9 +59,10 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
     private final com.faturaocr.application.export.ExportService exportService;
 
-    @Operation(summary = "Create a new invoice")
+    @Operation(summary = "Create a new invoice", description = "Creates a new invoice manually. Validates input and checks for duplicates. Returns the created invoice details.")
     @ApiResponse(responseCode = "201", description = "Invoice created successfully")
-    @ApiResponse(responseCode = "409", description = "Duplicate invoice detected", content = @Content(schema = @Schema(hidden = true)))
+    @ApiResponse(responseCode = "400", description = "Invalid validation error")
+    @ApiResponse(responseCode = "409", description = "Duplicate invoice detected (unless forceDuplicate=true)", content = @Content(schema = @Schema(implementation = DuplicateCheckResponse.class)))
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
     public ResponseEntity<InvoiceResponse> createInvoice(
@@ -72,7 +73,8 @@ public class InvoiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Check for duplicate invoices")
+    @Operation(summary = "Check for duplicate invoices", description = "Checks if an invoice with similar details already exists to prevent duplication.")
+    @ApiResponse(responseCode = "200", description = "Check completed successfully")
     @PostMapping("/check-duplicate")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
     public ResponseEntity<DuplicateCheckResponse> checkDuplicate(@RequestBody DuplicateCheckRequestDTO request) {
@@ -91,7 +93,10 @@ public class InvoiceController {
 
     @PutMapping("/{id}")
     @CanEditInvoice
-    @Operation(summary = "Update an existing invoice")
+    @Operation(summary = "Update an existing invoice", description = "Updates invoice details. Only allowed for editable invoices (PENDING, REJECTED).")
+    @ApiResponse(responseCode = "200", description = "Invoice updated successfully")
+    @ApiResponse(responseCode = "403", description = "Invoice cannot be edited in current status")
+    @ApiResponse(responseCode = "404", description = "Invoice not found")
     public ResponseEntity<InvoiceResponse> updateInvoice(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateInvoiceRequest request) {
@@ -101,7 +106,9 @@ public class InvoiceController {
 
     @DeleteMapping("/{id}")
     @CanDeleteInvoice
-    @Operation(summary = "Delete an invoice (soft delete)")
+    @Operation(summary = "Delete an invoice", description = "Soft deletes an invoice. Only allowed if user has permission and invoice is in deletable status.")
+    @ApiResponse(responseCode = "204", description = "Invoice deleted successfully")
+    @ApiResponse(responseCode = "403", description = "Insufficient permissions or invoice cannot be deleted")
     public ResponseEntity<Void> deleteInvoice(@PathVariable UUID id) {
         invoiceService.deleteInvoice(id);
         return ResponseEntity.noContent().build();
@@ -109,7 +116,9 @@ public class InvoiceController {
 
     @PatchMapping("/{id}/verify")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT')")
-    @Operation(summary = "Verify an invoice")
+    @Operation(summary = "Verify an invoice", description = "Changes invoice status to VERIFIED or PROCESSING based on workflow.")
+    @ApiResponse(responseCode = "200", description = "Invoice verified successfully")
+    @ApiResponse(responseCode = "422", description = "Invalid status transition")
     public ResponseEntity<InvoiceResponse> verifyInvoice(
             @PathVariable UUID id,
             @RequestBody(required = false) VerifyInvoiceRequest request) {
@@ -119,7 +128,8 @@ public class InvoiceController {
 
     @PatchMapping("/{id}/reject")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT')")
-    @Operation(summary = "Reject an invoice")
+    @Operation(summary = "Reject an invoice", description = "Changes invoice status to REJECTED. Requires a rejection reason.")
+    @ApiResponse(responseCode = "200", description = "Invoice rejected successfully")
     public ResponseEntity<InvoiceResponse> rejectInvoice(
             @PathVariable UUID id,
             @RequestBody @Valid RejectInvoiceRequest request) {
@@ -129,21 +139,25 @@ public class InvoiceController {
 
     @PatchMapping("/{id}/reopen")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
-    @Operation(summary = "Reopen a rejected invoice")
+    @Operation(summary = "Reopen a rejected invoice", description = "Moves a REJECTED invoice back to PENDING status.")
+    @ApiResponse(responseCode = "200", description = "Invoice reopened successfully")
     public ResponseEntity<InvoiceResponse> reopenInvoice(@PathVariable UUID id) {
         return ResponseEntity.ok(invoiceService.reopenInvoice(id));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
-    @Operation(summary = "Get invoice by ID")
+    @Operation(summary = "Get invoice details", description = "Retrieves full invoice details including line items.")
+    @ApiResponse(responseCode = "200", description = "Invoice found")
+    @ApiResponse(responseCode = "404", description = "Invoice not found")
     public ResponseEntity<InvoiceDetailResponse> getInvoice(@PathVariable UUID id) {
         return ResponseEntity.ok(invoiceService.getInvoiceById(id));
     }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
-    @Operation(summary = "List invoices with filtering")
+    @Operation(summary = "List invoices", description = "List invoices with pagination, sorting, and advanced filtering options.")
+    @ApiResponse(responseCode = "200", description = "List of invoices retrieved")
     public ResponseEntity<Page<InvoiceListResponse>> listInvoices(
             @Valid InvoiceFilterRequest filterRequest,
             @PageableDefault(size = 20, sort = "invoiceDate") Pageable pageable) {
@@ -152,7 +166,7 @@ public class InvoiceController {
 
     @GetMapping("/suppliers")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
-    @Operation(summary = "Get distinct supplier names for autocomplete")
+    @Operation(summary = "Autocomplete supplier names", description = "Returns unique supplier names matching the search term.")
     public ResponseEntity<List<String>> getSuppliers(
             @RequestParam(required = false) String search) {
         return ResponseEntity.ok(invoiceService.getSuppliers(search));
@@ -160,7 +174,7 @@ public class InvoiceController {
 
     @GetMapping("/filter-options")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN')")
-    @Operation(summary = "Get available filter options and ranges")
+    @Operation(summary = "Get filter options", description = "Returns available filter ranges (min/max amounts, dates) and distinct values.")
     public ResponseEntity<FilterOptionsResponse> getFilterOptions() {
         return ResponseEntity.ok(invoiceService.getFilterOptions());
     }
@@ -227,7 +241,7 @@ public class InvoiceController {
 
     @GetMapping("/export/formats")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT')")
-    @Operation(summary = "Get available export formats")
+    @Operation(summary = "Get export formats", description = "Returns available export formats for invoices.")
     public ResponseEntity<List<com.faturaocr.application.export.dto.ExportFormatMetadata>> getExportFormats() {
         return ResponseEntity.ok(exportService.getExportFormats());
     }

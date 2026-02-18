@@ -5,7 +5,7 @@ import com.faturaocr.application.export.ExportService;
 import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaEntity;
 import com.faturaocr.infrastructure.persistence.invoice.InvoiceSpecification;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
-import com.faturaocr.interfaces.rest.invoice.dto.InvoiceFilterRequest;
+import com.faturaocr.application.invoice.dto.InvoiceFilterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +25,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 @RequestMapping("/api/v1/invoices")
 @RequiredArgsConstructor
@@ -36,7 +39,12 @@ public class ExportController {
 
         @GetMapping("/export")
         @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'ACCOUNTANT')")
-        @Operation(summary = "Export invoices to Excel or CSV")
+        @Operation(summary = "Export invoices to Excel, CSV, or Accounting formats")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "File exported successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid request or format"),
+                        @ApiResponse(responseCode = "403", description = "Access denied")
+        })
         public void exportInvoices(
                         InvoiceFilterRequest filter,
                         @RequestParam(defaultValue = "XLSX") ExportFormat format,

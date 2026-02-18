@@ -19,5 +19,7 @@ public interface CategoryRepository {
 
     boolean existsByNameAndCompanyId(String name, UUID companyId);
 
+    List<Category> findAllById(Iterable<UUID> ids);
+
     void softDelete(UUID id);
 }

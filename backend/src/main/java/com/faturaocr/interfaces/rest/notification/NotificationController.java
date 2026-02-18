@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
@@ -36,25 +39,13 @@ public class NotificationController {
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get user notifications", description = "Retrieve paginated notifications for the current user")
+    @ApiResponse(responseCode = "200", description = "List of notifications retrieved")
     public ResponseEntity<Page<Notification>> getNotifications(
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser currentUser,
-            @RequestParam(required = false) Boolean isRead,
+            @Parameter(description = "Filter by read status (true/false)") @RequestParam(required = false) Boolean isRead,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        // Handle null isRead by calling different methods or passing it down
-        // Service expects primitive boolean for one method, or different method calls
-        // Let's assume service handles boolean logic now, or we adapt
-        // Handle null isRead logic in if/else below
-        // If isRead is null, maybe we want all? service.getUserNotifications takes
-        // boolean isRead.
-        // If the user wants ALL (read and unread), we should probably use a method that
-        // supports that or loop?
-        // Let's check service again.
-        // Service: getUserNotifications(UUID userId, boolean isRead, Pageable pageable)
-        // -> returns findAllByUserIdAndIsRead
-        // Service: getAllUserNotifications(UUID userId, Pageable pageable) -> returns
-        // findAllByUserId
-
+        // Handle null isRead logic
         if (isRead == null) {
             return ResponseEntity.ok(notificationService.getAllUserNotifications(currentUser.userId(), pageable));
         } else {
@@ -65,6 +56,7 @@ public class NotificationController {
     @GetMapping("/unread-count")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get unread count", description = "Get the number of unread notifications")
+    @ApiResponse(responseCode = "200", description = "Unread count retrieved")
     public ResponseEntity<Map<String, Long>> getUnreadCount(
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser currentUser) {
         long count = notificationService.getUnreadCount(currentUser.userId());
@@ -74,6 +66,10 @@ public class NotificationController {
     @PatchMapping("/{id}/read")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Mark as read", description = "Mark a specific notification as read")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Notification marked as read"),
+            @ApiResponse(responseCode = "404", description = "Notification not found")
+    })
     public ResponseEntity<Void> markAsRead(
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser currentUser,
             @PathVariable UUID id) {
@@ -85,6 +81,7 @@ public class NotificationController {
     @PatchMapping("/read-all")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Mark all as read", description = "Mark all notifications for the current user as read")
+    @ApiResponse(responseCode = "200", description = "All notifications marked as read")
     public ResponseEntity<Void> markAllAsRead(
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser currentUser) {
         notificationService.markAllAsRead(currentUser.userId());
@@ -94,6 +91,10 @@ public class NotificationController {
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Delete notification", description = "Delete a specific notification")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Notification deleted"),
+            @ApiResponse(responseCode = "404", description = "Notification not found")
+    })
     public ResponseEntity<Void> deleteNotification(
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser currentUser,
             @PathVariable UUID id) {

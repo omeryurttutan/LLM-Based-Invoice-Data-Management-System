@@ -33,7 +33,12 @@ public class AuthController extends BaseController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Register a new user")
+    @Operation(summary = "Register a new user account", description = "Creates a new user account and company. If companyCode is provided, joins an existing company. Returns access and refresh tokens.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "User registered successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input or validation error"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "Email already registered")
+    })
     public ResponseEntity<ApiResponse<AuthResponse>> register(
             @Valid @RequestBody RegisterCommand command) {
 
@@ -42,7 +47,12 @@ public class AuthController extends BaseController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Authenticate user and get tokens")
+    @Operation(summary = "Authenticate and obtain JWT tokens", description = "Authenticates a user with email and password. Returns a JWT access token and a refresh token.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Successfully authenticated"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Invalid email or password"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "423", description = "Account locked due to too many failed attempts")
+    })
     public ResponseEntity<ApiResponse<AuthResponse>> login(
             @Valid @RequestBody LoginCommand command) {
 
@@ -51,7 +61,11 @@ public class AuthController extends BaseController {
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Refresh access token")
+    @Operation(summary = "Refresh an expired access token", description = "Uses a valid refresh token to obtain a new access token. Does not require authentication header.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
+    })
     public ResponseEntity<ApiResponse<AuthResponse>> refresh(
             @Valid @RequestBody RefreshTokenCommand command) {
 
@@ -60,7 +74,11 @@ public class AuthController extends BaseController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Logout user and invalidate refresh token")
+    @Operation(summary = "Logout user and invalidate session", description = "Invalidates the provided refresh token. Requires Bearer authentication.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Logged out successfully"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized or invalid token")
+    })
     public ResponseEntity<ApiResponse<Void>> logout(
             @RequestBody RefreshTokenCommand command) {
 

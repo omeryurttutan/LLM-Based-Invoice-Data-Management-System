@@ -9,16 +9,21 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @Data
+@Schema(description = "Request to create a new user")
 public class CreateUserRequest {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
     @Size(max = 255)
+    @Schema(description = "Email address", example = "user@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
 
     @NotBlank(message = "Full name is required")
     @Size(max = 100)
+    @Schema(description = "Full name", example = "Ahmet Yılmaz", requiredMode = Schema.RequiredMode.REQUIRED)
     private String fullName;
 
     @NotBlank(message = "Password is required")
@@ -26,12 +31,15 @@ public class CreateUserRequest {
     // Note: Complex password validation logic can be added via custom annotation or
     // pattern
     // For now simple check
+    @Schema(description = "Password", example = "StrongPass123!", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
 
     @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Phone must act as valid phone format")
+    @Schema(description = "Phone number", example = "+905551234567")
     private String phone;
 
     @NotNull(message = "Role is required")
+    @Schema(description = "User role", example = "ACCOUNTANT", requiredMode = Schema.RequiredMode.REQUIRED)
     private Role role;
 
     public CreateUserCommand toCommand() {

@@ -53,10 +53,10 @@ class FallbackChain:
         if not self.chain_order:
             logger.warning("no_providers_configured", message="No LLM providers configured or enabled in chain order.")
 
-    async def generate_with_fallback(self, image_bytes: bytes, prompt: str) -> tuple[str, str, List[dict]]:
+    async def generate_with_fallback(self, image_bytes: bytes, prompt: str) -> tuple[str, str, List[dict], Optional[dict]]:
         """
         Try providers in order.
-        Returns: (response_text, provider_name, attempt_logs)
+        Returns: (response_text, provider_name, attempt_logs, usage_stats)
         """
         attempt_logs = []
         last_error = None
@@ -94,11 +94,8 @@ class FallbackChain:
 
                 logger.info("provider_attempt_started", provider=provider_name, attempt=index+1)
                 
-                # generate is sync, so we block here. 
-                # Ideally wrap in run_in_executor for async.
-                # Since we are in async def, let's allow it to block for now or use ThreadPoolExecutor if high load.
-                # For Phase 16 simplicity, keeping it direct as per Plan.
-                response_text = provider.generate(image_bytes, prompt)
+                # generate is now async and returns (text, usage)
+                response_text, usage = await provider.generate(image_bytes, prompt)
                 
                 duration = (time.time() - start_time) * 1000
                 self.health_manager.record_success(provider_name)
@@ -106,10 +103,11 @@ class FallbackChain:
                 attempt_logs.append({
                     "provider": provider_name,
                     "status": "SUCCESS",
-                    "duration_ms": duration
+                    "duration_ms": duration,
+                    "usage": usage
                 })
                 
-                return response_text, provider_name, attempt_logs
+                return response_text, provider_name, attempt_logs, usage
 
             except LLMAuthenticationError as e:
                 # Auth error: Record failure but do NOT retry this provider.

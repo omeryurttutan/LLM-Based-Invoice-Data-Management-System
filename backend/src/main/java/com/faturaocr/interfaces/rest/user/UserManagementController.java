@@ -25,9 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.Operation;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Tag(name = "User Management", description = "Admin user management endpoints")
 public class UserManagementController {
 
     private final UserManagementService userManagementService;
@@ -35,6 +41,8 @@ public class UserManagementController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a new user")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "User created successfully")
     public ApiResponse<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
         UserResponse response = userManagementService.createUser(request.toCommand());
         return ApiResponse.success("User created successfully", response);
@@ -42,6 +50,8 @@ public class UserManagementController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "List users for company")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "List of users retrieved")
     public ApiResponse<Page<UserResponse>> listUsers(Pageable pageable) {
         Page<UserResponse> response = userManagementService.listUsersByCompany(pageable);
         return ApiResponse.success(response);
@@ -49,6 +59,11 @@ public class UserManagementController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Get user details")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User found"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User not found")
+    })
     public ApiResponse<UserResponse> getUserById(@PathVariable UUID id) {
         UserResponse response = userManagementService.getUserById(id);
         return ApiResponse.success(response);
@@ -56,6 +71,8 @@ public class UserManagementController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update user")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User updated successfully")
     public ApiResponse<UserResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody UpdateUserRequest request) {
         UserResponse response = userManagementService.updateUser(id, request.toCommand());
         return ApiResponse.success("User updated successfully", response);
@@ -64,12 +81,16 @@ public class UserManagementController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete user")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "User deleted successfully")
     public void deleteUser(@PathVariable UUID id) {
         userManagementService.deleteUser(id);
     }
 
     @PatchMapping("/{id}/toggle-active")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Toggle user active status")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User status toggled")
     public ApiResponse<UserResponse> toggleUserActive(@PathVariable UUID id) {
         UserResponse response = userManagementService.toggleUserActive(id);
         String message = response.isActive() ? "User activated" : "User deactivated";
@@ -78,6 +99,8 @@ public class UserManagementController {
 
     @PatchMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Change user role")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User role updated")
     public ApiResponse<UserResponse> changeUserRole(@PathVariable UUID id,
             @Valid @RequestBody ChangeRoleRequest request) {
         UserResponse response = userManagementService.changeUserRole(id, request.toCommand());

@@ -17,3 +17,5 @@ class ExtractionResponse(BaseModel):
     validation_result: Optional[ValidationResult] = Field(None, description="Detailed validation result")
     raw_response: Optional[str] = Field(None, description="Raw LLM response (for debugging)")
     fallback_attempts: Optional[list] = Field(None, description="Log of fallback attempts")
+    input_tokens: Optional[int] = Field(None, description="Number of input tokens used")
+    output_tokens: Optional[int] = Field(None, description="Number of output tokens used")

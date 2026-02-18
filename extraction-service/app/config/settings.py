@@ -61,6 +61,16 @@ class Settings(BaseSettings):
     RABBITMQ_RECONNECT_DELAY: int = 5
     RABBITMQ_RECONNECT_MAX_DELAY: int = 60
 
+    # LLM Cost Settings (Per 1K Tokens)
+    LLM_COST_GEMINI_INPUT_PER_1K: float = 0.00015
+    LLM_COST_GEMINI_OUTPUT_PER_1K: float = 0.0006
+    LLM_COST_GPT_INPUT_PER_1K: float = 0.005
+    LLM_COST_GPT_OUTPUT_PER_1K: float = 0.015
+    LLM_COST_CLAUDE_INPUT_PER_1K: float = 0.0008
+    LLM_COST_CLAUDE_OUTPUT_PER_1K: float = 0.004
+    
+    LLM_USAGE_REPORTING_ENABLED: bool = True
+
     # XML Parser Settings (Phase 18)
     XML_PARSER_MAX_FILE_SIZE_MB: int = 50
     XML_PARSER_DEFAULT_CONFIDENCE: float = 98.0

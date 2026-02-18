@@ -13,7 +13,7 @@ from app.core.logging import logger
 from app.core.exceptions import ExtractionServiceException
 from app.services.llm.base_provider import LLMError, LLMTimeoutError, LLMRateLimitError
 
-router = APIRouter()
+router = APIRouter(tags=["Extraction"])
 extraction_service = ExtractionService()
 
 def get_extraction_service():

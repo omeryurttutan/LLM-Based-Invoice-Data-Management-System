@@ -36,7 +36,8 @@ class BaseLLMProvider(ABC):
     """
     
     @abstractmethod
-    def generate(self, image_bytes: bytes, prompt: str) -> str:
+    @abstractmethod
+    async def generate(self, image_bytes: bytes, prompt: str) -> tuple[str, dict]:
         """
         Send an image and a prompt to the LLM and return the text response.
         
@@ -45,7 +46,9 @@ class BaseLLMProvider(ABC):
             prompt: Text prompt instructions
             
         Returns:
-            The raw text response from the LLM.
+            A tuple containing:
+            - The raw text response from the LLM.
+            - A dictionary containing usage statistics (input_tokens, output_tokens).
             
         Raises:
             LLMError: Base class for all specific LLM errors.

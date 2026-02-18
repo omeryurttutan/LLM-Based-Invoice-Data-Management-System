@@ -63,6 +63,13 @@ public class CategoryRepositoryAdapter implements CategoryRepository {
     }
 
     @Override
+    public List<Category> findAllById(Iterable<UUID> ids) {
+        return categoryJpaRepository.findAllById(ids).stream()
+                .map(categoryMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void softDelete(UUID id) {
         categoryJpaRepository.findById(id).ifPresent(entity -> {
             entity.setDeleted(true);

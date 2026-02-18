@@ -21,6 +21,7 @@ public class AutomationRuleService {
     private final AutomationRuleRepository repository;
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "rules", key = "#rule.companyId")
     public AutomationRule createRule(AutomationRule rule) {
         validateRule(rule);
         rule.setName(SanitizationUtils.sanitizeHtml(rule.getName()));
@@ -32,6 +33,7 @@ public class AutomationRuleService {
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "rules", key = "#companyId")
     public AutomationRule updateRule(Long id, UUID companyId, AutomationRule updatedRule) {
         AutomationRule existingRule = getRule(id, companyId);
         validateRule(updatedRule);
@@ -54,16 +56,19 @@ public class AutomationRuleService {
                 .orElseThrow(() -> new RuntimeException("Automation rule not found"));
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = "rules", key = "#companyId")
     public Page<AutomationRule> listRules(UUID companyId, Pageable pageable) {
         return repository.findAllByCompanyId(companyId, pageable);
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "rules", key = "#companyId")
     public void deleteRule(Long id, UUID companyId) {
         AutomationRule rule = getRule(id, companyId);
         repository.delete(rule);
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = "rules", key = "#companyId + ':active:' + #triggerPoint")
     public List<AutomationRule> getActiveRules(UUID companyId, TriggerPoint triggerPoint) {
         return repository.findByCompanyIdAndTriggerPointAndActive(companyId, triggerPoint, true);
     }

@@ -7,7 +7,7 @@ import com.faturaocr.domain.notification.enums.NotificationType;
 import com.faturaocr.domain.notification.service.channel.NotificationChannel;
 import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.port.UserRepository;
-import com.faturaocr.infrastructure.persistence.notification.NotificationRepository;
+import com.faturaocr.domain.notification.port.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -39,6 +39,7 @@ public class NotificationService {
 
     // Convenience overload
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "unread-notification-count", key = "#userId")
     public void notify(UUID userId, UUID companyId, NotificationType type, String title, String message,
             NotificationSeverity severity, NotificationReferenceType referenceType, UUID referenceId,
             Map<String, Object> metadata) {
@@ -102,11 +103,13 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "unread-notification-count", key = "#userId")
     public long getUnreadCount(UUID userId) {
         return notificationRepository.countByUserIdAndIsReadFalse(userId);
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "unread-notification-count", key = "#userId")
     public void markAsRead(UUID notificationId, UUID userId) {
         Notification notification = notificationRepository.findByIdAndUserId(notificationId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found or access denied"));
@@ -116,6 +119,7 @@ public class NotificationService {
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "unread-notification-count", key = "#userId")
     public void markAllAsRead(UUID userId) {
         notificationRepository.markAllAsRead(userId, Instant.now());
     }

@@ -1,0 +1,168 @@
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    path: /api/v1/api-docs
+    enabled: false
+  swagger-ui:
+    path: /api/docs
+    enabled: false
+
+spring:
+  application:
+    name: fatura-ocr-backend
+  profiles:
+    active: prod
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/fatura_ocr_db}
+    username: ${SPRING_DATASOURCE_USERNAME:fatura_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:fatura_secret_2026}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      leak-detection-threshold: 60000
+
+  jpa:
+    properties:
+      hibernate:
+        generate_statistics: false
+    show-sql: false
+
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:redis}
+      port: ${SPRING_REDIS_PORT:6379}
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+          max-wait: 2000ms
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:rabbitmq}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:fatura_mq}
+    password: ${SPRING_RABBITMQ_PASSWORD:mq_secret_2026}
+
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp.sendgrid.net}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:apikey}
+    password: ${SPRING_MAIL_PASSWORD:your-sendgrid-api-key}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+  access-token:
+    expiration: 900000
+  refresh-token:
+    expiration: 604800000
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers,flyway
+  endpoint:
+    health:
+      show-details: when_authorized
+    env:
+      show-values: when_authorized
+
+# Alerting Configuration
+app:
+  alerts:
+    email:
+      enabled: ${ALERTS_EMAIL_ENABLED:true}
+      recipients: ${ALERTS_EMAIL_RECIPIENTS:admin@example.com}
+    slack:
+      enabled: ${ALERTS_SLACK_ENABLED:false}
+      webhook-url: ${ALERTS_SLACK_WEBHOOK_URL}
+
+  # LLM Budget Configuration
+  llm:
+    budget:
+      monthly-limit-usd: ${LLM_BUDGET_MONTHLY_LIMIT_USD:50.0}
+      daily-limit-usd: ${LLM_BUDGET_DAILY_LIMIT_USD:5.0}
+      alert-threshold-percent: ${LLM_BUDGET_ALERT_THRESHOLD_PERCENT:80}
+      hard-limit-enabled: ${LLM_BUDGET_HARD_LIMIT_ENABLED:false}
+
+  extraction-service:
+    url: ${EXTRACTION_SERVICE_URL:http://extraction-service:8000}
+
+  kvkk:
+    encryption:
+      enabled: true
+      key-env-variable: KVKK_ENCRYPTION_KEY
+    consent:
+      data-processing-required: true
+      current-version: "1.0"
+    strict-minimization: true
+    retention:
+      enabled: true
+      job-cron: "0 0 2 * * ?"
+      users-days: 30
+      invoices-days: 1825
+      companies-days: 1825
+      audit-logs-days: 3650
+      notifications-days: 90
+      rule-logs-days: 365
+    audit-masking:
+      enabled: true
+
+  security:
+    password:
+      bcrypt-strength: 12
+    login:
+      max-attempts: 5
+      lockout-duration-minutes: 15
+    rate-limit:
+      enabled: true
+      public-limit: 20
+      login-limit: 5
+      authenticated-limit: 100
+      upload-limit: 10
+      export-limit: 5
+      admin-limit: 50
+      window-seconds: 60
+    headers:
+      hsts-enabled: true
+      csp-enabled: true
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:https://admin.faturaocr.com}
+    internal-api-key: ${INTERNAL_API_KEY}
+    request:
+      max-json-body-size: 1048576
+
+# File Upload Configuration
+upload:
+  storage-path: ${UPLOAD_STORAGE_PATH:/data/invoices}
+  max-file-size: ${UPLOAD_MAX_FILE_SIZE_MB:20}MB
+  max-bulk-total-size: ${UPLOAD_MAX_BULK_TOTAL_SIZE_MB:200}MB
+
+export:
+  logo:
+    firm-number: "001"
+    use-legacy-format: false
+  netsis:
+    branch-code: "0"
+    use-legacy-format: false
+  mikro:
+    delimiter: ";"
+    database-name: "MIKRO_DB"
+  luca:
+    firm-code: "100"

@@ -97,4 +97,29 @@ public class InvoiceDTOMapper {
         }
         return response;
     }
+
+    public InvoiceListResponse mapJpaToListResponse(InvoiceJpaEntity invoice,
+            java.util.Map<java.util.UUID, String> categoryNameMap) {
+        InvoiceListResponse response = new InvoiceListResponse();
+        response.setId(invoice.getId());
+        response.setInvoiceNumber(invoice.getInvoiceNumber());
+        response.setInvoiceDate(invoice.getInvoiceDate());
+        response.setDueDate(invoice.getDueDate());
+        response.setSupplierName(invoice.getSupplierName());
+        response.setTotalAmount(invoice.getTotalAmount());
+        response.setCurrency(invoice.getCurrency());
+        response.setStatus(invoice.getStatus());
+        response.setSourceType(invoice.getSourceType());
+        if (invoice.getItems() != null) {
+            response.setItemCount(invoice.getItems().size());
+        } else {
+            response.setItemCount(0);
+        }
+        response.setCreatedAt(invoice.getCreatedAt());
+
+        if (invoice.getCategoryId() != null && categoryNameMap != null) {
+            response.setCategoryName(categoryNameMap.get(invoice.getCategoryId()));
+        }
+        return response;
+    }
 }

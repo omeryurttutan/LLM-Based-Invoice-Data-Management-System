@@ -20,8 +20,10 @@ public interface InvoiceJpaRepository
                 extends JpaRepository<InvoiceJpaEntity, UUID>, JpaSpecificationExecutor<InvoiceJpaEntity> {
         Optional<InvoiceJpaEntity> findByIdAndCompanyIdAndIsDeletedFalse(UUID id, UUID companyId);
 
+        @org.springframework.data.jpa.repository.EntityGraph(attributePaths = { "category", "items" })
         Page<InvoiceJpaEntity> findAllByCompanyIdAndIsDeletedFalse(UUID companyId, Pageable pageable);
 
+        @org.springframework.data.jpa.repository.EntityGraph(attributePaths = { "category", "items" })
         Page<InvoiceJpaEntity> findAllByCompanyIdAndStatusAndIsDeletedFalse(
                         UUID companyId, InvoiceStatus status, Pageable pageable);
 

@@ -60,8 +60,22 @@ import { useAuthStore } from '@/stores/auth-store';
 import { formatCurrency } from '@/lib/utils';
 import { versionService } from '@/services/version-service';
 import { InvoiceVersionSummary, VersionDiff } from '@/types/version-history';
-import { VersionTimeline } from '@/components/invoice/VersionTimeline';
-import { VersionDiffViewer } from '@/components/invoice/VersionDiffViewer';
+import dynamic from 'next/dynamic';
+
+const VersionTimeline = dynamic(
+  () => import('@/components/invoice/VersionTimeline').then((mod) => mod.VersionTimeline),
+  {
+    loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>,
+    ssr: false
+  }
+);
+const VersionDiffViewer = dynamic(
+  () => import('@/components/invoice/VersionDiffViewer').then((mod) => mod.VersionDiffViewer),
+  {
+    loading: () => <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>,
+    ssr: false
+  }
+);
 import { RevertDialog } from '@/components/invoice/RevertDialog';
 import { useLocale, useTranslations } from 'next-intl';
 

@@ -16,20 +16,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/profile")
 @RequiredArgsConstructor
+@Tag(name = "Profile", description = "User profile management endpoints")
 public class ProfileController {
 
     private final ProfileService profileService;
 
     @GetMapping
+    @Operation(summary = "Get current user profile")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Profile details retrieved")
     public ApiResponse<UserProfileResponse> getMyProfile(@AuthenticationPrincipal AuthenticatedUser currentUser) {
         UserProfileResponse response = profileService.getProfile(currentUser.userId());
         return ApiResponse.success(response);
     }
 
     @PutMapping
+    @Operation(summary = "Update current user profile")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Profile updated successfully")
     public ApiResponse<UserProfileResponse> updateProfile(
             @AuthenticationPrincipal AuthenticatedUser currentUser,
             @Valid @RequestBody UpdateProfileRequest request) {
@@ -38,6 +46,8 @@ public class ProfileController {
     }
 
     @PatchMapping("/password")
+    @Operation(summary = "Change password")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Password changed successfully")
     public ApiResponse<Void> changePassword(
             @AuthenticationPrincipal AuthenticatedUser currentUser,
             @Valid @RequestBody ChangePasswordRequest request) {

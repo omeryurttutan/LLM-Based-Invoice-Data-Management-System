@@ -11,7 +11,9 @@ from app.core.logging import logger
 from app.messaging.connection_manager import RabbitMQConnectionManager
 from app.messaging.message_models import ExtractionRequest, ExtractionResultMessage
 from app.messaging.publisher import ResultPublisher
+import structlog
 from app.services.extraction.extraction_service import ExtractionService
+from app.services.usage_reporter import UsageReporter
 from app.core.exceptions import ExtractionServiceException
 
 class ExtractionConsumer(threading.Thread):
@@ -25,6 +27,7 @@ class ExtractionConsumer(threading.Thread):
         self.should_stop = False
         self.connection_manager = RabbitMQConnectionManager()
         self.extraction_service = ExtractionService()
+        self.usage_reporter = UsageReporter()
         self.is_ready = False # Health check flag
 
     def run(self):
@@ -117,6 +120,9 @@ class ExtractionConsumer(threading.Thread):
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 return
 
+            # Bind correlation_id to logger context
+            structlog.contextvars.bind_contextvars(correlation_id=correlation_id)
+
             # 3. Process Extraction (Sync call to async method requires async runner?)
             # ExtractionService methods are async. We are in a sync callback.
             # We need to run async code synchronously here.
@@ -135,6 +141,20 @@ class ExtractionConsumer(threading.Thread):
                     )
                 )
                 
+                # Report Usage
+                if extraction_result.input_tokens is not None and extraction_result.output_tokens is not None:
+                    self.usage_reporter.report_usage(
+                        provider=extraction_result.provider,
+                        model="auto", # Model is dynamic/fallback, usage reporter might need update or just use provider
+                        request_type="EXTRACTION",
+                        input_tokens=extraction_result.input_tokens,
+                        output_tokens=extraction_result.output_tokens,
+                        success=True,
+                        duration_ms=extraction_result.processing_time_ms,
+                        invoice_id=request.invoice_id,
+                        correlation_id=correlation_id
+                    )
+
                 # 4. Success Result
                 result_message = ExtractionResultMessage(
                     correlation_id=request.correlation_id,
