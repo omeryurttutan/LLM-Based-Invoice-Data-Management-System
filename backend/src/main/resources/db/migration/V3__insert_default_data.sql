@@ -43,7 +43,7 @@ INSERT INTO users (
     'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     'admin@demo.com',
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.HlGvoXe.BxGX2u',
+    '$2a$12$xIutmiIFIgdxR7CCYpels.RP1TIf6Rrqzb2ebWZIM0.9ASey4kTZm',
     'Sistem Yöneticisi',
     'ADMIN',
     TRUE,

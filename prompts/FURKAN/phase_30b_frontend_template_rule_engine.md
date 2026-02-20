@@ -8,9 +8,9 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080
-  - **Python Microservice**: Port 8000 — LLM-based extraction
-  - **Next.js Frontend**: Port 3000
+  - **Spring Boot Backend**: Port 8082
+  - **Python Microservice**: Port 8001 — LLM-based extraction
+  - **Next.js Frontend**: Port 3001
 
 ### Current State (Phases 0-29 + 30-A Completed)
 - ✅ Phase 0-9: Docker, CI/CD, Hexagonal Architecture, Database, Auth (JWT + Redis), RBAC (ADMIN/MANAGER/ACCOUNTANT/INTERN), Invoice CRUD, Audit Log, Duplication Control
@@ -27,7 +27,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 
 ### What Phase 30-A Delivers (Backend Endpoints)
 
-**Supplier Templates API — Base URL**: `http://localhost:8080/api/v1/templates`
+**Supplier Templates API — Base URL**: `http://localhost:8082/api/v1/templates`
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -42,7 +42,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 **Template Response Shape:**
 - id, supplierTaxNumber, supplierName, sampleCount, learnedData (field_accuracy, common_corrections, typical_line_item_count, typical_amount_range), defaultCategory (id + name), defaultCurrency, typicalTaxRates, averageConfidence, lastInvoiceDate, isActive, createdAt, updatedAt
 
-**Automation Rules API — Base URL**: `http://localhost:8080/api/v1/rules`
+**Automation Rules API — Base URL**: `http://localhost:8082/api/v1/rules`
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|

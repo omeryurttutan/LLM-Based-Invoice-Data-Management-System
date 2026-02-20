@@ -12,6 +12,7 @@ import com.faturaocr.domain.user.valueobject.Role;
 import com.faturaocr.infrastructure.security.JwtTokenProvider;
 import com.faturaocr.infrastructure.security.LoginAttemptService;
 import com.faturaocr.infrastructure.security.RefreshTokenService;
+import com.faturaocr.domain.company.port.CompanyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -39,6 +40,8 @@ class AuthenticationServiceTest {
     private AuditLogRepository auditLogRepository;
     @Mock
     private LoginAttemptService loginAttemptService;
+    @Mock
+    private CompanyRepository companyRepository;
 
     private AuthenticationService authenticationService;
 
@@ -46,7 +49,7 @@ class AuthenticationServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         authenticationService = new AuthenticationService(userRepository, passwordEncoder, jwtTokenProvider,
-                refreshTokenService, auditLogRepository, loginAttemptService);
+                refreshTokenService, auditLogRepository, loginAttemptService, companyRepository);
 
         lenient().when(loginAttemptService.isBlocked(any())).thenReturn(false);
     }
@@ -54,7 +57,8 @@ class AuthenticationServiceTest {
     @Test
     void shouldRegisterNewUser() {
         // Arrange
-        RegisterCommand command = new RegisterCommand(UUID.randomUUID(), "new@example.com", "Password123!", "New User",
+        RegisterCommand command = new RegisterCommand(UUID.randomUUID(), null, null, "new@example.com", "Password123!",
+                "New User",
                 "1234567890");
         when(userRepository.existsByEmailAndCompanyId(any(), any())).thenReturn(false);
         when(passwordEncoder.encode(any())).thenReturn("hashedPwd");

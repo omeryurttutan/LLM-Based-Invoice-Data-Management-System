@@ -8,8 +8,8 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-- **Backend**: Java 17 + Spring Boot 3.2 (Hexagonal Architecture) — **running on port 8080**
-- **Frontend**: Next.js 14+ (App Router, TypeScript, Tailwind CSS, Shadcn/ui) — **running on port 3000**
+- **Backend**: Java 17 + Spring Boot 3.2 (Hexagonal Architecture) — **running on port 8082**
+- **Frontend**: Next.js 14+ (App Router, TypeScript, Tailwind CSS, Shadcn/ui) — **running on port 3001**
 - **Database**: PostgreSQL 15+
 
 ### Current State
@@ -55,7 +55,7 @@ Implement fully functional authentication pages (Login, Register) with complete 
 
 ### 1. Backend API Reference
 
-**Base URL**: `http://localhost:8080/api/v1`
+**Base URL**: `http://localhost:8082/api/v1`
 
 #### 1.1 Authentication Endpoints
 
@@ -312,7 +312,7 @@ Extend the Axios client created in Phase 10 with full token management:
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/auth-store';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/api/v1';
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -1537,7 +1537,7 @@ npx shadcn-ui@latest add form    # Optional: for better form handling
 
 ```env
 # API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:8082/api/v1
 
 # App Configuration
 NEXT_PUBLIC_APP_NAME=Fatura OCR
@@ -1626,22 +1626,22 @@ npm run dev      # Manual testing
 
 ```bash
 # Test registration
-curl -X POST http://localhost:8080/api/v1/auth/register \
+curl -X POST http://localhost:8082/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"Test123!@#","fullName":"Test User"}'
 
 # Test login
-curl -X POST http://localhost:8080/api/v1/auth/login \
+curl -X POST http://localhost:8082/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"Test123!@#"}'
 
 # Test token refresh (replace with actual token)
-curl -X POST http://localhost:8080/api/v1/auth/refresh \
+curl -X POST http://localhost:8082/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{"refreshToken":"<your-refresh-token>"}'
 
 # Test get current user (replace with actual token)
-curl -X GET http://localhost:8080/api/v1/auth/me \
+curl -X GET http://localhost:8082/api/v1/auth/me \
   -H "Authorization: Bearer <your-access-token>"
 ```
 

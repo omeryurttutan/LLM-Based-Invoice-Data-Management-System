@@ -22,16 +22,16 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_company_created ON audit_logs(company_
 CREATE INDEX IF NOT EXISTS idx_invoice_versions_invoice_version ON invoice_versions(invoice_id, version_number DESC);
 
 -- 8. Templates: Lookup
-CREATE INDEX IF NOT EXISTS idx_templates_company_tax_hash ON templates(company_id, supplier_tax_number_hash);
+CREATE INDEX IF NOT EXISTS idx_templates_company_tax_hash ON supplier_templates(company_id, supplier_tax_number_hash);
 
 -- 9. Rules: Active rules
-CREATE INDEX IF NOT EXISTS idx_rules_company_active_priority ON rules(company_id, is_active, priority);
+CREATE INDEX IF NOT EXISTS idx_rules_company_active_priority ON automation_rules(company_id, is_active, priority);
 
 -- 10. User Consents: Lookup
-CREATE INDEX IF NOT EXISTS idx_user_consents_user_type_created ON user_consents(user_id, consent_type, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_user_consents_user_type_created ON user_consents(user_id, consent_type, granted_at DESC);
 
 -- 11. Partial Indexes for Soft Delete (optimization for active records)
 CREATE INDEX IF NOT EXISTS idx_invoices_active_partial ON invoices(company_id) WHERE is_deleted = false;
 CREATE INDEX IF NOT EXISTS idx_categories_active_partial ON categories(company_id) WHERE is_deleted = false;
-CREATE INDEX IF NOT EXISTS idx_rules_active_partial ON rules(company_id) WHERE is_deleted = false;
-CREATE INDEX IF NOT EXISTS idx_templates_active_partial ON templates(company_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_rules_active_partial ON automation_rules(company_id) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_templates_active_partial ON supplier_templates(company_id) WHERE is_active = true;

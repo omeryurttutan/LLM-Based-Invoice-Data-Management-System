@@ -32,6 +32,8 @@ export function MonthlyTrendChart({
   const router = useRouter();
 
   const t = useTranslations('dashboard.charts');
+  const tCards = useTranslations('dashboard.cards');
+  const tStatus = useTranslations('common.status');
   const formatNumber = useFormatter();
 
   if (loading) {
@@ -108,7 +110,7 @@ export function MonthlyTrendChart({
             <Line
               type="monotone"
               dataKey="totalAmount"
-              name={useTranslations('dashboard.cards')('totalAmount')}
+              name={tCards('totalAmount')}
               stroke="#2563eb"
               activeDot={{ r: 8 }}
               strokeWidth={2}
@@ -116,7 +118,7 @@ export function MonthlyTrendChart({
             <Line
               type="monotone"
               dataKey="verifiedAmount"
-              name={useTranslations('common.status')('verified')}
+              name={tStatus('verified')}
               stroke="#16a34a"
               strokeDasharray="5 5"
               strokeWidth={2}

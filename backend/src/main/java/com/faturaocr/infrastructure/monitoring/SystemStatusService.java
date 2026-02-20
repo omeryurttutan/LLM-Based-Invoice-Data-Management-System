@@ -4,13 +4,16 @@ import com.faturaocr.domain.monitoring.port.LlmApiUsageRepository;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.search.Search;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.health.CompositeHealth;
 import org.springframework.boot.actuate.health.HealthComponent;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,28 +30,52 @@ public class SystemStatusService {
 
         // 1. Services Health
         HealthComponent health = healthEndpoint.health();
-        status.put("health", health);
+        List<Map<String, Object>> services = new ArrayList<>();
 
-        // 2. Metrics Summary
-        Map<String, Object> metrics = new HashMap<>();
-        metrics.put("extraction_total", getCounterValue("invoice.extraction.total"));
-        metrics.put("extraction_success", getCounterValue("invoice.extraction.success"));
-        metrics.put("extraction_failure", getCounterValue("invoice.extraction.failure"));
-        metrics.put("upload_total", getCounterValue("invoice.upload.total"));
-        status.put("metrics", metrics);
+        // Add main status
+        services.add(Map.of(
+                "name", "Backend API",
+                "status", health.getStatus().toString().equals("UP") ? "UP" : "DOWN"));
 
-        // 3. LLM Cost Summary (Aggregate for all companies or specific if context
-        // available)
-        // For admin dashboard, we might want total cost across all companies or a
-        // specific one.
-        // Assuming single tenant or admin viewing aggregate for now.
-        // In a real multi-tenant app, we'd need to iterate or sum all.
-        // For this project, let's show a placeholder or sum if possible.
+        // Add components if available
+        if (health instanceof CompositeHealth compositeHealth) {
+            compositeHealth.getComponents().forEach((name, component) -> {
+                services.add(Map.of(
+                        "name", capitalize(name),
+                        "status", component.getStatus().toString().equals("UP") ? "UP" : "DOWN"));
+            });
+        }
+        status.put("services", services);
 
-        // TODO: Add company context or aggregation query.
-        // For now, we will return a structure that the frontend can consume.
+        // 2. Resources Summary
+        Map<String, Object> resources = new HashMap<>();
+        Runtime runtime = Runtime.getRuntime();
+        resources.put("jvmHeapUsage", runtime.totalMemory() - runtime.freeMemory());
+        resources.put("jvmHeapMax", runtime.maxMemory());
+        resources.put("dbActiveConnections", 1); // Mocked or get from datasource if possible
+        resources.put("dbMaxConnections", 10);
+        resources.put("diskUsage", 1024L * 1024 * 1024 * 5); // 5GB mock
+        resources.put("diskTotal", 1024L * 1024 * 1024 * 20); // 20GB mock
+        status.put("resources", resources);
+
+        // 3. LLM Cost Summary (placeholder)
+        status.put("llmCost", Map.of(
+                "currentMonthCost", 0.0,
+                "monthlyLimit", 100.0,
+                "dailyCost", 0.0,
+                "dailyLimit", 10.0,
+                "byProvider", List.of()));
+
+        // 4. Recent Alerts
+        status.put("alerts", List.of());
 
         return status;
+    }
+
+    private String capitalize(String str) {
+        if (str == null || str.isEmpty())
+            return str;
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     private double getCounterValue(String name) {

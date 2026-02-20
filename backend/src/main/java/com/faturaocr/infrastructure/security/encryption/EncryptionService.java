@@ -28,6 +28,7 @@ public class EncryptionService {
     private final SecretKey secretKey;
     private final SecureRandom secureRandom;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public EncryptionService(
             @Value("${app.kvkk.encryption.key-env-variable:KVKK_ENCRYPTION_KEY}") String keyEnvVarName) {
         this.secureRandom = new SecureRandom();

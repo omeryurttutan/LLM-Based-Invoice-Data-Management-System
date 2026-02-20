@@ -7,7 +7,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 ### Project Overview
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
-- **Architecture**: Hybrid — Spring Boot (8080), Python FastAPI (8000), Next.js (3000)
+- **Architecture**: Hybrid — Spring Boot (8082), Python FastAPI (8001), Next.js (3001)
 
 ### Current State (Phases 0-35 Completed)
 All features implemented. Phase 35-A added comprehensive unit tests for the backend with JaCoCo coverage reporting and TestDataBuilder utilities.

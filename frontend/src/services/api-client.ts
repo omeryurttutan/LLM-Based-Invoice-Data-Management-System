@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth-store';
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/api/v1',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ apiClient.interceptors.response.use(
     // try refresh -> retry original request
     // else logout
     if (error.response?.status === 401) {
-        // useAuthStore.getState().logout(); // Optional auto-logout
+      // useAuthStore.getState().logout(); // Optional auto-logout
     }
     return Promise.reject(error);
   }

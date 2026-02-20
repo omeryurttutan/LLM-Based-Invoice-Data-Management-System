@@ -8,11 +8,11 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080
-  - **Python Microservice**: Port 8000 — LLM-based extraction
-  - **Next.js Frontend**: Port 3000
-  - **RabbitMQ**: Port 5672
-  - **Redis**: Port 6379
+  - **Spring Boot Backend**: Port 8082
+  - **Python Microservice**: Port 8001 — LLM-based extraction
+  - **Next.js Frontend**: Port 3001
+  - **RabbitMQ**: Port 5673
+  - **Redis**: Port 6380
 
 ### Current State (Phases 0-31 Completed)
 - ✅ Phase 0-9: Docker, CI/CD, Hexagonal Architecture, Database, Auth (JWT + Redis), RBAC (ADMIN/MANAGER/ACCOUNTANT/INTERN), Invoice CRUD, Audit Log, Duplication Control
@@ -39,7 +39,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 
 **Current SecurityConfig (Phase 4/5):**
 - CSRF disabled (JWT-based, stateless)
-- CORS configured for localhost:3000 and localhost:8080
+- CORS configured for localhost:3001 and localhost:8082
 - Session management: STATELESS
 - Public endpoints: /api/v1/auth/**, /api/v1/health, /actuator/health, /swagger-ui/**, /v3/api-docs/**
 - All other endpoints: authenticated
@@ -191,12 +191,12 @@ Use Spring Security's `headers()` configuration in the SecurityFilterChain. For 
 
 ### 4. CORS Hardening
 
-The current CORS configuration only allows `localhost:3000` and `localhost:8080`. Make it environment-aware.
+The current CORS configuration only allows `localhost:3001` and `localhost:8082`. Make it environment-aware.
 
 **Requirements:**
 
 - Move allowed origins to configuration (application.yml / environment variables)
-- Development: `http://localhost:3000`, `http://localhost:8080`
+- Development: `http://localhost:3001`, `http://localhost:8082`
 - Staging: staging domain URL
 - Production: production domain URL
 - Do NOT use wildcard `*` for allowed origins in any environment
@@ -310,7 +310,7 @@ Create an admin endpoint that reports the current security configuration status.
 
 ### 8. Python Microservice Security
 
-The Python FastAPI service (port 8000) also needs basic security hardening. Since it's an internal service (only called by Spring Boot, not exposed to the public), the requirements are lighter:
+The Python FastAPI service (port 8001) also needs basic security hardening. Since it's an internal service (only called by Spring Boot, not exposed to the public), the requirements are lighter:
 
 **8.1 Internal API Key Authentication:**
 
@@ -334,7 +334,7 @@ Add basic rate limiting to the FastAPI extraction endpoints:
 **8.4 CORS:**
 
 Since FastAPI is internal-only, CORS should be restricted:
-- Only allow requests from Spring Boot (http://localhost:8080, or the backend container hostname in Docker)
+- Only allow requests from Spring Boot (http://localhost:8082, or the backend container hostname in Docker)
 
 ---
 ### 9. Frontend: 429 Rate Limit Response Handling
@@ -444,11 +444,11 @@ Add to application.yml:
 - `app.security.login.lockout-duration-minutes`: 15
 - `app.security.headers.hsts-enabled`: false
 - `app.security.headers.csp-enabled`: true
-- `app.security.cors.allowed-origins`: http://localhost:3000
+- `app.security.cors.allowed-origins`: http://localhost:3001
 - `app.security.request.max-json-body-size`: 1048576
 
 Add to .env.example:
-- `CORS_ALLOWED_ORIGINS=http://localhost:3000`
+- `CORS_ALLOWED_ORIGINS=http://localhost:3001`
 - `INTERNAL_API_KEY=<generate-a-random-key>`
 
 ---

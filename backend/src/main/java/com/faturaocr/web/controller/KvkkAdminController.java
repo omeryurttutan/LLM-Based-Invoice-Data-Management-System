@@ -31,12 +31,6 @@ public class KvkkAdminController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/kvkk/report")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<KvkkReportResponse> getComplianceReport() {
-        return ResponseEntity.ok(kvkkReportService.getComplianceReport());
-    }
-
     @GetMapping("/consent/report")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<KvkkReportResponse> getConsentReport() {

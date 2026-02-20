@@ -39,7 +39,7 @@ public class PushNotificationChannel implements NotificationChannel {
     @Value("${vapid.subject}")
     private String vapidSubject;
 
-    @Value("${frontend.url:http://localhost:3000}")
+    @Value("${frontend.url:http://localhost:3001}")
     private String frontendUrl;
 
     private PushService pushService;

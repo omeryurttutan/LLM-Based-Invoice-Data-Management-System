@@ -7,7 +7,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 ### Project Overview
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM & Frontend) & Ömer Talha Yurttutan (Backend & Infrastructure)
-- **Architecture**: Hybrid Microservices — Spring Boot (8080), Python FastAPI (8000), Next.js (3000)
+- **Architecture**: Hybrid Microservices — Spring Boot (8082), Python FastAPI (8001), Next.js (3001)
 
 ### Current State (Phases 0-40 Completed)
 The entire application is feature-complete, tested, performance-optimized, deployed to staging/production environments, and has a monitoring/alerting system in place. The remaining gap is formal API documentation. While individual phase prompts contained endpoint descriptions, there is no interactive, browseable API documentation accessible to developers or for the graduation report.
@@ -69,7 +69,7 @@ This allows Swagger UI users to click "Authorize", paste their JWT token, and te
 **1.3 Server URLs**
 
 Define server URLs for different environments:
-- Development: `http://localhost:8080`
+- Development: `http://localhost:8082`
 - Staging: (the staging URL from Phase 39, or a placeholder)
 - Production: (the production URL from Phase 39, or a placeholder)
 
@@ -444,7 +444,7 @@ Add a note in the Swagger UI description that this is API version 1.0.0 and all 
 **8.1 Generate Postman Collection**
 
 SpringDoc can generate an OpenAPI 3.0 JSON spec at `/api/v1/api-docs`. This can be imported directly into Postman. Document the steps:
-1. Access `http://localhost:8080/api/v1/api-docs` to get the raw OpenAPI JSON
+1. Access `http://localhost:8082/api/v1/api-docs` to get the raw OpenAPI JSON
 2. Import into Postman using "Import > Link" or "Import > Raw Text"
 3. Configure a Postman environment with variables: `baseUrl`, `accessToken`
 
@@ -538,15 +538,15 @@ fatura-ocr-system/
 
 ### Verification Tests
 
-1. **Swagger UI Access**: Navigate to `http://localhost:8080/api/docs` — verify the Swagger UI loads and displays all endpoint groups
+1. **Swagger UI Access**: Navigate to `http://localhost:8082/api/docs` — verify the Swagger UI loads and displays all endpoint groups
 2. **Authentication in Swagger**: Click "Authorize" → enter a valid JWT token → test a protected endpoint (e.g., GET /invoices) — verify it works
 3. **All Endpoints Visible**: Verify every endpoint from sections 3.1-3.14 appears in the Swagger UI with correct method, path, and description
 4. **Request Examples**: Verify that clicking "Try it out" on POST endpoints shows a pre-filled example request body
 5. **Response Examples**: Verify that response schemas show the correct structure with example values
 6. **Error Responses**: Verify that each endpoint documents its possible error codes
 7. **Enum Values**: Verify that enum fields (status, sourceType, currency, etc.) show their allowed values in the schema
-8. **OpenAPI JSON**: Access `http://localhost:8080/api/v1/api-docs` — verify it returns valid JSON that can be imported into Postman
-9. **Python Docs**: Access `http://localhost:8000/docs` — verify the extraction service documentation is enhanced
+8. **OpenAPI JSON**: Access `http://localhost:8082/api/v1/api-docs` — verify it returns valid JSON that can be imported into Postman
+9. **Python Docs**: Access `http://localhost:8001/docs` — verify the extraction service documentation is enhanced
 10. **Production Config**: Start with `SPRING_PROFILES_ACTIVE=prod` — verify Swagger UI is NOT accessible
 
 ### Quality Checks

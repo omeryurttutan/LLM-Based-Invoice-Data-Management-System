@@ -8,9 +8,9 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080
-  - **Python Microservice**: Port 8000 — LLM-based extraction
-  - **Next.js Frontend**: Port 3000
+  - **Spring Boot Backend**: Port 8082
+  - **Python Microservice**: Port 8001 — LLM-based extraction
+  - **Next.js Frontend**: Port 3001
 
 ### Current State (Phases 0-22 Completed)
 - ✅ Phase 0-3: Docker environment, CI/CD, Hexagonal Architecture, Database schema (companies, users, invoices, invoice_items, categories, audit_logs, batch_jobs — Flyway migrations, soft delete, indexes, composite indexes on invoice_number+company_id, status+invoice_date)

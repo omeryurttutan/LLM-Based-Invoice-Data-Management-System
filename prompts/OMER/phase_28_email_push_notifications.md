@@ -8,9 +8,9 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080
-  - **Python Microservice**: Port 8000
-  - **Next.js Frontend**: Port 3000
+  - **Spring Boot Backend**: Port 8082
+  - **Python Microservice**: Port 8001
+  - **Next.js Frontend**: Port 3001
 
 ### Current State (Phases 0-27 Completed)
 - ✅ Phase 0-9: Infrastructure, Auth (JWT + Redis), RBAC, Invoice CRUD, Audit Log, Dedup
@@ -309,7 +309,7 @@ The notification service iterates over enabled channels and dispatches to each. 
 **General:**
 - `NOTIFICATION_EMAIL_ENABLED`: Default true
 - `NOTIFICATION_PUSH_ENABLED`: Default true
-- `FRONTEND_URL`: Default "http://localhost:3000" (for email links)
+- `FRONTEND_URL`: Default "http://localhost:3001" (for email links)
 
 ### 9. Database Migration
 

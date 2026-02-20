@@ -7,7 +7,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 ### Project Overview
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM & Frontend) & Ömer Talha Yurttutan (Backend & Infrastructure)
-- **Architecture**: Hybrid Microservices — Spring Boot (8080), Python FastAPI (8000), Next.js (3000)
+- **Architecture**: Hybrid Microservices — Spring Boot (8082), Python FastAPI (8001), Next.js (3001)
 - **Infrastructure**: PostgreSQL 15, Redis 7, RabbitMQ 3, Nginx (reverse proxy), Docker
 
 ### Current State (Phases 0-41 Completed — THIS IS THE FINAL PHASE)
@@ -332,7 +332,7 @@ Create `docs/deployment/troubleshooting.md` — a guide for diagnosing and fixin
 |---|---|---|
 | Backend fails to start | Database not ready | Check PostgreSQL health, wait for it to be healthy before backend starts |
 | Backend fails to start | Migration error | Check Flyway migration logs, fix the SQL, re-run |
-| Backend fails to start | Port already in use | Check if another process is using 8080 |
+| Backend fails to start | Port already in use | Check if another process is using 8082 |
 | Frontend fails to start | Build error | Check build logs, verify Node.js version |
 | Extraction service fails | Missing Python dependencies | Rebuild the Docker image |
 | Extraction service fails | LLM API keys not set | Check .env file for GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY |
@@ -406,7 +406,7 @@ Update the root `README.md` to be a professional project overview.
   1. Clone the repo
   2. Copy `.env.example` to `.env` and fill in API keys
   3. Run `docker compose up`
-  4. Access the app at `http://localhost:3000`
+  4. Access the app at `http://localhost:3001`
 - **Project Structure**: Brief overview of the directory structure
 - **Development**: How to run tests, how to add new features, branch strategy
 - **Deployment**: Link to the deployment guide

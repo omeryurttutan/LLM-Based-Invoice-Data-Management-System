@@ -25,7 +25,7 @@ export function useWebSocket() {
 
         const socketUrl = process.env.NEXT_PUBLIC_API_URL
             ? `${process.env.NEXT_PUBLIC_API_URL.replace('/api/v1', '')}/ws`
-            : 'http://localhost:8080/ws';
+            : 'http://localhost:8082/ws';
 
         const client = new Client({
             webSocketFactory: () => new SockJS(socketUrl),
@@ -64,8 +64,8 @@ export function useWebSocket() {
                         // for now default styling, refined in component
                         style: {
                             borderLeft: `4px solid ${notification.severity === 'SUCCESS' ? '#22c55e' :
-                                    notification.severity === 'ERROR' ? '#ef4444' :
-                                        notification.severity === 'WARNING' ? '#eab308' : '#3b82f6'
+                                notification.severity === 'ERROR' ? '#ef4444' :
+                                    notification.severity === 'WARNING' ? '#eab308' : '#3b82f6'
                                 }`
                         }
                     });

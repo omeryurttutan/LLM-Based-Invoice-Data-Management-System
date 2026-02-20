@@ -40,6 +40,12 @@ export default function RegisterPage() {
       .string()
       .min(1, tVal('required'))
       .email(tVal('email')),
+    companyName: z
+      .string()
+      .min(1, tVal('required')),
+    taxNumber: z
+      .string()
+      .regex(/^\d{10}$/, tVal('requirements.taxNumber', { fallback: 'Vergi numarası tam 10 haneli olmalıdır' })),
     password: z
       .string()
       .min(1, tVal('required'))
@@ -80,6 +86,8 @@ export default function RegisterPage() {
       email: '',
       password: '',
       confirmPassword: '',
+      companyName: '',
+      taxNumber: '',
     },
   });
 
@@ -94,6 +102,8 @@ export default function RegisterPage() {
         fullName: data.fullName,
         email: data.email,
         password: data.password,
+        companyName: data.companyName,
+        taxNumber: data.taxNumber,
       });
 
       setAuth(response.user, {
@@ -174,6 +184,35 @@ export default function RegisterPage() {
             </div>
             {errors.email && (
               <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="companyName">{t('companyNameLabel', { fallback: 'Şirket Adı' })}</Label>
+            <Input
+              id="companyName"
+              type="text"
+              placeholder="Örnek A.Ş."
+              disabled={isLoading}
+              {...register('companyName')}
+            />
+            {errors.companyName && (
+              <p className="text-sm text-destructive">{errors.companyName.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="taxNumber">{t('taxNumberLabel', { fallback: 'Vergi No' })}</Label>
+            <Input
+              id="taxNumber"
+              type="text"
+              placeholder="1234567890"
+              maxLength={10}
+              disabled={isLoading}
+              {...register('taxNumber')}
+            />
+            {errors.taxNumber && (
+              <p className="text-sm text-destructive">{errors.taxNumber.message}</p>
             )}
           </div>
 

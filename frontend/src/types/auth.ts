@@ -36,7 +36,9 @@ export interface RegisterRequest {
   email: string;
   password: string;
   fullName: string;
-  companyId?: string;  // Optional for first user
+  companyId?: string;
+  companyName?: string;
+  taxNumber?: string;
 }
 
 // Auth response (login/register)

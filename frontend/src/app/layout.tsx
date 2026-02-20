@@ -37,7 +37,7 @@ export default async function RootLayout({
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
             </head>
             <body className={inter.className}>
-                <NextIntlClientProvider messages={messages}>
+                <NextIntlClientProvider messages={messages} locale={locale}>
                     <QueryProvider>
                         <ThemeProvider
                             attribute="class"

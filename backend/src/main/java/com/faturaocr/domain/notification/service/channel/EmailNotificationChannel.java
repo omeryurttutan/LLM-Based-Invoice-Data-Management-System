@@ -33,7 +33,7 @@ public class EmailNotificationChannel implements NotificationChannel {
     @Value("${notification.email.from-name}")
     private String fromName;
 
-    @Value("${frontend.url:http://localhost:3000}")
+    @Value("${frontend.url:http://localhost:3001}")
     private String frontendUrl;
 
     @Override

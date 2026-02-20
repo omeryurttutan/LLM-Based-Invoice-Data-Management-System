@@ -13,6 +13,7 @@
         "monthlyTrend": "Aylık Fatura Trendi",
         "categoryDistribution": "Kategori Dağılımı",
         "statusDistribution": "Durum Dağılımı",
+        "statusTimeline": "Durum Zaman Çizelgesi",
         "topSuppliers": "En Çok Çalışılan Tedarikçiler",
         "other": "Diğer"
     },
@@ -20,10 +21,13 @@
         "title": "Son Hareketler",
         "viewAll": "Tümünü Gör"
     },
-    "actions": {
+    "pendingActions": {
         "title": "Bekleyen İşlemler",
-        "verify": "Doğrula ({count})",
-        "noActions": "Bekleyen işlem bulunmuyor"
+        "description": "Doğrulanması gereken faturalar",
+        "noPending": "Bekleyen faturanız yok",
+        "allProcessed": "Tüm faturalar işlendi",
+        "daysWaiting": "{days} gündür bekliyor",
+        "viewAll": "Tümünü Gör"
     },
     "performance": {
         "title": "LLM Çıkarım Performansı",

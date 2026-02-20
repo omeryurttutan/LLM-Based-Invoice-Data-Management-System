@@ -25,42 +25,36 @@ The system follows a hybrid microservices architecture:
 - **Real-time Notifications:** WebSocket-based in-app alerts, emails, and web push notifications.
 - **Interactive Dashboard:** Visual analytics for spending trends, top suppliers, and category distribution.
 
-## 🚀 Quick Start
-
-Get the development environment running in 5 minutes.
+## 🚀 Quick Start (Local Development)
 
 ### Prerequisites
 
-- Docker & Docker Compose
-- API Keys for Gemini (Required), OpenAI/Anthropic (Optional)
+- **Java 17 & Maven** (for Backend)
+- **Node.js 20+ & npm** (for Frontend)
+- **Python 3.11+** (for Extraction Service)
+- **PostgreSQL 15+, Redis 7+, RabbitMQ 3.x** (Running locally on custom ports)
 
 ### Installation
 
 1. **Clone the repository**
-
    ```bash
    git clone https://github.com/MFurkanAkdag/Fatura-OCR.git
    cd Fatura-OCR
    ```
 
 2. **Configure Environment**
-   Copy the example environment file and fill in your API keys.
+   - Backend: `backend/src/main/resources/application.yml` is already configured for local ports.
+   - Extraction Service: `extraction-service/.env` is already configured.
 
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your GEMINI_API_KEY
-   ```
+3. **Run Services**
+   - **Backend**: `cd backend && mvn spring-boot:run`
+   - **Frontend**: `cd frontend && npm install && npm run dev`
+   - **Extraction**: `cd extraction-service && pip install -r requirements.txt && python app/main.py`
 
-3. **Start the Stack**
-
-   ```bash
-   docker compose up -d
-   ```
-
-4. **Access the Application**
-   - **Frontend:** [http://localhost:3000](http://localhost:3000)
-   - **Backend API:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-   - **RabbitMQ:** [http://localhost:15672](http://localhost:15672) (guest/guest)
+### Access the Application
+- **Frontend:** [http://localhost:3001](http://localhost:3001)
+- **Backend API (Swagger):** [http://localhost:8082/api/docs](http://localhost:8082/api/docs)
+- **RabbitMQ Management:** [http://localhost:15673](http://localhost:15673) (if configured locally)
 
 ## 📂 Project Structure
 

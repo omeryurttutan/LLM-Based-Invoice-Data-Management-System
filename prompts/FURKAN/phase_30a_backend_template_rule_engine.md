@@ -1,7 +1,7 @@
 ﻿# PHASE 30-A: TEMPLATE LEARNING & RULE ENGINE LLM-based extraction
- - **Next.js Frontend**: Port 3000
- - **RabbitMQ**: Port 5672
- - **Redis**: Port 6379
+ - **Next.js Frontend**: Port 3001
+ - **RabbitMQ**: Port 5673
+ - **Redis**: Port 6380
 
 ### Current State (Phases 0-29 Completed)
 - Phase 10-12: Frontend layout (sidebar, dark/light mode), auth pages, invoice list/CRUD UI

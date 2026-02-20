@@ -15,7 +15,7 @@ public class ExtractionServiceHealthIndicator implements HealthIndicator {
     private final String extractionServiceUrl;
 
     public ExtractionServiceHealthIndicator(
-            @Value("${app.extraction-service.url:http://localhost:8000}") String extractionServiceUrl) {
+            @Value("${app.extraction-service.url:http://localhost:8001}") String extractionServiceUrl) {
         this.restClient = RestClient.builder().build();
         this.extractionServiceUrl = extractionServiceUrl;
     }

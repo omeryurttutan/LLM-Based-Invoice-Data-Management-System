@@ -8,10 +8,10 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080
-  - **Python Microservice**: Port 8000 - LLM-based extraction
-  - **Next.js Frontend**: Port 3000
-  - **RabbitMQ**: Port 5672 (AMQP), 15672 (Management UI)
+  - **Spring Boot Backend**: Port 8082
+  - **Python Microservice**: Port 8001 - LLM-based extraction
+  - **Next.js Frontend**: Port 3001
+  - **RabbitMQ**: Port 5673 (AMQP), 15672 (Management UI)
 
 ### Current State (Phases 0-18 Completed)
 - ✅ Phase 0: Docker Compose — RabbitMQ running, Python service has RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASSWORD env vars
@@ -258,7 +258,7 @@ Map internal exceptions to error codes in the FAILED result message:
 The RabbitMQ consumer should run as a background task alongside the FastAPI HTTP server. Both must run in the same Python process/container.
 
 **Approach: Run consumer in a separate thread**
-- FastAPI starts normally on port 8000 (serving HTTP endpoints)
+- FastAPI starts normally on port 8001 (serving HTTP endpoints)
 - On startup, launch a background thread (or asyncio task) that runs the Pika consumer
 - Use FastAPI lifecycle events (on_startup, on_shutdown) to manage the consumer thread
 - The consumer thread runs its own Pika event loop (blocking_connection + start_consuming)

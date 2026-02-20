@@ -13,56 +13,9 @@ interface ExtractionPerformanceCardProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const CustomTooltip = ({ active, payload, label }: any) => {
-  const t = useTranslations('dashboard.performance');
-  const format = useFormatter();
-
-  if (active && payload && payload.length) {
-    const d = payload[0].payload;
-    return (
-      <div className="rounded-lg border bg-background p-2 shadow-sm">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="flex flex-col">
-            <span className="text-[0.70rem] uppercase text-muted-foreground">
-              {t('model')}
-            </span>
-            <span className="font-bold text-muted-foreground">
-              {d.provider}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[0.70rem] uppercase text-muted-foreground">
-              {t('success')}
-            </span>
-            <span className="font-bold text-green-500">
-              {d.successCount}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[0.70rem] uppercase text-muted-foreground">
-              {t('error')}
-            </span>
-            <span className="font-bold text-red-500">
-              {d.errorCount}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[0.70rem] uppercase text-muted-foreground">
-              {t('cost')}
-            </span>
-            <span className="font-bold">
-              {format.number(d.cost, { style: 'currency', currency: 'USD', minimumFractionDigits: 4 })}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
 export function ExtractionPerformanceCard({ data, loading }: ExtractionPerformanceCardProps) {
   const t = useTranslations('dashboard.performance');
+  const format = useFormatter();
 
   if (loading) {
     return (
@@ -80,10 +33,53 @@ export function ExtractionPerformanceCard({ data, loading }: ExtractionPerforman
 
   if (!data || data.totalExtractions === 0) {
     return null;
-    // Or show empty state if desired, but requirements say "If no LLM extractions exist, show: 'Henüz LLM ile çıkarım yapılmadı.'"
-    // However requirement 233 says "Conditional Rendering: Only render... if ADMIN or MANAGER". 
-    // If data is empty for admin, we should probably show it.
   }
+
+  // Define CustomTooltip inside to use closure for 't' and 'format'
+  const CustomPerformanceTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const d = payload[0].payload;
+      return (
+        <div className="rounded-lg border bg-background p-2 shadow-sm">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                {t('model')}
+              </span>
+              <span className="font-bold text-muted-foreground">
+                {d.provider}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                {t('success')}
+              </span>
+              <span className="font-bold text-green-500">
+                {d.successCount}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                {t('error')}
+              </span>
+              <span className="font-bold text-red-500">
+                {d.errorCount}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                {t('cost')}
+              </span>
+              <span className="font-bold">
+                {format.number(d.cost, { style: 'currency', currency: 'USD', minimumFractionDigits: 4 })}
+              </span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   const successData = [
     { name: t('successful'), value: data.successRate, color: "#22c55e" },
@@ -162,7 +158,7 @@ export function ExtractionPerformanceCard({ data, loading }: ExtractionPerforman
               <XAxis type="number" hide />
               <YAxis dataKey="provider" type="category" width={60} tick={{ fontSize: 12 }} />
               <Tooltip
-                content={<CustomTooltip />}
+                content={<CustomPerformanceTooltip />}
                 cursor={{ fill: 'transparent' }}
               />
               <Bar dataKey="attempts" radius={[0, 4, 4, 0]}>

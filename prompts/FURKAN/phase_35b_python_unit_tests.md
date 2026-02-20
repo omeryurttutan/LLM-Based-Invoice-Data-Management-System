@@ -8,9 +8,9 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080 (tested in Phase 35-A by Ömer)
-  - **Python Microservice**: Port 8000 — FastAPI extraction service
-  - **Next.js Frontend**: Port 3000 (tested in Phase 37)
+  - **Spring Boot Backend**: Port 8082 (tested in Phase 35-A by Ömer)
+  - **Python Microservice**: Port 8001 — FastAPI extraction service
+  - **Next.js Frontend**: Port 3001 (tested in Phase 37)
 
 ### Current State (Phases 0-34 Completed)
 The Python extraction service (built across Phases 13-19) contains:

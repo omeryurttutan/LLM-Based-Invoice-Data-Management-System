@@ -1198,8 +1198,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",  // Next.js dev
-            "http://localhost:8080"   // Backend
+            "http://localhost:3001",  // Next.js dev
+            "http://localhost:8082"   // Backend
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -1662,7 +1662,7 @@ public class UserRepositoryAdapter implements UserRepository {
 
 ### Test 1: Register New User
 ```bash
-curl -X POST http://localhost:8080/api/v1/auth/register \
+curl -X POST http://localhost:8082/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "companyId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
@@ -1676,7 +1676,7 @@ curl -X POST http://localhost:8080/api/v1/auth/register \
 
 ### Test 2: Login
 ```bash
-curl -X POST http://localhost:8080/api/v1/auth/login \
+curl -X POST http://localhost:8082/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@demo.com",
@@ -1691,7 +1691,7 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 # Get token from login response
 TOKEN="eyJhbGciOiJIUzI1NiJ9..."
 
-curl -X GET http://localhost:8080/api/v1/invoices \
+curl -X GET http://localhost:8082/api/v1/invoices \
   -H "Authorization: Bearer $TOKEN"
 
 # Expected: 200 OK (or 404 if no invoices)
@@ -1699,14 +1699,14 @@ curl -X GET http://localhost:8080/api/v1/invoices \
 
 ### Test 4: Access Without Token
 ```bash
-curl -X GET http://localhost:8080/api/v1/invoices
+curl -X GET http://localhost:8082/api/v1/invoices
 
 # Expected: 401 Unauthorized
 ```
 
 ### Test 5: Refresh Token
 ```bash
-curl -X POST http://localhost:8080/api/v1/auth/refresh \
+curl -X POST http://localhost:8082/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "abc123..."
@@ -1717,7 +1717,7 @@ curl -X POST http://localhost:8080/api/v1/auth/refresh \
 
 ### Test 6: Logout
 ```bash
-curl -X POST http://localhost:8080/api/v1/auth/logout \
+curl -X POST http://localhost:8082/api/v1/auth/logout \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "abc123..."
@@ -1730,7 +1730,7 @@ curl -X POST http://localhost:8080/api/v1/auth/logout \
 ```bash
 # Try 5+ wrong passwords
 for i in {1..6}; do
-  curl -X POST http://localhost:8080/api/v1/auth/login \
+  curl -X POST http://localhost:8082/api/v1/auth/login \
     -H "Content-Type: application/json" \
     -d '{"email": "admin@demo.com", "password": "wrong"}'
 done

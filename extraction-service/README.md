@@ -59,7 +59,7 @@ cd extraction-service
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+python app/main.py # Port 8001 üzerinden çalışacaktır
 ```
 
 ## API Endpointleri
@@ -86,18 +86,18 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 |----------|-----------|----------|
 | `APP_NAME` | Fatura OCR Extraction Service | Uygulama adı |
 | `APP_VERSION` | 1.0.0 | Versiyon |
-| `DEBUG` | false | Debug modu |
+| `DEBUG` | true | Debug modu |
 | `LOG_LEVEL` | INFO | Log seviyesi |
 | `ALLOWED_ORIGINS` | http://localhost:3001,http://localhost:8082 | CORS izin verilen originler |
-| `SPRING_BOOT_URL` | http://localhost:8080 | Backend URL |
+| `SPRING_BOOT_URL` | http://localhost:8082 | Backend URL |
 | `GEMINI_API_KEY` | - | Google Gemini API anahtarı |
 | `OPENAI_API_KEY` | - | OpenAI API anahtarı |
 | `ANTHROPIC_API_KEY` | - | Anthropic API anahtarı |
 | `MAX_FILE_SIZE_MB` | 10 | Maksimum dosya boyutu (MB) |
 | `SUPPORTED_FORMATS` | pdf,jpg,jpeg,png | Desteklenen formatlar |
 | `REQUEST_TIMEOUT` | 60 | HTTP timeout (saniye) |
-| `RABBITMQ_HOST` | rabbitmq | RabbitMQ host |
-| `RABBITMQ_PORT` | 5672 | RabbitMQ port |
+| `RABBITMQ_HOST` | localhost | RabbitMQ host |
+| `RABBITMQ_PORT` | 5673 | RabbitMQ port |
 
 ## Testler
 

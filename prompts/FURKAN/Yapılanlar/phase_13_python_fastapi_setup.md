@@ -8,9 +8,9 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080 - handles auth, CRUD, business logic
-  - **Python Microservice**: Port 8000 - handles LLM-based invoice data extraction
-  - **Next.js Frontend**: Port 3000 - user interface
+  - **Spring Boot Backend**: Port 8082 - handles auth, CRUD, business logic
+  - **Python Microservice**: Port 8001 - handles LLM-based invoice data extraction
+  - **Next.js Frontend**: Port 3001 - user interface
 
 ### Current State (Phases 0-12 Completed)
 - ✅ Phase 0-3: Docker environment, CI/CD, Hexagonal Architecture, Database
@@ -138,7 +138,7 @@ Create a Pydantic Settings class that reads from environment variables:
 - `APP_VERSION` - Version string (default: "1.0.0")
 - `DEBUG` - Debug mode flag (default: false)
 - `LOG_LEVEL` - Logging level (default: "INFO")
-- `ALLOWED_ORIGINS` - CORS origins, comma-separated (default: "http://localhost:3000,http://localhost:8080")
+- `ALLOWED_ORIGINS` - CORS origins, comma-separated (default: "http://localhost:3001,http://localhost:8082")
 
 **LLM API Keys (required in later phases, optional now):**
 - `GEMINI_API_KEY` - Google Gemini API key
@@ -146,7 +146,7 @@ Create a Pydantic Settings class that reads from environment variables:
 - `ANTHROPIC_API_KEY` - Anthropic Claude API key
 
 **Service URLs:**
-- `SPRING_BOOT_URL` - Backend URL (default: "http://localhost:8080")
+- `SPRING_BOOT_URL` - Backend URL (default: "http://localhost:8082")
 
 **Processing Settings:**
 - `MAX_FILE_SIZE_MB` - Maximum upload size (default: 10)
@@ -314,7 +314,7 @@ Use structlog for JSON-formatted logs:
 - Copy requirements.txt and install with --no-cache-dir
 - Copy application code
 - Create non-root user for security
-- Expose port 8000
+- Expose port 8001
 - Run with uvicorn, 4 workers, host 0.0.0.0
 
 **Required system packages:**
@@ -385,7 +385,7 @@ pytest tests/ --cov=app --cov-report=html
 ### Manual Testing
 
 1. Start services with Docker Compose
-2. Access Swagger UI at http://localhost:8000/docs
+2. Access Swagger UI at http://localhost:8001/docs
 3. Test each health endpoint
 4. Verify logs in container output
 5. Test CORS with browser fetch from frontend
@@ -439,7 +439,7 @@ pytest tests/ --cov=app --cov-report=html
 
 ### Docker
 - [ ] Dockerfile builds successfully
-- [ ] Container runs on port 8000
+- [ ] Container runs on port 8001
 - [ ] Health check passes
 - [ ] Connects to same network as backend
 
@@ -527,7 +527,7 @@ Actual vs estimated
 
 ## SUCCESS CRITERIA
 
-1. ✅ FastAPI service runs on port 8000
+1. ✅ FastAPI service runs on port 8001
 2. ✅ All health endpoints return correct responses
 3. ✅ Swagger docs accessible and accurate
 4. ✅ Structured logging working
@@ -546,7 +546,7 @@ Actual vs estimated
 
 1. **No LLM Calls Yet**: This phase only sets up infrastructure. LLM integration comes in Phase 15-17.
 
-2. **Port 8000**: The extraction service runs on 8000, not 8080 (that's Spring Boot).
+2. **Port 8001**: The extraction service runs on 8001, not 8082 (that's Spring Boot).
 
 3. **Docker Networking**: Services communicate via Docker network using service names (extraction-service, backend), not localhost.
 

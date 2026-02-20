@@ -12,6 +12,8 @@ import com.faturaocr.domain.common.exception.DomainException;
 import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.port.UserRepository;
 import com.faturaocr.domain.user.valueobject.Email;
+import com.faturaocr.domain.company.entity.Company;
+import com.faturaocr.domain.company.port.CompanyRepository;
 import com.faturaocr.domain.user.valueobject.Role;
 import com.faturaocr.infrastructure.audit.AuditRequestContext;
 import com.faturaocr.infrastructure.common.util.SanitizationUtils;
@@ -38,6 +40,7 @@ public class AuthenticationService {
     private final RefreshTokenService refreshTokenService;
     private final AuditLogRepository auditLogRepository;
     private final LoginAttemptService loginAttemptService;
+    private final CompanyRepository companyRepository;
 
     @org.springframework.beans.factory.annotation.Value("${security.brute-force.max-attempts:5}")
     private int maxLoginAttempts;
@@ -51,13 +54,15 @@ public class AuthenticationService {
             JwtTokenProvider jwtTokenProvider,
             RefreshTokenService refreshTokenService,
             AuditLogRepository auditLogRepository,
-            LoginAttemptService loginAttemptService) {
+            LoginAttemptService loginAttemptService,
+            CompanyRepository companyRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenService = refreshTokenService;
         this.auditLogRepository = auditLogRepository;
         this.loginAttemptService = loginAttemptService;
+        this.companyRepository = companyRepository;
     }
 
     /**
@@ -67,22 +72,40 @@ public class AuthenticationService {
         LOGGER.info("Registering new user with email: {}", command.email());
 
         Email email = Email.of(command.email());
+        java.util.UUID actualCompanyId = command.companyId();
+        Role userRole = Role.ACCOUNTANT;
 
-        // Check if email already exists in the same company
-        if (userRepository.existsByEmailAndCompanyId(email, command.companyId())) {
-            throw new DomainException("AUTH_EMAIL_EXISTS", "Email already registered in this company");
+        if (actualCompanyId == null) {
+            // Create new company
+            if (command.companyName() == null || command.companyName().isBlank()) {
+                throw new DomainException("VALIDATION_ERROR", "Company name is required when creating a new company");
+            }
+            if (command.taxNumber() == null || !command.taxNumber().matches("^\\d{10}$")) {
+                throw new DomainException("VALIDATION_ERROR", "Tax number must be exactly 10 digits");
+            }
+
+            Company newCompany = new Company(command.companyName(), command.taxNumber());
+            Company savedCompany = companyRepository.save(newCompany);
+            actualCompanyId = savedCompany.getId();
+            userRole = Role.ADMIN; // First user is ADMIN
+            LOGGER.info("Created new company with ID: {}", actualCompanyId);
+        } else {
+            // Check if email already exists in the existing company
+            if (userRepository.existsByEmailAndCompanyId(email, actualCompanyId)) {
+                throw new DomainException("AUTH_EMAIL_EXISTS", "Email already registered in this company");
+            }
         }
 
         // Create user
         String sanitizedFullName = SanitizationUtils.sanitizeHtml(command.fullName());
 
         User user = User.builder()
-                .companyId(command.companyId())
+                .companyId(actualCompanyId)
                 .email(email)
                 .passwordHash(passwordEncoder.encode(command.password()))
                 .fullName(sanitizedFullName)
                 .phone(command.phone())
-                .role(Role.ACCOUNTANT) // Default role for new registrations
+                .role(userRole) // Assigned role (ADMIN if new company, ACCOUNTANT if joining)
                 .isActive(true)
                 .build();
 
@@ -148,6 +171,25 @@ public class AuthenticationService {
         LOGGER.info("User logged in successfully: {}", user.getId());
 
         return generateAuthResponse(user);
+    }
+
+    /**
+     * Get current user info by ID.
+     */
+    public AuthResponse.UserInfo getCurrentUser(java.util.UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DomainException("AUTH_USER_NOT_FOUND", "User not found"));
+
+        if (!user.isActive()) {
+            throw new DomainException("AUTH_ACCOUNT_INACTIVE", "Account is inactive");
+        }
+
+        return new AuthResponse.UserInfo(
+                user.getId(),
+                user.getEmailValue(),
+                user.getFullName(),
+                user.getRole().name(),
+                user.getCompanyId());
     }
 
     /**

@@ -8,9 +8,9 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080
-  - **Python Microservice**: Port 8000
-  - **Next.js Frontend**: Port 3000
+  - **Spring Boot Backend**: Port 8082
+  - **Python Microservice**: Port 8001
+  - **Next.js Frontend**: Port 3001
 
 ### Current State (Phases 0-26 Completed)
 - ✅ Phase 0-9: Docker, CI/CD, Hexagonal Architecture, DB, Auth, RBAC, Invoice CRUD, Audit Log, Dedup
@@ -76,7 +76,7 @@ Build the frontend notification UI: a WebSocket connection for real-time notific
 ### 1. WebSocket Connection Manager
 
 Create a WebSocket connection service/hook that:
-- Connects to the backend STOMP endpoint at `ws://localhost:8080/ws` (or the configured backend URL)
+- Connects to the backend STOMP endpoint at `ws://localhost:8082/ws` (or the configured backend URL)
 - Uses SockJS client library for WebSocket with fallback
 - Uses @stomp/stompjs (or stompjs) for STOMP protocol
 - Sends the JWT access token during CONNECT (as a header: `Authorization: Bearer {token}`)

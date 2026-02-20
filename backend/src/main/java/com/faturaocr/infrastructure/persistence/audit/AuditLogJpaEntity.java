@@ -50,13 +50,16 @@ public class AuditLogJpaEntity {
     @Column(name = "company_id")
     private UUID companyId;
 
-    @Column(name = "old_value", columnDefinition = "text")
+    @org.hibernate.annotations.ColumnTransformer(write = "?::jsonb")
+    @Column(name = "old_value", columnDefinition = "jsonb")
     private String oldValue;
 
-    @Column(name = "new_value", columnDefinition = "text")
+    @org.hibernate.annotations.ColumnTransformer(write = "?::jsonb")
+    @Column(name = "new_value", columnDefinition = "jsonb")
     private String newValue;
 
-    @Column(name = "ip_address", length = 45)
+    @org.hibernate.annotations.ColumnTransformer(write = "?::inet")
+    @Column(name = "ip_address", columnDefinition = "inet")
     private String ipAddress;
 
     @Column(name = "user_agent", columnDefinition = "text")
@@ -68,7 +71,8 @@ public class AuditLogJpaEntity {
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
-    @Column(name = "metadata", columnDefinition = "text")
+    @org.hibernate.annotations.ColumnTransformer(write = "?::jsonb")
+    @Column(name = "metadata", columnDefinition = "jsonb")
     private String metadata;
 
     @Column(name = "created_at", nullable = false, updatable = false)

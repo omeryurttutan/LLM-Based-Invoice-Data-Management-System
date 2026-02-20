@@ -9,6 +9,10 @@ import com.faturaocr.domain.invoice.entity.InvoiceVersion.ChangeSource;
 import com.faturaocr.domain.invoice.repository.InvoiceVersionRepository;
 import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.port.UserRepository;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaEntity;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaRepository;
+import com.faturaocr.infrastructure.persistence.user.UserJpaEntity;
+import com.faturaocr.infrastructure.persistence.user.UserJpaRepository;
 import com.faturaocr.domain.user.valueobject.Email;
 import com.faturaocr.infrastructure.security.AuthenticatedUser;
 import com.faturaocr.infrastructure.security.SecurityUtils;
@@ -39,6 +43,12 @@ class InvoiceVersionServiceImplTest {
     private InvoiceVersionRepository versionRepository;
 
     @Mock
+    private InvoiceJpaRepository invoiceJpaRepository;
+
+    @Mock
+    private UserJpaRepository jpaUserRepository;
+
+    @Mock
     private UserRepository userRepository;
 
     @Mock
@@ -48,7 +58,9 @@ class InvoiceVersionServiceImplTest {
     private InvoiceVersionServiceImpl versionService;
 
     private Invoice invoice;
+    private InvoiceJpaEntity invoiceEntity;
     private User user;
+    private UserJpaEntity userEntity;
     private UUID userId;
     private UUID companyId;
 
@@ -69,13 +81,24 @@ class InvoiceVersionServiceImplTest {
                 .companyId(companyId)
                 .passwordHash("hash")
                 .build();
+
+        userEntity = new UserJpaEntity();
+        userEntity.setId(userId);
+        userEntity.setEmail("test@example.com");
+        userEntity.setFullName("Test User");
+        userEntity.setCompanyId(companyId);
+
+        invoiceEntity = new InvoiceJpaEntity();
+        invoiceEntity.setId(invoice.getId());
+        invoiceEntity.setCompanyId(companyId);
     }
 
     @Test
     void createSnapshot_ShouldSaveVersion_WhenCalled() {
         // Arrange
         when(versionRepository.findMaxVersionNumberByInvoiceId(invoice.getId())).thenReturn(Optional.of(0));
-        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
+        when(invoiceJpaRepository.findById(invoice.getId())).thenReturn(Optional.of(invoiceEntity));
+        when(jpaUserRepository.findById(any(UUID.class))).thenReturn(Optional.of(userEntity));
 
         JsonNode mockJson = mock(JsonNode.class);
         when(objectMapper.valueToTree(any())).thenReturn(mockJson);
@@ -98,7 +121,7 @@ class InvoiceVersionServiceImplTest {
                 .id(UUID.randomUUID())
                 .versionNumber(1)
                 .changeSource(ChangeSource.MANUAL_EDIT)
-                .changedBy(user)
+                .changedBy(userEntity)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -125,7 +148,8 @@ class InvoiceVersionServiceImplTest {
 
         // Mock findMaxVersionNumber
         when(versionRepository.findMaxVersionNumberByInvoiceId(invoice.getId())).thenReturn(Optional.of(54));
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(invoiceJpaRepository.findById(invoice.getId())).thenReturn(Optional.of(invoiceEntity));
+        when(jpaUserRepository.findById(any())).thenReturn(Optional.of(userEntity));
         when(objectMapper.valueToTree(any())).thenReturn(mock(JsonNode.class));
 
         // Mock cleanup query

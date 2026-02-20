@@ -1,6 +1,7 @@
 package com.faturaocr.domain.invoice.repository;
 
 import com.faturaocr.domain.invoice.entity.InvoiceVersion;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

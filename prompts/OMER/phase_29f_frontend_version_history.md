@@ -8,8 +8,8 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid
-  - **Spring Boot Backend**: Port 8080
-  - **Next.js Frontend**: Port 3000
+  - **Spring Boot Backend**: Port 8082
+  - **Next.js Frontend**: Port 3001
 
 ### Current State (Phases 0-28 Completed)
 - ✅ Phase 0-12: Infrastructure, backend core, frontend core

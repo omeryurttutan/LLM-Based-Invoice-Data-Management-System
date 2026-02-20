@@ -16,14 +16,14 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <div className="absolute top-6 left-6">
         <h1 className="text-xl font-bold text-primary">Fatura OCR</h1>
       </div>
-      
+
       <div className="w-full max-w-md p-4">
         {children}
       </div>
-      
+
       {/* Optional: Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-muted-foreground">
-        © 2025 Fatura OCR ve Veri Yönetim Sistemi
+        © 2026 Fatura OCR ve Veri Yönetim Sistemi
       </div>
     </div>
   );

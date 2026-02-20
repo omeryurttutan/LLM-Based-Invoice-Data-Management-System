@@ -8,11 +8,11 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080
-  - **Python Microservice**: Port 8000
-  - **Next.js Frontend**: Port 3000
-  - **RabbitMQ**: Port 5672
-  - **Redis**: Port 6379
+  - **Spring Boot Backend**: Port 8082
+  - **Python Microservice**: Port 8001
+  - **Next.js Frontend**: Port 3001
+  - **RabbitMQ**: Port 5673
+  - **Redis**: Port 6380
 
 ### Current State (Phases 0-26 Completed)
 - ✅ Phase 0-9: Docker, CI/CD, Hexagonal Architecture, Database, Auth (JWT + Redis), RBAC (ADMIN/MANAGER/ACCOUNTANT/INTERN), Invoice CRUD, Audit Log, Duplication Control
@@ -60,7 +60,7 @@ Build the backend notification infrastructure: a notifications database table, a
 - Configure simple message broker with destination prefix: `/topic` (broadcast) and `/queue` (user-specific)
 - Application destination prefix: `/app`
 - User destination prefix: `/user` (for sending to specific users)
-- Allowed origins: frontend URL (http://localhost:3000 in dev, configurable for prod)
+- Allowed origins: frontend URL (http://localhost:3001 in dev, configurable for prod)
 
 **Authentication Integration:**
 - WebSocket connections must be authenticated
@@ -244,7 +244,7 @@ Define clear, informative Turkish messages for each notification type:
 
 ### 9. Configuration — Environment Variables
 
-- `WEBSOCKET_ALLOWED_ORIGINS`: Default "http://localhost:3000"
+- `WEBSOCKET_ALLOWED_ORIGINS`: Default "http://localhost:3001"
 - `NOTIFICATION_MAX_PER_USER`: Default 500 (max stored, oldest auto-deleted)
 - `NOTIFICATION_AUTO_CLEANUP_DAYS`: Default 90 (delete notifications older than X days)
 - `NOTIFICATION_BATCH_NOTIFY_THRESHOLD`: Default 1 (send batch notification only when batch has more than X files)

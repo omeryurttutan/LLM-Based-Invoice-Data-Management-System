@@ -36,6 +36,7 @@ public class KvkkDataMigrationRunner implements CommandLineRunner {
             migrateUsers();
             migrateCompanies();
             migrateInvoices();
+            migrateSupplierTemplates();
             markMigrationComplete();
             LOGGER.info("KVKK sensitive data migration completed successfully.");
         } else {
@@ -148,6 +149,26 @@ public class KvkkDataMigrationRunner implements CommandLineRunner {
             }
         }
         LOGGER.info("Migrated {} invoices.", count);
+    }
+
+    private void migrateSupplierTemplates() {
+        LOGGER.info("Migrating Supplier Templates...");
+        String selectSql = "SELECT id, supplier_tax_number FROM supplier_templates WHERE supplier_tax_number IS NOT NULL";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(selectSql);
+
+        for (Map<String, Object> row : rows) {
+            UUID id = (UUID) row.get("id");
+            String taxNumber = (String) row.get("supplier_tax_number");
+
+            if (taxNumber != null && !isEncrypted(taxNumber)) {
+                String encrypted = encryptionService.encrypt(taxNumber);
+                String hash = hashString(taxNumber);
+                jdbcTemplate.update(
+                        "UPDATE supplier_templates SET supplier_tax_number = ?, supplier_tax_number_hash = ? WHERE id = ?",
+                        encrypted, hash, id);
+            }
+        }
+        LOGGER.info("Migrated {} supplier templates.", rows.size());
     }
 
     private void markMigrationComplete() {

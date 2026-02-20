@@ -1,6 +1,7 @@
 package com.faturaocr.domain.invoice.entity;
 
-import com.faturaocr.domain.user.entity.User;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaEntity;
+import com.faturaocr.infrastructure.persistence.user.UserJpaEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -27,7 +28,7 @@ public class InvoiceVersion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_id", nullable = false)
-    private Invoice invoice;
+    private InvoiceJpaEntity invoice;
 
     @Column(name = "version_number", nullable = false)
     private Integer versionNumber;
@@ -53,7 +54,7 @@ public class InvoiceVersion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "changed_by_user_id", nullable = false)
-    private User changedBy;
+    private UserJpaEntity changedBy;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

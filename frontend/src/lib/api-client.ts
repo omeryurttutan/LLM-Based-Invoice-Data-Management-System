@@ -5,7 +5,7 @@ import { getCookie } from '@/lib/utils';
 import trCommon from '@/messages/tr/common.json';
 import enCommon from '@/messages/en/common.json';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/api/v1';
 
 // Simplified translation helper for non-React context
 const getTranslation = (key: string, params?: Record<string, string | number>) => {
@@ -87,7 +87,20 @@ const processQueue = (error: AxiosError | null, token: string | null = null) => 
 };
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // If the response follows our standard ApiResponse wrapping, unwrap the data field
+    // but check if it's actually an ApiResponse structure first to avoid breaking other responses (like Blobs)
+    if (response.data &&
+      typeof response.data === 'object' &&
+      'success' in response.data &&
+      'data' in response.data) {
+      return {
+        ...response,
+        data: response.data.data
+      };
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 

@@ -63,6 +63,8 @@ class AuthenticationServiceTest {
         // Given
         RegisterCommand command = new RegisterCommand(
                 TestFixtures.COMPANY_ID,
+                null,
+                null,
                 "new@example.com",
                 "password123",
                 "New User",

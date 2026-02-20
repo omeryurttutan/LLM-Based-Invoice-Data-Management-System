@@ -8,8 +8,8 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-- **Backend**: Java 17 + Spring Boot 3.2 — **port 8080**
-- **Frontend**: Next.js 14+ (App Router, TypeScript, Tailwind CSS, Shadcn/ui) — **port 3000**
+- **Backend**: Java 17 + Spring Boot 3.2 — **port 8082**
+- **Frontend**: Next.js 14+ (App Router, TypeScript, Tailwind CSS, Shadcn/ui) — **port 3001**
 
 ### Current State (Phases 0-11 Completed)
 - ✅ Phase 0-3: Docker environment, CI/CD, Hexagonal Architecture, Database schema
@@ -33,7 +33,7 @@ Build complete invoice management UI: list with pagination/sorting/filters, deta
 
 ## BACKEND API REFERENCE
 
-**Base URL**: `http://localhost:8080/api/v1`
+**Base URL**: `http://localhost:8082/api/v1`
 
 ### Invoice Endpoints
 

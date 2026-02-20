@@ -9,7 +9,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * JPA configuration for the application.
  */
 @Configuration
-@EnableJpaRepositories(basePackages = "com.faturaocr.infrastructure.persistence")
+@EnableJpaRepositories(basePackages = {
+        "com.faturaocr.infrastructure.persistence",
+        "com.faturaocr.domain.invoice.repository"
+})
 @EnableJpaAuditing
 @EnableTransactionManagement
 public class JpaConfig {

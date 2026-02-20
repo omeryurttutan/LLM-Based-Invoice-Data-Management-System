@@ -7,7 +7,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 ### Project Overview
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM & Frontend) & Ömer Talha Yurttutan (Backend & Infrastructure)
-- **Architecture**: Hybrid Microservices — Spring Boot (8080), Python FastAPI (8000), Next.js (3000)
+- **Architecture**: Hybrid Microservices — Spring Boot (8082), Python FastAPI (8001), Next.js (3001)
 - **Infrastructure**: PostgreSQL 15, Redis 7, RabbitMQ 3
 
 ### Current State (Phases 0-38 Completed)
@@ -46,20 +46,20 @@ The existing Dockerfiles from Phase 0 are development-oriented (include dev depe
 
 Create a multi-stage Dockerfile:
 - **Stage 1 (Build)**: Use a Maven/Gradle image with JDK 17. Copy source code, run the build to produce a JAR file. Skip tests during the Docker build (tests are already run in CI/CD).
-- **Stage 2 (Runtime)**: Use a minimal JRE 17 image (like `eclipse-temurin:17-jre-alpine`). Copy only the JAR from Stage 1. Set appropriate JVM memory flags for production (initial heap, max heap — keep reasonable for a graduation project, e.g., 256m-512m). Expose port 8080. Run as a non-root user for security. Include a health check instruction.
+- **Stage 2 (Runtime)**: Use a minimal JRE 17 image (like `eclipse-temurin:17-jre-alpine`). Copy only the JAR from Stage 1. Set appropriate JVM memory flags for production (initial heap, max heap — keep reasonable for a graduation project, e.g., 256m-512m). Expose port 8082. Run as a non-root user for security. Include a health check instruction.
 
 **1.2 Frontend (Next.js) — `frontend/Dockerfile.prod`**
 
 Create a multi-stage Dockerfile:
 - **Stage 1 (Dependencies)**: Use Node.js 20 alpine. Install dependencies only (copy package.json and lock file first for Docker layer caching).
 - **Stage 2 (Build)**: Copy source code, run `next build` to produce the production build. Set `NEXT_TELEMETRY_DISABLED=1`.
-- **Stage 3 (Runtime)**: Use Node.js 20 alpine (slim). Copy only the `.next/standalone` output (if using Next.js standalone output mode) or the built files. Expose port 3000. Run as non-root user.
+- **Stage 3 (Runtime)**: Use Node.js 20 alpine (slim). Copy only the `.next/standalone` output (if using Next.js standalone output mode) or the built files. Expose port 3001. Run as non-root user.
 
 **1.3 Extraction Service (Python FastAPI) — `extraction-service/Dockerfile.prod`**
 
 Create a multi-stage Dockerfile:
 - **Stage 1 (Build)**: Use Python 3.11 slim. Install system dependencies needed for Pillow (image processing libraries). Install Python dependencies from requirements.txt.
-- **Stage 2 (Runtime)**: Use Python 3.11 slim. Copy installed packages and source code from Stage 1. Do NOT include test files or development dependencies. Expose port 8000. Run as non-root user. Use Uvicorn with production settings (no reload, appropriate worker count).
+- **Stage 2 (Runtime)**: Use Python 3.11 slim. Copy installed packages and source code from Stage 1. Do NOT include test files or development dependencies. Expose port 8001. Run as non-root user. Use Uvicorn with production settings (no reload, appropriate worker count).
 
 **1.4 Image Size Targets**
 
@@ -193,10 +193,10 @@ Create an Nginx configuration that:
 - Listens on port 80 (HTTP) and redirects all traffic to port 443 (HTTPS)
 - Listens on port 443 (HTTPS) with SSL/TLS
 - Routes requests based on path:
-  - `/api/*` → proxy to backend service (port 8080)
-  - `/ws/*` → proxy to backend WebSocket (port 8080) with WebSocket upgrade headers
-  - `/extraction/*` → proxy to extraction service (port 8000) — only if direct access is needed; otherwise, extraction is internal only via RabbitMQ
-  - `/` and all other paths → proxy to frontend service (port 3000)
+  - `/api/*` → proxy to backend service (port 8082)
+  - `/ws/*` → proxy to backend WebSocket (port 8082) with WebSocket upgrade headers
+  - `/extraction/*` → proxy to extraction service (port 8001) — only if direct access is needed; otherwise, extraction is internal only via RabbitMQ
+  - `/` and all other paths → proxy to frontend service (port 3001)
 - Sets proper proxy headers: `X-Real-IP`, `X-Forwarded-For`, `X-Forwarded-Proto`, `Host`
 - WebSocket support: `Upgrade`, `Connection` headers for the `/ws` path
 - Client max body size: at least 20MB (for invoice file uploads)

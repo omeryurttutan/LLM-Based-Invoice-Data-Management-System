@@ -38,7 +38,7 @@ class Settings(BaseSettings):
 
     
     # Service URLs
-    SPRING_BOOT_URL: str = "http://localhost:8080"
+    SPRING_BOOT_URL: str = "http://localhost:8082"
     INTERNAL_API_KEY: str = "fatura-ocr-internal-secret-key-2026"
     
     

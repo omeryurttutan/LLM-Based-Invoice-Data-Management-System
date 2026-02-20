@@ -1148,8 +1148,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",
-            "http://localhost:8080"
+            "http://localhost:3001",
+            "http://localhost:8082"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -1329,12 +1329,12 @@ class RbacIntegrationTest {
 ### Test 1: Permission Check
 ```bash
 # Login as ADMIN
-ADMIN_TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
+ADMIN_TOKEN=$(curl -s -X POST http://localhost:8082/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@demo.com", "password": "Admin123!"}' | jq -r '.data.accessToken')
 
 # Should succeed (ADMIN has all permissions)
-curl -X GET http://localhost:8080/api/v1/users \
+curl -X GET http://localhost:8082/api/v1/users \
   -H "Authorization: Bearer $ADMIN_TOKEN"
 # Expected: 200 OK
 ```
@@ -1345,12 +1345,12 @@ curl -X GET http://localhost:8080/api/v1/users \
 INTERN_TOKEN="..."
 
 # Should fail - INTERN cannot delete
-curl -X DELETE http://localhost:8080/api/v1/invoices/some-id \
+curl -X DELETE http://localhost:8082/api/v1/invoices/some-id \
   -H "Authorization: Bearer $INTERN_TOKEN"
 # Expected: 403 Forbidden
 
 # Should fail - INTERN cannot export
-curl -X GET http://localhost:8080/api/v1/invoices/export \
+curl -X GET http://localhost:8082/api/v1/invoices/export \
   -H "Authorization: Bearer $INTERN_TOKEN"
 # Expected: 403 Forbidden
 ```
@@ -1358,7 +1358,7 @@ curl -X GET http://localhost:8080/api/v1/invoices/export \
 ### Test 3: Company Isolation
 ```bash
 # User from Company A tries to access Company B's invoice
-curl -X GET http://localhost:8080/api/v1/invoices/company-b-invoice-id \
+curl -X GET http://localhost:8082/api/v1/invoices/company-b-invoice-id \
   -H "Authorization: Bearer $COMPANY_A_TOKEN"
 # Expected: 403 or 404
 ```

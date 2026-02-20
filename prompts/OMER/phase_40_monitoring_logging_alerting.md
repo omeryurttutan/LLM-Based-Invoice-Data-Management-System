@@ -7,7 +7,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 ### Project Overview
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM & Frontend) & Ömer Talha Yurttutan (Backend & Infrastructure)
-- **Architecture**: Hybrid Microservices — Spring Boot (8080), Python FastAPI (8000), Next.js (3000)
+- **Architecture**: Hybrid Microservices — Spring Boot (8082), Python FastAPI (8001), Next.js (3001)
 - **Infrastructure**: PostgreSQL 15, Redis 7, RabbitMQ 3, Nginx (reverse proxy)
 
 ### Current State (Phases 0-39 Completed)
@@ -60,7 +60,7 @@ Configure this in `application-prod.yml` and `application-staging.yml`:
 - `management.endpoints.web.exposure.include`: health, info, metrics, loggers, flyway
 - `management.endpoint.health.show-details`: when-authorized
 - `management.endpoint.env.show-values`: when-authorized
-- `management.server.port`: Consider running Actuator on a separate port (e.g., 8081) in production so Nginx can block external access to it. If too complex for the graduation project, keep it on 8080 but secure with Spring Security RBAC.
+- `management.server.port`: Consider running Actuator on a separate port (e.g., 8081) in production so Nginx can block external access to it. If too complex for the graduation project, keep it on 8082 but secure with Spring Security RBAC.
 
 **1.2 Health Indicator Customization**
 

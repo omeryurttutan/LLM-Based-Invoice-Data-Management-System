@@ -8,19 +8,19 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-  - **Spring Boot Backend**: Port 8080
-  - **Python Microservice**: Port 8000 - LLM-based extraction
-  - **Next.js Frontend**: Port 3000
-  - **RabbitMQ**: Port 5672 (AMQP), 15672 (Management UI)
+  - **Spring Boot Backend**: Port 8082
+  - **Python Microservice**: Port 8001 - LLM-based extraction
+  - **Next.js Frontend**: Port 3001
+  - **RabbitMQ**: Port 5673 (AMQP), 15672 (Management UI)
 
 ### Current State (Phases 0-18 Completed)
-- ✅ Phase 0: Docker Compose environment — RabbitMQ 3.x running on port 5672, credentials in .env (RABBITMQ_USER, RABBITMQ_PASSWORD), Spring Boot already has spring-boot-starter-amqp dependency
+- ✅ Phase 0: Docker Compose environment — RabbitMQ 3.x running on port 5673, credentials in .env (RABBITMQ_USER, RABBITMQ_PASSWORD), Spring Boot already has spring-boot-starter-amqp dependency
 - ✅ Phase 1-9: CI/CD, Hexagonal Architecture, Database Schema, Auth (JWT), RBAC, Company/User API, Invoice CRUD API, Audit Log, Duplication Check
 - ✅ Phase 10-12: Frontend layout, auth pages, invoice CRUD UI
 - ✅ Phase 13-18 (FURKAN): FastAPI service, image preprocessing, Gemini integration, fallback chain (GPT + Claude), validation & confidence score, e-Invoice XML parser
 
 ### What Exists Already
-- **RabbitMQ container**: Running in Docker Compose (Phase 0), management UI at localhost:15672
+- **RabbitMQ container**: Running in Docker Compose (Phase 0), management UI at localhost:15673
 - **spring-boot-starter-amqp**: Already in pom.xml (Phase 0)
 - **RabbitMQ connection config**: Already in application.yml (host, port, username, password)
 - **Invoice entity**: Full CRUD with status field (PENDING, VERIFIED, REJECTED, PROCESSING)
@@ -306,7 +306,7 @@ Add/update:
 - Test full round-trip: publish request → receive result → invoice updated in DB
 
 ### 3. Manual Tests
-- Verify exchanges and queues visible in RabbitMQ Management UI (localhost:15672)
+- Verify exchanges and queues visible in RabbitMQ Management UI (localhost:15673)
 - Verify message persistence (restart RabbitMQ, check messages survive)
 - Verify DLQ receives rejected messages
 

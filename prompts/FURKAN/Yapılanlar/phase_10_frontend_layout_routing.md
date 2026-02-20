@@ -8,8 +8,8 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
 - **Architecture**: Hybrid (Modular Monolith + Microservice)
-- **Backend**: Java 17 + Spring Boot 3.2 (Hexagonal Architecture) — **running on port 8080**
-- **Frontend**: Next.js 14+ (App Router, TypeScript, Tailwind CSS, Shadcn/ui) — **running on port 3000**
+- **Backend**: Java 17 + Spring Boot 3.2 (Hexagonal Architecture) — **running on port 8082**
+- **Frontend**: Next.js 14+ (App Router, TypeScript, Tailwind CSS, Shadcn/ui) — **running on port 3001**
 - **Database**: PostgreSQL 15+
 
 ### Current State
@@ -500,7 +500,7 @@ export default function InvoicesPage() {
 **File**: `src/services/api-client.ts`
 
 Set up Axios instance with:
-- Base URL: `process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'`
+- Base URL: `process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/api/v1'`
 - Request interceptor: attach `Authorization: Bearer <token>` from auth store
 - Response interceptor: handle 401 (redirect to login), handle token refresh
 - Error standardization: map backend errors to frontend-friendly format
@@ -510,7 +510,7 @@ Set up Axios instance with:
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8082/api/v1',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -780,7 +780,7 @@ Custom 404 page:
 **File**: `frontend/.env.local`
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:8082/api/v1
 NEXT_PUBLIC_APP_NAME=Fatura OCR
 NEXT_PUBLIC_APP_VERSION=1.0.0
 ```
@@ -823,7 +823,7 @@ Same as above with placeholder values, committed to git.
 
 ### Manual Testing Steps
 
-1. **Run the app**: `npm run dev` → opens at http://localhost:3000
+1. **Run the app**: `npm run dev` → opens at http://localhost:3001
 2. **Dashboard route**: Navigate to `/` → see dashboard placeholder with sidebar
 3. **Sidebar navigation**: Click each nav item → correct page renders, active state highlights
 4. **Sidebar collapse**: Click collapse button → sidebar shrinks to icon mode

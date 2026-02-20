@@ -7,7 +7,7 @@ You are working on "Fatura OCR ve Veri Yönetim Sistemi" (Invoice OCR and Data M
 ### Project Overview
 - **Project Name**: Fatura OCR ve Veri Yönetim Sistemi
 - **Team**: Muhammed Furkan Akdağ (AI/LLM) & Ömer Talha Yurttutan (Web)
-- **Architecture**: Hybrid — Spring Boot (8080), Python FastAPI (8000), Next.js (3000)
+- **Architecture**: Hybrid — Spring Boot (8082), Python FastAPI (8001), Next.js (3001)
 
 ### Current State (Phases 0-36 Completed)
 All features implemented. Phase 35-A/B added unit tests (backend + Python). Phase 36-A/B added integration tests (backend + Python). Frontend has zero tests so far.
@@ -256,7 +256,7 @@ Individual tests can override these handlers for specific scenarios.
 - `npx playwright install` (browser binaries)
 
 **Configuration (`playwright.config.ts`):**
-- Base URL: `http://localhost:3000`
+- Base URL: `http://localhost:3001`
 - Browsers: Chromium (primary), optionally Firefox and WebKit
 - Timeout: 30 seconds per test
 - Retries: 1 (flaky test protection)
@@ -267,9 +267,9 @@ Individual tests can override these handlers for specific scenarios.
 **Test Environment:**
 
 E2E tests need the FULL stack running:
-- Spring Boot backend (port 8080) — or a mock server
-- Python extraction service (port 8000) — or a mock server
-- Next.js frontend (port 3000)
+- Spring Boot backend (port 8082) — or a mock server
+- Python extraction service (port 8001) — or a mock server
+- Next.js frontend (port 3001)
 - PostgreSQL, Redis, RabbitMQ
 
 **Two approaches:**

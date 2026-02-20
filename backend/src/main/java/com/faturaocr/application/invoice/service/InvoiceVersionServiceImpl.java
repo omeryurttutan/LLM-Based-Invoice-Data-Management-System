@@ -9,8 +9,11 @@ import com.faturaocr.domain.invoice.entity.InvoiceItem;
 import com.faturaocr.domain.invoice.entity.InvoiceVersion;
 import com.faturaocr.domain.invoice.entity.InvoiceVersion.ChangeSource;
 import com.faturaocr.domain.invoice.repository.InvoiceVersionRepository;
-import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.port.UserRepository;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaEntity;
+import com.faturaocr.infrastructure.persistence.invoice.InvoiceJpaRepository;
+import com.faturaocr.infrastructure.persistence.user.UserJpaEntity;
+import com.faturaocr.infrastructure.persistence.user.UserJpaRepository;
 import com.faturaocr.infrastructure.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +29,8 @@ import java.util.stream.Collectors;
 public class InvoiceVersionServiceImpl implements InvoiceVersionService {
 
     private final InvoiceVersionRepository versionRepository;
-    private final UserRepository userRepository;
+    private final InvoiceJpaRepository invoiceJpaRepository;
+    private final UserJpaRepository jpaUserRepository;
     private final ObjectMapper objectMapper;
 
     private static final int MAX_VERSIONS_PER_INVOICE = 50;
@@ -66,18 +70,21 @@ public class InvoiceVersionServiceImpl implements InvoiceVersionService {
                     .orElse(0);
             Integer nextVersion = maxVersion + 1;
 
+            InvoiceJpaEntity invoiceEntity = invoiceJpaRepository.findById(invoice.getId())
+                    .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
             UUID currentUserId = SecurityUtils.getCurrentUserId();
-            User currentUser = userRepository.findById(currentUserId)
+            UserJpaEntity currentUserEntity = jpaUserRepository.findById(currentUserId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             InvoiceVersion version = InvoiceVersion.builder()
-                    .invoice(invoice)
+                    .invoice(invoiceEntity)
                     .versionNumber(nextVersion)
                     .snapshotData(snapshotData)
                     .itemsSnapshot(itemsSnapshot)
                     .changeSource(source)
                     .changeSummary(changeSummary)
-                    .changedBy(currentUser)
+                    .changedBy(currentUserEntity)
                     .companyId(invoice.getCompanyId())
                     .build();
 
@@ -175,12 +182,12 @@ public class InvoiceVersionServiceImpl implements InvoiceVersionService {
                 .build();
     }
 
-    private InvoiceVersionDto.UserDto mapUser(User user) {
+    private InvoiceVersionDto.UserDto mapUser(UserJpaEntity user) {
         if (user == null)
             return null;
         return InvoiceVersionDto.UserDto.builder()
                 .id(user.getId())
-                .email(user.getEmailValue())
+                .email(user.getEmail())
                 .firstName(user.getFullName())
                 .build();
     }
