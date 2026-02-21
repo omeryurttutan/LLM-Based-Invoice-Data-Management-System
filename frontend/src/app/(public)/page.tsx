@@ -6,13 +6,27 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col min-h-screen bg-background text-foreground">
             <header className="px-6 lg:px-14 h-20 flex items-center border-b">
-                <Link className="flex items-center justify-center font-bold text-2xl gap-2" href="/">
+                <Link className="flex items-center justify-center font-bold text-2xl gap-2 mr-8" href="/">
                     <FileText className="h-8 w-8 text-primary" />
                     <span>Fatura OCR</span>
                 </Link>
-                <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-                    <PublicNav />
+                <nav className="hidden md:flex items-center gap-6">
+                    <Link className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="#ozellikler">
+                        Özellikler
+                    </Link>
+                    <Link className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="#fiyatlandirma">
+                        Fiyatlandırma
+                    </Link>
+                    <Link className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="#hakkimizda">
+                        Hakkımızda
+                    </Link>
+                    <Link className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="#iletisim">
+                        İletişim
+                    </Link>
                 </nav>
+                <div className="ml-auto flex items-center gap-4 sm:gap-6">
+                    <PublicNav />
+                </div>
             </header>
             <main className="flex-1">
                 <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 flex items-center justify-center">

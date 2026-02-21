@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, LogOut } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslations } from "next-intl";
+import { UserMenu } from "@/components/layout/user-menu";
 
 export function PublicNav() {
     const { isAuthenticated, logout } = useAuth();
@@ -13,18 +14,25 @@ export function PublicNav() {
     
     if (isAuthenticated) {
         return (
-            <>
-                <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 mt-2" onClick={logout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Çıkış Yap
-                </Button>
-            </>
+            <div className="flex items-center gap-4">
+                <Link href="/dashboard">
+                    <Button variant="outline" className="hidden sm:flex">
+                        Dashboard
+                    </Button>
+                </Link>
+                <Link href="/login?redirect=/dashboard">
+                    <Button>
+                        Sisteme Git <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                </Link>
+                <UserMenu />
+            </div>
         );
     }
 
     return (
-        <>
-            <Link className="text-sm font-medium hover:underline underline-offset-4 mt-2" href="/login">
+        <div className="flex items-center gap-4">
+            <Link className="text-sm font-medium hover:underline underline-offset-4" href="/login">
                 Giriş Yap
             </Link>
             <Link href="/login?redirect=/dashboard">
@@ -32,7 +40,7 @@ export function PublicNav() {
                     Sisteme Git <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
             </Link>
-        </>
+        </div>
     );
 }
 
