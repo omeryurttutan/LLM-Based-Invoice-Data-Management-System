@@ -3,6 +3,7 @@
     "markAllRead": "Mark All as Read",
     "viewAll": "View All Notifications",
     "empty": "No notifications",
+    "emptyDescription": "No notifications match the selected criteria.",
     "types": {
         "info": "Info",
         "success": "Success",
@@ -14,6 +15,23 @@
     },
     "tabs": {
         "all": "All",
-        "unread": "Unread"
+        "unread": "Unread",
+        "read": "Read"
+    },
+    "filters": {
+        "typePlaceholder": "Type",
+        "allTypes": "All Types",
+        "extraction": "Data Extraction",
+        "batchUpload": "Batch Upload",
+        "confidenceScore": "Confidence Score",
+        "autoVerification": "Auto Verification",
+        "verification": "Verification",
+        "system": "System",
+        "severityPlaceholder": "Severity",
+        "allSeverities": "All Severities",
+        "infoSeverity": "Info",
+        "warningSeverity": "Warning",
+        "errorSeverity": "Error",
+        "successSeverity": "Success"
     }
 }

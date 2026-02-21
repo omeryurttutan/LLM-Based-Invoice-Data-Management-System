@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import {
     Check,
     Trash2,
@@ -30,6 +31,7 @@ import { Notification, NotificationType, NotificationSeverity } from '@/types/no
 import { useNotificationStore } from '@/stores/notification-store';
 
 export default function NotificationsPage() {
+    const t = useTranslations('notifications');
     const router = useRouter();
     const queryClient = useQueryClient();
     const { markAsRead: markAsReadInStore, markAllAsRead: markAllAsReadInStore, removeNotification } = useNotificationStore();
@@ -101,13 +103,13 @@ export default function NotificationsPage() {
     return (
         <div className="space-y-6 h-full flex flex-col">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">Bildirimler</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
                 <Button
                     variant="outline"
                     onClick={() => markAllAsReadMutation.mutate()}
                     disabled={markAllAsReadMutation.isPending}
                 >
-                    <Check className="mr-2 h-4 w-4" /> Tümünü Okundu İşaretle
+                    <Check className="mr-2 h-4 w-4" /> {t('markAllRead')}
                 </Button>
             </div>
 
@@ -115,38 +117,38 @@ export default function NotificationsPage() {
                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                     <Tabs value={filterTab} onValueChange={(v: string) => { setFilterTab(v as "ALL" | "UNREAD" | "READ"); setPage(0); }} className="w-full sm:w-auto">
                         <TabsList>
-                            <TabsTrigger value="ALL">Tümü</TabsTrigger>
-                            <TabsTrigger value="UNREAD">Okunmamış</TabsTrigger>
-                            <TabsTrigger value="READ">Okunmuş</TabsTrigger>
+                            <TabsTrigger value="ALL">{t('tabs.all')}</TabsTrigger>
+                            <TabsTrigger value="UNREAD">{t('tabs.unread')}</TabsTrigger>
+                            <TabsTrigger value="READ">{t('tabs.read')}</TabsTrigger>
                         </TabsList>
                     </Tabs>
 
                     <div className="flex gap-2 w-full sm:w-auto">
                         <Select value={selectedType} onValueChange={(v: string) => { setSelectedType(v as NotificationType | "ALL"); setPage(0); }}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Tür" />
+                                <SelectValue placeholder={t('filters.typePlaceholder')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="ALL">Tüm Türler</SelectItem>
-                                <SelectItem value="EXTRACTION_COMPLETED">Veri Çıkarımı</SelectItem>
-                                <SelectItem value="BATCH_COMPLETED">Toplu Yükleme</SelectItem>
-                                <SelectItem value="LOW_CONFIDENCE">Güven Skoru</SelectItem>
-                                <SelectItem value="HIGH_CONFIDENCE_AUTO_VERIFIED">Otomatik Doğrulama</SelectItem>
-                                <SelectItem value="INVOICE_VERIFIED">Doğrulama</SelectItem>
-                                <SelectItem value="SYSTEM_ANNOUNCEMENT">Sistem</SelectItem>
+                                <SelectItem value="ALL">{t('filters.allTypes')}</SelectItem>
+                                <SelectItem value="EXTRACTION_COMPLETED">{t('filters.extraction')}</SelectItem>
+                                <SelectItem value="BATCH_COMPLETED">{t('filters.batchUpload')}</SelectItem>
+                                <SelectItem value="LOW_CONFIDENCE">{t('filters.confidenceScore')}</SelectItem>
+                                <SelectItem value="HIGH_CONFIDENCE_AUTO_VERIFIED">{t('filters.autoVerification')}</SelectItem>
+                                <SelectItem value="INVOICE_VERIFIED">{t('filters.verification')}</SelectItem>
+                                <SelectItem value="SYSTEM_ANNOUNCEMENT">{t('filters.system')}</SelectItem>
                             </SelectContent>
                         </Select>
 
                         <Select value={selectedSeverity} onValueChange={(v: string) => { setSelectedSeverity(v as NotificationSeverity | "ALL"); setPage(0); }}>
                             <SelectTrigger className="w-[150px]">
-                                <SelectValue placeholder="Önem Derecesi" />
+                                <SelectValue placeholder={t('filters.severityPlaceholder')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="ALL">Tüm Dereceler</SelectItem>
-                                <SelectItem value="INFO">Bilgi (Info)</SelectItem>
-                                <SelectItem value="WARNING">Uyarı (Warning)</SelectItem>
-                                <SelectItem value="ERROR">Hata (Error)</SelectItem>
-                                <SelectItem value="SUCCESS">Başarılı (Success)</SelectItem>
+                                <SelectItem value="ALL">{t('filters.allSeverities')}</SelectItem>
+                                <SelectItem value="INFO">{t('filters.infoSeverity')}</SelectItem>
+                                <SelectItem value="WARNING">{t('filters.warningSeverity')}</SelectItem>
+                                <SelectItem value="ERROR">{t('filters.errorSeverity')}</SelectItem>
+                                <SelectItem value="SUCCESS">{t('filters.successSeverity')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -160,8 +162,8 @@ export default function NotificationsPage() {
                     ) : data?.content.length === 0 ? (
                         <div className="flex flex-col items-center justify-center flex-1 h-64 text-muted-foreground p-8">
                             <Bell className="h-12 w-12 mb-4 opacity-20" />
-                            <p className="text-lg font-medium">Bildirim bulunamadı</p>
-                            <p className="text-sm">Seçilen kriterlere uygun bildirim yok.</p>
+                            <p className="text-lg font-medium">{t('empty')}</p>
+                            <p className="text-sm">{t('emptyDescription')}</p>
                         </div>
                     ) : (
                         <div className="flex flex-col p-2 gap-2">

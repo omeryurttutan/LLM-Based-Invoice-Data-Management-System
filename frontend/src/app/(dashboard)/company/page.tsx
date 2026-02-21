@@ -1,22 +1,27 @@
+'use client';
+
 import { Building2 } from "lucide-react"
 import { PageHeader } from "@/components/common/page-header"
 import { EmptyState } from "@/components/common/empty-state"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 
 export default function CompanyPage() {
+  const t = useTranslations('common.pages.company');
+
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Şirket Bilgileri"
-        description="Şirket detayları ve fatura ayarları."
+        title={t('title')}
+        description={t('description')}
         actions={
-            <Button variant="outline">Düzenle</Button>
+            <Button variant="outline">{t('edit')}</Button>
         }
       />
       <EmptyState
         icon={Building2}
-        title="Şirket Profili"
-        description="Şirketinizin vergi ve adres bilgileri burada yer alacak."
+        title={t('profileTitle')}
+        description={t('profileDescription')}
       />
     </div>
   )

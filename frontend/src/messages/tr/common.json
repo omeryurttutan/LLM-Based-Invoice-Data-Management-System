@@ -84,5 +84,47 @@
         "daysAgo": "{count} gün önce",
         "yesterday": "Dün",
         "today": "Bugün"
+    },
+    "pages": {
+        "users": {
+            "title": "Kullanıcılar",
+            "description": "Sistem kullanıcılarını ve rollerini yönetin.",
+            "newUser": "Yeni Kullanıcı",
+            "listTitle": "Kullanıcı Listesi",
+            "listDescription": "Şirketinizdeki kayıtlı kullanıcılar burada listelenecek."
+        },
+        "company": {
+            "title": "Şirket Bilgileri",
+            "description": "Şirket detayları ve fatura ayarları.",
+            "edit": "Düzenle",
+            "profileTitle": "Şirket Profili",
+            "profileDescription": "Şirketinizin vergi ve adres bilgileri burada yer alacak."
+        },
+        "auditLogs": {
+            "title": "Denetim Logu",
+            "description": "Sistemdeki tüm işlem geçmişini ve değişiklikleri izleyin.",
+            "historyTitle": "İşlem Geçmişi",
+            "historyDescription": "Kullanıcı aktiviteleri ve sistem olayları burada listelenecek."
+        },
+        "profile": {
+            "title": "Profil",
+            "description": "Kişisel bilgilerinizi ve tercihlerinizi güncelleyin.",
+            "save": "Kaydet",
+            "profileTitle": "Kullanıcı Profili",
+            "profileDescription": "Ad, soyad, e-posta ve şifre değiştirme formu burada olacak."
+        },
+        "settings": {
+            "title": "Ayarlar",
+            "description": "Uygulama genel yapılandırması ve tercihler.",
+            "settingsTitle": "Uygulama Ayarları",
+            "settingsDescription": "Tema, bildirimler ve dil seçenekleri burada yönetilecek."
+        },
+        "upload": {
+            "title": "Fatura Yükle",
+            "description": "Fatura görüntülerini veya PDF dosyalarını sisteme yükleyin.",
+            "moduleTitle": "Yükleme Modülü",
+            "moduleDescription": "Dosya sürükle-bırak ve OCR işleme alanı burada olacak.",
+            "selectFile": "Dosya Seç (Demo)"
+        }
     }
 }

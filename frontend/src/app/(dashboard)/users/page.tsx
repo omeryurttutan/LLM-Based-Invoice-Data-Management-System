@@ -1,25 +1,30 @@
+'use client';
+
 import { Users, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/common/page-header"
 import { EmptyState } from "@/components/common/empty-state"
+import { useTranslations } from "next-intl"
 
 export default function UsersPage() {
+  const t = useTranslations('common.pages.users');
+
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Kullanıcılar"
-        description="Sistem kullanıcılarını ve rollerini yönetin."
+        title={t('title')}
+        description={t('description')}
         actions={
           <Button>
             <UserPlus className="mr-2 h-4 w-4" />
-            Yeni Kullanıcı
+            {t('newUser')}
           </Button>
         }
       />
       <EmptyState
         icon={Users}
-        title="Kullanıcı Listesi"
-        description="Şirketinizdeki kayıtlı kullanıcılar burada listelenecek."
+        title={t('listTitle')}
+        description={t('listDescription')}
       />
     </div>
   )

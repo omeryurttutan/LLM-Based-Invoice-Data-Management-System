@@ -1,22 +1,27 @@
+'use client';
+
 import { UserCircle } from "lucide-react"
 import { PageHeader } from "@/components/common/page-header"
 import { EmptyState } from "@/components/common/empty-state"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 
 export default function ProfilePage() {
+  const t = useTranslations('common.pages.profile');
+
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Profil"
-        description="Kişisel bilgilerinizi ve tercihlerinizi güncelleyin."
+        title={t('title')}
+        description={t('description')}
         actions={
-            <Button>Kaydet</Button>
+            <Button>{t('save')}</Button>
         }
       />
       <EmptyState
         icon={UserCircle}
-        title="Kullanıcı Profili"
-        description="Ad, soyad, e-posta ve şifre değiştirme formu burada olacak."
+        title={t('profileTitle')}
+        description={t('profileDescription')}
       />
     </div>
   )

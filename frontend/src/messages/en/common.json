@@ -84,5 +84,47 @@
         "daysAgo": "{count} days ago",
         "yesterday": "Yesterday",
         "today": "Today"
+    },
+    "pages": {
+        "users": {
+            "title": "Users",
+            "description": "Manage system users and roles.",
+            "newUser": "New User",
+            "listTitle": "User List",
+            "listDescription": "Registered users in your company will be listed here."
+        },
+        "company": {
+            "title": "Company Information",
+            "description": "Company details and invoice settings.",
+            "edit": "Edit",
+            "profileTitle": "Company Profile",
+            "profileDescription": "Your company's tax and address information will appear here."
+        },
+        "auditLogs": {
+            "title": "Audit Log",
+            "description": "Monitor all activity history and changes in the system.",
+            "historyTitle": "Activity History",
+            "historyDescription": "User activities and system events will be listed here."
+        },
+        "profile": {
+            "title": "Profile",
+            "description": "Update your personal information and preferences.",
+            "save": "Save",
+            "profileTitle": "User Profile",
+            "profileDescription": "Name, email and password change form will be here."
+        },
+        "settings": {
+            "title": "Settings",
+            "description": "General application configuration and preferences.",
+            "settingsTitle": "Application Settings",
+            "settingsDescription": "Theme, notifications and language options will be managed here."
+        },
+        "upload": {
+            "title": "Upload Invoice",
+            "description": "Upload invoice images or PDF files to the system.",
+            "moduleTitle": "Upload Module",
+            "moduleDescription": "Drag-and-drop file upload and OCR processing area will be here.",
+            "selectFile": "Select File (Demo)"
+        }
     }
 }
