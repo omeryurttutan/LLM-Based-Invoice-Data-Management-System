@@ -98,7 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
     if (!isAuthenticated && !isPublicRoute) {
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
     } else if (isAuthenticated && isPublicRoute) {
       // Honor the 'redirect' query parameter if it exists
       const searchParams = new URLSearchParams(window.location.search);

@@ -32,7 +32,7 @@ export function PublicNav() {
             <Link className="text-sm font-medium hover:underline underline-offset-4 mt-2" href="/login">
                 Giriş Yap
             </Link>
-            <Link href="/dashboard">
+            <Link href="/login?redirect=/dashboard">
                 <Button>
                     Sisteme Git <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -59,7 +59,7 @@ export function PublicHeroButtons() {
             <Link href="/login">
                 <Button size="lg" className="h-12 px-8">Hemen Başla</Button>
             </Link>
-            <Link href="/dashboard">
+            <Link href="/login?redirect=/dashboard">
                 <Button variant="outline" size="lg" className="h-12 px-8">
                     Dashboard&apos;u İncele
                 </Button>
