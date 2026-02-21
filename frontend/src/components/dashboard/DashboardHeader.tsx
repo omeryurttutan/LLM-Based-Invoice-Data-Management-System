@@ -58,11 +58,11 @@ export function DashboardHeader({
                 {dateRange?.from ? (
                   dateRange.to ? (
                     <>
-                      {format(dateRange.from, "LLO", { locale: dateLocale })} -{" "}
-                      {format(dateRange.to, "LLO", { locale: dateLocale })}
+                      {format(dateRange.from, "dd MMM yyyy", { locale: dateLocale })} -{" "}
+                      {format(dateRange.to, "dd MMM yyyy", { locale: dateLocale })}
                     </>
                   ) : (
-                    format(dateRange.from, "LLO", { locale: dateLocale })
+                    format(dateRange.from, "dd MMM yyyy", { locale: dateLocale })
                   )
                 ) : (
                   <span>{t('dateSelect') || 'Tarih Aralığı Seçin'}</span>
