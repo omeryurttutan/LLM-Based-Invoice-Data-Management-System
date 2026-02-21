@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Plus, Pencil, Trash2, Search, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,18 +50,19 @@ import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory 
 import { Category, CreateCategoryRequest } from '@/types/category';
 import { useAuthStore } from '@/stores/auth-store';
 
-const categorySchema = z.object({
-  name: z.string().min(1, 'Kategori adı zorunludur'),
-  description: z.string().optional(),
-  color: z.string().min(1, 'Renk seçimi zorunludur'),
-  icon: z.string().optional(),
-});
-
-type CategoryFormValues = z.infer<typeof categorySchema>;
-
 export default function CategoriesPage() {
+  const t = useTranslations('categories');
   const { user } = useAuthStore();
   const isAdminOrManager = user?.role === 'ADMIN' || user?.role === 'MANAGER';
+
+  const categorySchema = z.object({
+    name: z.string().min(1, t('nameRequired')),
+    description: z.string().optional(),
+    color: z.string().min(1, t('colorRequired')),
+    icon: z.string().optional(),
+  });
+
+  type CategoryFormValues = z.infer<typeof categorySchema>;
 
   const { data: categories, isLoading } = useCategories();
   const createMutation = useCreateCategory();
@@ -131,19 +133,19 @@ export default function CategoriesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Kategoriler</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
         {isAdminOrManager && (
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => form.reset({ color: '#3b82f6' })}>
-                <Plus className="mr-2 h-4 w-4" /> Yeni Kategori
+                <Plus className="mr-2 h-4 w-4" /> {t('create')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Yeni Kategori Oluştur</DialogTitle>
+                <DialogTitle>{t('createTitle')}</DialogTitle>
                 <DialogDescription>
-                  Kategoriler faturaları gruplandırmak ve raporlamak için kullanılır.
+                  {t('createDescription')}
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -153,9 +155,9 @@ export default function CategoriesPage() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Kategori Adı</FormLabel>
+                        <FormLabel>{t('nameLabel')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Örn: Teknoloji" {...field} />
+                          <Input placeholder={t('namePlaceholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -166,9 +168,9 @@ export default function CategoriesPage() {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Açıklama</FormLabel>
+                        <FormLabel>{t('descriptionLabel')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Kategori açıklaması..." {...field} />
+                          <Textarea placeholder={t('descriptionPlaceholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -179,7 +181,7 @@ export default function CategoriesPage() {
                     name="color"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Renk</FormLabel>
+                        <FormLabel>{t('colorLabel')}</FormLabel>
                         <FormControl>
                           <div className="flex items-center gap-2">
                             <Input type="color" className="w-12 h-10 p-1" {...field} />
@@ -193,7 +195,7 @@ export default function CategoriesPage() {
                   <DialogFooter>
                     <Button type="submit" disabled={createMutation.isPending}>
                       {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Oluştur
+                      {t('submitCreate')}
                     </Button>
                   </DialogFooter>
                 </form>
@@ -207,7 +209,7 @@ export default function CategoriesPage() {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Kategori ara..."
+            placeholder={t('searchPlaceholder')}
             className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -220,17 +222,17 @@ export default function CategoriesPage() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]"></TableHead>
-              <TableHead>Kategori Adı</TableHead>
-              <TableHead>Açıklama</TableHead>
-              <TableHead>Fatura Sayısı</TableHead>
-              <TableHead className="text-right">İşlemler</TableHead>
+              <TableHead>{t('nameLabel')}</TableHead>
+              <TableHead>{t('descriptionLabel')}</TableHead>
+              <TableHead>{t('invoiceCount')}</TableHead>
+              <TableHead className="text-right">{t('actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredCategories?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
-                  Kategori bulunamadı.
+                  {t('notFound')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -277,17 +279,16 @@ export default function CategoriesPage() {
       <Dialog open={!!editingCategory} onOpenChange={(open) => !open && setEditingCategory(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Kategoriyi Düzenle</DialogTitle>
+            <DialogTitle>{t('edit')}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Same fields as create form */}
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kategori Adı</FormLabel>
+                    <FormLabel>{t('nameLabel')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -300,7 +301,7 @@ export default function CategoriesPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Açıklama</FormLabel>
+                    <FormLabel>{t('descriptionLabel')}</FormLabel>
                     <FormControl>
                       <Textarea {...field} />
                     </FormControl>
@@ -313,7 +314,7 @@ export default function CategoriesPage() {
                 name="color"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Renk</FormLabel>
+                    <FormLabel>{t('colorLabel')}</FormLabel>
                     <FormControl>
                       <div className="flex items-center gap-2">
                         <Input type="color" className="w-12 h-10 p-1" {...field} />
@@ -327,7 +328,7 @@ export default function CategoriesPage() {
               <DialogFooter>
                 <Button type="submit" disabled={updateMutation.isPending}>
                   {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Güncelle
+                  {t('submitUpdate')}
                 </Button>
               </DialogFooter>
             </form>
@@ -339,20 +340,20 @@ export default function CategoriesPage() {
       <AlertDialog open={!!deletingCategory} onOpenChange={(open) => !open && setDeletingCategory(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              &quot;{deletingCategory?.name}&quot; kategorisini silmek üzeresiniz.
+              {t('deleteDescription', { name: deletingCategory?.name ?? '' })}
               {deletingCategory && deletingCategory.invoiceCount > 0 && (
                 <span className="block text-destructive font-bold mt-2">
-                  DİKKAT: Bu kategoriye bağlı {deletingCategory.invoiceCount} fatura bulunmaktadır.
+                  {t('deleteWarning', { count: deletingCategory.invoiceCount })}
                 </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogCancel>{t('deleteCancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-              Sil
+              {t('deleteConfirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

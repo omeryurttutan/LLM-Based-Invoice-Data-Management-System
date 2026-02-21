@@ -1,10 +1,26 @@
 {
     "title": "Kategoriler",
     "create": "Yeni Kategori",
-    "edit": "Kategori Düzenle",
+    "createTitle": "Yeni Kategori Oluştur",
+    "createDescription": "Kategoriler faturaları gruplandırmak ve raporlamak için kullanılır.",
+    "edit": "Kategoriyi Düzenle",
     "nameLabel": "Kategori Adı",
+    "namePlaceholder": "Örn: Teknoloji",
+    "nameRequired": "Kategori adı zorunludur",
     "descriptionLabel": "Açıklama",
+    "descriptionPlaceholder": "Kategori açıklaması...",
     "colorLabel": "Renk",
+    "colorRequired": "Renk seçimi zorunludur",
     "keywordsLabel": "Anahtar Kelimeler",
-    "deleteConfirm": "Bu kategoriyi silmek, ilgili faturaların kategorisiz kalmasına neden olabilir. Devam etmek istiyor musunuz?"
+    "searchPlaceholder": "Kategori ara...",
+    "invoiceCount": "Fatura Sayısı",
+    "actions": "İşlemler",
+    "submitCreate": "Oluştur",
+    "submitUpdate": "Güncelle",
+    "notFound": "Kategori bulunamadı.",
+    "deleteTitle": "Emin misiniz?",
+    "deleteDescription": "\"{name}\" kategorisini silmek üzeresiniz.",
+    "deleteWarning": "DİKKAT: Bu kategoriye bağlı {count} fatura bulunmaktadır.",
+    "deleteConfirm": "Sil",
+    "deleteCancel": "İptal"
 }
