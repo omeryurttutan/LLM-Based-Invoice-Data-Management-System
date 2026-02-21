@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -12,14 +13,16 @@ import { Languages } from 'lucide-react';
 
 export function LanguageSwitcher() {
     const locale = useLocale();
+    const router = useRouter();
     const t = useTranslations('navigation.header');
 
     const switchLocale = (newLocale: string) => {
-        // Set cookie for next-intl middleware
+        // Set cookie for next-intl
         document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
 
-        // Refresh to apply new locale
-        window.location.reload();
+        // Use router.refresh() to re-fetch server components with new locale
+        // instead of window.location.reload() which can crash SSR without middleware
+        router.refresh();
     };
 
     return (
@@ -41,3 +44,4 @@ export function LanguageSwitcher() {
         </DropdownMenu>
     );
 }
+
