@@ -92,7 +92,7 @@ export default function DashboardPage() {
       {/* KPI Cards */}
       <SummaryCards
         stats={statsQuery.data}
-        loading={statsQuery.isLoading}
+        loading={statsQuery.isLoading && !statsQuery.isError}
         currency={currency}
       />
 
@@ -101,14 +101,14 @@ export default function DashboardPage() {
         <div className="col-span-3">
           <CategoryDistributionChart
             data={categoriesQuery.data}
-            loading={categoriesQuery.isLoading}
+            loading={categoriesQuery.isLoading && !categoriesQuery.isError}
             currency={currency}
           />
         </div>
         <div className="col-span-4">
           <MonthlyTrendChart
             data={trendQuery.data}
-            loading={trendQuery.isLoading}
+            loading={trendQuery.isLoading && !trendQuery.isError}
             currency={currency}
           />
         </div>
@@ -119,14 +119,14 @@ export default function DashboardPage() {
         <div className="col-span-3">
           <TopSuppliersChart
             data={suppliersQuery.data}
-            loading={suppliersQuery.isLoading}
+            loading={suppliersQuery.isLoading && !suppliersQuery.isError}
             currency={currency}
           />
         </div>
         <div className="col-span-4">
           <PendingActionsList
             data={pendingQuery.data}
-            loading={pendingQuery.isLoading}
+            loading={pendingQuery.isLoading && !pendingQuery.isError}
           />
         </div>
       </div>
@@ -134,14 +134,14 @@ export default function DashboardPage() {
       {/* Status Timeline */}
       <StatusTimelineChart
         data={timelineQuery.data}
-        loading={timelineQuery.isLoading}
+        loading={timelineQuery.isLoading && !timelineQuery.isError}
       />
 
       {/* Admin/Manager Sections */}
       {isAdminOrManager && (
         <ExtractionPerformanceCard
           data={extractionQuery.data}
-          loading={extractionQuery.isLoading}
+          loading={extractionQuery.isLoading && !extractionQuery.isError}
         />
       )}
 

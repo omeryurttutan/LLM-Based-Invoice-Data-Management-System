@@ -26,7 +26,7 @@ export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
     });
   };
 
-  if (loading || !stats) {
+  if (loading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
@@ -39,6 +39,30 @@ export function SummaryCards({ stats, loading, currency }: SummaryCardsProps) {
             <CardContent>
               <Skeleton className="h-8 w-[60px] mb-2" />
               <Skeleton className="h-4 w-[140px]" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[
+          { title: t('cards.totalInvoices'), icon: <FileText className="h-4 w-4 text-muted-foreground" /> },
+          { title: t('cards.totalAmount'), icon: <TrendingUp className="h-4 w-4 text-muted-foreground" /> },
+          { title: tStatus('pending'), icon: <Clock className="h-4 w-4 text-yellow-500" /> },
+          { title: tStatus('verified'), icon: <CheckCircle className="h-4 w-4 text-green-500" /> },
+        ].map((item, i) => (
+          <Card key={i}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
+              {item.icon}
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-muted-foreground">—</div>
+              <p className="text-xs text-muted-foreground">Veri bulunamadı</p>
             </CardContent>
           </Card>
         ))}

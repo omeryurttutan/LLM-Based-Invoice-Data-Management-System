@@ -6,6 +6,7 @@ export const useDashboardStats = (params?: { dateFrom?: string; dateTo?: string;
     queryKey: ['dashboard-stats', params],
     queryFn: () => dashboardService.getDashboardStats(params),
     staleTime: 60 * 1000,
+    retry: 1,
   });
 };
 
@@ -14,6 +15,7 @@ export const useCategoryDistribution = (params?: { dateFrom?: string; dateTo?: s
     queryKey: ['dashboard-categories', params],
     queryFn: () => dashboardService.getCategoryDistribution(params),
     staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
 };
 
@@ -22,6 +24,7 @@ export const useMonthlyTrend = (params?: { months?: number; currency?: string })
     queryKey: ['dashboard-trends', params],
     queryFn: () => dashboardService.getMonthlyTrend(params),
     staleTime: 60 * 1000,
+    retry: 1,
   });
 };
 
@@ -30,6 +33,7 @@ export const useTopSuppliers = (params?: { dateFrom?: string; dateTo?: string; c
     queryKey: ['dashboard-suppliers', params],
     queryFn: () => dashboardService.getTopSuppliers(params),
     staleTime: 60 * 1000,
+    retry: 1,
   });
 };
 
@@ -38,6 +42,7 @@ export const usePendingActions = (params?: { limit?: number }) => {
     queryKey: ['dashboard-pending', params],
     queryFn: () => dashboardService.getPendingActions(params),
     staleTime: 60 * 1000,
+    retry: 1,
   });
 };
 
@@ -46,6 +51,7 @@ export const useStatusTimeline = (params?: { days?: number }) => {
     queryKey: ['dashboard-timeline', params],
     queryFn: () => dashboardService.getStatusTimeline(params),
     staleTime: 60 * 1000,
+    retry: 1,
   });
 };
 
@@ -54,6 +60,7 @@ export const useExtractionPerformance = (params?: { dateFrom?: string; dateTo?: 
     queryKey: ['dashboard-extraction', params],
     queryFn: () => dashboardService.getExtractionPerformance(params),
     staleTime: 60 * 1000,
+    retry: 1,
   });
 };
 
