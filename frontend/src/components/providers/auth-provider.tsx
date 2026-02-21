@@ -95,7 +95,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     if (!isInitialized || isChecking) return;
 
-    const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+    const isPublicRoute = pathname === '/' || publicRoutes.some(route => pathname.startsWith(route));
 
     if (!isAuthenticated && !isPublicRoute) {
       router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
@@ -120,7 +120,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   // Prevent flash of protected content before redirect
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  const isPublicRoute = pathname === '/' || publicRoutes.some(route => pathname.startsWith(route));
   if (!isChecking && !isAuthenticated && !isPublicRoute) {
     return null;
   }

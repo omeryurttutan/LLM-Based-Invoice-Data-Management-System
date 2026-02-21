@@ -6,7 +6,7 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col min-h-screen bg-background text-foreground">
             <header className="px-6 lg:px-14 h-20 flex items-center border-b">
-                <Link className="flex items-center justify-center font-bold text-2xl gap-2" href="#">
+                <Link className="flex items-center justify-center font-bold text-2xl gap-2" href="/">
                     <FileText className="h-8 w-8 text-primary" />
                     <span>Fatura OCR</span>
                 </Link>

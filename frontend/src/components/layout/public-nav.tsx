@@ -18,11 +18,6 @@ export function PublicNav() {
                     <LogOut className="mr-2 h-4 w-4" />
                     Çıkış Yap
                 </Button>
-                <Link href="/dashboard">
-                    <Button>
-                        Sisteme Git <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                </Link>
             </>
         );
     }
