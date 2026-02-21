@@ -73,11 +73,14 @@ export function DashboardHeader({
               <Calendar
                 initialFocus
                 mode="range"
-                defaultMonth={dateRange?.from}
+                captionLayout="dropdown"
+                defaultMonth={dateRange?.from || new Date()}
                 selected={dateRange}
                 onSelect={setDateRange}
                 numberOfMonths={2}
                 locale={dateLocale}
+                startMonth={new Date(2020, 0)}
+                endMonth={new Date(2030, 11)}
               />
             </PopoverContent>
           </Popover>

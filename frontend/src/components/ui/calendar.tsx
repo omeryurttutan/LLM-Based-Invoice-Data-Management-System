@@ -19,25 +19,22 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      captionLayout="dropdown"
-      fromYear={2020}
-      toYear={2030}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        month_caption: "flex items-center justify-between px-1 pt-1 gap-2",
-        caption_label: "text-sm font-medium hidden",
+        month_caption: "flex items-center justify-between px-8 pt-1 relative",
+        caption_label: "text-sm font-medium",
         dropdowns: "flex items-center gap-1",
         dropdown: "appearance-none bg-transparent border border-border rounded-md px-2 py-1 text-sm font-medium cursor-pointer hover:bg-accent focus:outline-none focus:ring-1 focus:ring-ring",
         nav: "flex items-center gap-1",
         button_previous: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1"
         ),
         button_next: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1"
         ),
         month_grid: "w-full border-collapse space-y-1",
         weekdays: "flex",
