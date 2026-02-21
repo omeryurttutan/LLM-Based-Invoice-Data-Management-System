@@ -100,7 +100,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!isAuthenticated && !isPublicRoute) {
       router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
     } else if (isAuthenticated && isPublicRoute) {
-      router.push('/');
+      // Honor the 'redirect' query parameter if it exists
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectPath = searchParams.get('redirect') || '/';
+      router.push(redirectPath);
     }
   }, [isAuthenticated, isInitialized, isChecking, pathname, router]);
 
