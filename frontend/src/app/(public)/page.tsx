@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { FileText, ArrowRight } from "lucide-react";
+import { FileText } from "lucide-react";
+import { PublicNav, PublicHeroButtons } from "@/components/layout/public-nav";
 
 export default function LandingPage() {
     return (
@@ -10,15 +10,8 @@ export default function LandingPage() {
                     <FileText className="h-8 w-8 text-primary" />
                     <span>Fatura OCR</span>
                 </Link>
-                <nav className="ml-auto flex gap-4 sm:gap-6">
-                    <Link className="text-sm font-medium hover:underline underline-offset-4 mt-2" href="/login">
-                        Giriş Yap
-                    </Link>
-                    <Link href="/dashboard">
-                        <Button>
-                            Sisteme Git <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                    </Link>
+                <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+                    <PublicNav />
                 </nav>
             </header>
             <main className="flex-1">
@@ -33,16 +26,7 @@ export default function LandingPage() {
                                     Gelişmiş OCR ve LLM teknolojileriyle faturalarınızdan verileri otomatik olarak çekin, kategorize edin ve doğrulayın. İş süreçlerinizi hızlandırın.
                                 </p>
                             </div>
-                            <div className="space-x-4 pt-4">
-                                <Link href="/login">
-                                    <Button size="lg" className="h-12 px-8">Hemen Başla</Button>
-                                </Link>
-                                <Link href="/dashboard">
-                                    <Button variant="outline" size="lg" className="h-12 px-8">
-                                        Dashboard&apos;u İncele
-                                    </Button>
-                                </Link>
-                            </div>
+                            <PublicHeroButtons />
                         </div>
                     </div>
                 </section>

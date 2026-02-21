@@ -1,3 +1,5 @@
+'use client';
+
 import { Upload } from "lucide-react"
 import { PageHeader } from "@/components/common/page-header"
 import { EmptyState } from "@/components/common/empty-state"
