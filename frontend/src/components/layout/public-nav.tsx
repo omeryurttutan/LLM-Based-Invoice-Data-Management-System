@@ -15,16 +15,6 @@ export function PublicNav() {
     if (isAuthenticated) {
         return (
             <div className="flex items-center gap-4">
-                <Link href="/dashboard">
-                    <Button variant="outline" className="hidden sm:flex">
-                        Dashboard
-                    </Button>
-                </Link>
-                <Link href="/login?redirect=/dashboard">
-                    <Button>
-                        Sisteme Git <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                </Link>
                 <UserMenu />
             </div>
         );
