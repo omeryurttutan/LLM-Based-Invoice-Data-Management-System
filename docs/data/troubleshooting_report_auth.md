@@ -80,6 +80,33 @@ Bu rapor, Fatura OCR projesinde karşılaşılan kimlik doğrulama (authenticati
 
 ---
 
+## 4. Performans ve Kullanıcı Arayüzü (UI) Sorunları
+
+### 4.1. Hook Seviyesinde Sonsuz Döngüler (Infinite Fetching)
+*   **Sorun:** Uygulama açıldığında veya toplu işlem (upload) başlatıldığında sistem donuyor ve "Too many requests" (429) hatası alınıyordu.
+*   **Sebep:** `useBatchStatus` ve `useUpload` hook'ları içinde kullanılan `useEffect` blokları, veri her güncellendiğinde (veya yeni bir WebSocket bildirimi geldiğinde) tekrar tetiklenip sonsuz bir `refetch()` döngüsü başlatıyordu.
+*   **Çözüm:** `useRef` hook'u kullanılarak `lastProcessedNotificationId` ve `processedBatchId` takibi yapıldı. Bir bildirim veya işlem sonucu zaten işlenmişse, efektin tekrar çalışması engellenerek sonsuz döngü kırıldı.
+
+### 4.2. i18n Çeviri Anahtarlarının Ham Görünmesi
+*   **Sorun:** Dashboard ve sidebar üzerinde metinler yerine `dashboard.title`, `navigation.sidebar.dashboard` gibi JSON anahtarları görünüyordu.
+*   **Sebep:** `src/i18n.ts` içindeki dinamik `await import` kullanımı, mevcut Next.js/Webpack ortamında dil dosyalarını (dictionary) zamanında veya doğru bir şekilde yükleyemiyordu.
+*   **Çözüm:** Dinamik import yapısı, `tr` ve `en` dosyalarının en üstte statik olarak içe aktarıldığı (`static import`) güvenli bir yapıya dönüştürüldü.
+
+### 4.3. Kademeli Rate Limit Hataları ve UI Kilitlenmesi
+*   **Sorun:** Dashboard'a girildiğinde 8 parelel istek atıldığı için backend limitlerine takılıp arka arkaya 10-15 tane "Hata" uyarısı (toast) çıkıyor ve tarayıcı kilitleniyordu.
+*   **Sebep:** 
+    1. React Query başarısız olan 429 (Rate Limit) hatalarını varsayılan olarak bekleyip tekrar deniyordu.
+    2. Her hata isteği yeni bir toast bildirimi açıyordu.
+*   **Çözüm:** 
+    1. `QueryProvider.tsx` üzerinde 429, 401 ve 404 hataları için `retry` mekanizması kapatıldı.
+    2. `api-client.ts` üzerindeki rate limit uyarısına sabit bir `id` verilerek, aynı anda 10 hata gelse bile ekranda tek bir uyarının (overwrite) görünmesi sağlandı.
+
+### 4.4. Redirection ve Landing Page Eksikliği
+*   **Sorun:** `localhost:3001/` adresine girildiğinde direkt `/dashboard`'a yönlendirme yapılması sistemde takılmalara sebep olabiliyordu ve karşılama sayfası (Landing Page) bulunmuyordu.
+*   **Çözüm:** `next.config.js` üzerindeki otomatik yönlendirme kaldırıldı. `src/app/(public)/page.tsx` adresi altına modern ve sade bir Landing Page (Karşılama Sayfası) eklenerek kullanıcının sisteme bilinçli bir şekilde girmesi sağlandı.
+
+---
+
 ## Özet ve Tavsiyeler
 İleride benzer bir problemle karşılaşıldığında;
 1.  Öncelikle Docker servislerinin (`docker-compose ps`) ayakta olduğunu doğrulayın.
@@ -87,4 +114,6 @@ Bu rapor, Fatura OCR projesinde karşılaşılan kimlik doğrulama (authenticati
 3.  Frontend tarafında login döngüsü oluşuyorsa `/auth/me` isteğinin network sekmesinde 200 dönüp dönmediğini kontrol edin.
 4.  Çeviri hataları alıyorsanız, hook'ların React kurallarına uygun (en üst seviyede) çağrıldığından emin olun.
 5.  Yeni bir panel eklediğinizde `messages/tr/*.json` dosyalarındaki anahtarların bileşendeki `t('key')` kullanımıyla birebir uyuştuğunu teyit edin.
-6.  **Kritik:** Yeni bir frontend servisi oluşturduğunuzda mutlaka `@/lib/api-client` (veya interceptor içeren merkezi istemci) kullanıldığından emin olun, aksi halde token gönderilmediği için 401 hatası alırsınız.
+6.  **Sonsuz Döngü Kontrolü:** Eğer bir `useEffect` içinde `refetch` veya state güncellemesi yapıyorsanız, mutlaka işlemi bir `ref` veya dış kontrol mekanizmasıyla limitleyin.
+7.  **Rate Limit:** Bir sayfada çok fazla paralel istek atılıyorsa, React Query'nin retry stratejisini dikkatli yapılandırın.
+8.  **Kritik:** Yeni bir frontend servisi oluşturduğunuzda mutlaka `@/lib/api-client` (veya interceptor içeren merkezi istemci) kullanıldığından emin olun, aksi halde token gönderilmediği için 401 hatası alırsınız.

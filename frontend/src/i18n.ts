@@ -1,5 +1,7 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
+import trMessages from './messages/tr';
+import enMessages from './messages/en';
 
 export default getRequestConfig(async () => {
     const cookieStore = cookies();
@@ -7,7 +9,7 @@ export default getRequestConfig(async () => {
 
     return {
         locale,
-        messages: (await import(`./messages/${locale}`)).default,
+        messages: locale === 'en' ? enMessages : trMessages,
         timeZone: 'Europe/Istanbul'
     };
 });

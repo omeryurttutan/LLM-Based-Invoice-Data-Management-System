@@ -22,7 +22,7 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   // Main
-  { title: "dashboard", href: "/", icon: LayoutDashboard, section: "main" },
+  { title: "dashboard", href: "/dashboard", icon: LayoutDashboard, section: "main" },
   { title: "invoices", href: "/invoices", icon: FileText, section: "main" },
   { title: "upload", href: "/invoices/upload", icon: Upload, section: "main" },
   { title: "categories", href: "/categories", icon: FolderOpen, section: "main" },

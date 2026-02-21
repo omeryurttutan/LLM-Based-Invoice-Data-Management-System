@@ -3,7 +3,7 @@ import { invoiceService } from "@/services/invoice-service";
 import { useUploadStore } from "@/store/use-upload-store";
 import { toast } from "sonner";
 import { useBatchStatus } from "@/hooks/use-batch-status";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function useUpload() {
   const queryClient = useQueryClient();
@@ -131,17 +131,23 @@ export function useUpload() {
   }, [batchStatus?.status, batchId, queryClient]);
 
   // Refined approach: mimic original logic but simpler
+  const processedBatchId = useRef<string | null>(null);
+
   useEffect(() => {
     if (isComplete && batchStatus) {
+      if (processedBatchId.current === batchId) return;
+
       if (batchStatus.status === 'COMPLETED') {
         toast.success("Toplu işlem tamamlandı.");
         queryClient.invalidateQueries({ queryKey: ["invoices"] });
+        processedBatchId.current = batchId;
       } else if (batchStatus.status === 'FAILED') {
         toast.error("Toplu işlem hatalarla tamamlandı.");
+        processedBatchId.current = batchId;
       }
       // Reset batchId? No, user might want to see result.
     }
-  }, [isComplete, batchStatus?.status, queryClient, batchStatus]);
+  }, [isComplete, batchStatus?.status, queryClient, batchStatus, batchId]);
 
   return {
     uploadMutation,

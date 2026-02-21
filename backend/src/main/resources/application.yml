@@ -139,7 +139,7 @@ app:
       enabled: true
       public-limit: 20
       login-limit: 5
-      authenticated-limit: 100
+      authenticated-limit: 500
       upload-limit: 10
       export-limit: 5
       admin-limit: 50

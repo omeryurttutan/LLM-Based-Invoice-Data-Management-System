@@ -177,19 +177,15 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 429) {
       const retryAfter = parseInt(error.response.headers['retry-after'] || '60', 10);
 
-      // Prevent infinite loops or excessive retries
-      if (originalRequest._retry) {
-        return Promise.reject(error);
-      }
-      originalRequest._retry = true;
+      // Show localized toast without awaiting an artificial sleep
+      toast.warning(getTranslation('messages.error.rateLimited') + ` (${retryAfter}s)`, {
+        id: 'rate-limit-toast'
+      });
 
-      // Show localized toast
-      // We know "rateLimited" is in common.json
-      toast.warning(getTranslation('messages.error.rateLimited') + ` (${retryAfter}s)`);
-
-      // Wait and retry
-      await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
-      return apiClient(originalRequest);
+      // Reject the promise immediately so the UI doesn't freeze
+      // Components can catch this and handle gracefully instead of being stuck
+      (error as any).translatedMessage = getTranslation('messages.error.rateLimited');
+      return Promise.reject(error);
     }
 
     // Handle other errors (optional translation mapping)
