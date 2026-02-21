@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 import {
   Briefcase,
   ChevronLeft
@@ -49,10 +50,10 @@ export function Sidebar() {
       )}
     >
       <div className="flex h-16 items-center px-4 py-4">
-        <div className={cn("flex items-center gap-2 font-bold text-xl", isCollapsed && "justify-center w-full")}>
+        <Link href="/" className={cn("flex items-center gap-2 font-bold text-xl hover:opacity-80 transition-opacity", isCollapsed && "justify-center w-full")}>
           <Briefcase className="h-6 w-6 text-primary" />
           {!isCollapsed && <span className="truncate">Fatura OCR</span>}
-        </div>
+        </Link>
       </div>
 
       <Separator />

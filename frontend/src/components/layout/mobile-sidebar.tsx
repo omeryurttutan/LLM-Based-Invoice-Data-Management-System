@@ -3,6 +3,7 @@
 import { useState } from "react"
 
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 import { Briefcase, Menu } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -32,10 +33,10 @@ export function MobileSidebar() {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="pr-0 bg-card w-[300px] p-0">
-        <div className="flex items-center gap-2 px-6 py-4 font-bold text-xl border-b">
+        <Link href="/" className="flex items-center gap-2 px-6 py-4 font-bold text-xl border-b hover:opacity-80 transition-opacity">
            <Briefcase className="h-6 w-6 text-primary" />
            <span>Fatura OCR</span>
-        </div>
+        </Link>
         <ScrollArea className="h-[calc(100vh-65px)] px-4 py-4">
            <div className="flex flex-col gap-4">
             {["main", "management", "other"].map((section) => {
