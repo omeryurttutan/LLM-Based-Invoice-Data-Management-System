@@ -4,7 +4,7 @@ import trMessages from './messages/tr';
 import enMessages from './messages/en';
 
 export default getRequestConfig(async () => {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const locale = cookieStore.get('NEXT_LOCALE')?.value || 'tr';
 
     return {
