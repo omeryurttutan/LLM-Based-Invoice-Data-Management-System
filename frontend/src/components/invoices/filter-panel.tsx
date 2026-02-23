@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
     StatusFilter, DateRangeFilter, AmountRangeFilter, SupplierFilter, CategoryFilter,
-    CurrencyFilter, SourceTypeFilter, LlmProviderFilter, ConfidenceFilter
+    CurrencyFilter, SourceTypeFilter
 } from './filters';
 import { useTranslations } from 'next-intl';
 
@@ -19,7 +19,7 @@ export function FilterPanel() {
     const t = useTranslations('invoices.filters');
     const tCommon = useTranslations('common');
     const { filters, setFilters, clearFilters, activeFilterCount } = useInvoiceFilters();
-    const { data: options } = useFilterOptions();
+    const { data: options, isLoading: isLoadingOptions } = useFilterOptions();
     const [isOpen, setIsOpen] = useState(false);
 
     // ... (rest of the component state)
@@ -71,11 +71,13 @@ export function FilterPanel() {
                                     value={localFilters.status}
                                     onChange={(val) => setLocalFilters({ ...localFilters, status: val })}
                                     options={options?.statuses}
+                                    isLoading={isLoadingOptions}
                                 />
                                 <CategoryFilter
                                     value={localFilters.categoryId}
                                     onChange={(val) => setLocalFilters({ ...localFilters, categoryId: val })}
                                     options={options?.categories}
+                                    isLoading={isLoadingOptions}
                                 />
 
                                 {/* Row 2 */}
@@ -90,27 +92,17 @@ export function FilterPanel() {
                                 <CurrencyFilter
                                     value={localFilters.currency}
                                     onChange={(val) => setLocalFilters({ ...localFilters, currency: val })}
-                                    options={options?.currencies}
+                                    options={options?.currencies?.length ? options.currencies : ['TRY', 'USD', 'EUR', 'GBP']}
+                                    isLoading={isLoadingOptions}
                                 />
 
                                 {/* Row 3 */}
                                 <SourceTypeFilter
                                     value={localFilters.sourceType}
                                     onChange={(val) => setLocalFilters({ ...localFilters, sourceType: val })}
-                                    options={options?.sourceTypes}
+                                    options={options?.sourceTypes?.length ? options.sourceTypes : ['LLM', 'E_INVOICE', 'MANUAL']}
+                                    isLoading={isLoadingOptions}
                                 />
-                                <LlmProviderFilter
-                                    value={localFilters.llmProvider}
-                                    onChange={(val) => setLocalFilters({ ...localFilters, llmProvider: val })}
-                                    options={options?.llmProviders}
-                                    sourceType={localFilters.sourceType}
-                                />
-                                {localFilters.sourceType?.includes('LLM') && (
-                                    <ConfidenceFilter
-                                        value={{ min: localFilters.confidenceMin, max: localFilters.confidenceMax }}
-                                        onChange={(val) => setLocalFilters({ ...localFilters, confidenceMin: val.min, confidenceMax: val.max })}
-                                    />
-                                )}
                             </CardContent>
                             <CardFooter className="flex justify-end gap-2 border-t p-4 bg-muted/20">
                                 <Button variant="ghost" onClick={handleClear} className="text-muted-foreground hover:text-destructive">

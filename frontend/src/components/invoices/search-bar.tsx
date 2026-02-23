@@ -5,8 +5,10 @@ import { Search, X } from 'lucide-react';
 import { useInvoiceFilters } from '@/hooks/use-invoice-filters';
 import { useEffect, useState, useCallback } from 'react';
 import { useDebounce } from 'use-debounce';
+import { useTranslations } from 'next-intl';
 
 export function SearchBar() {
+  const t = useTranslations('invoices.filters');
   const { filters, setFilters } = useInvoiceFilters();
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 400);
@@ -32,7 +34,7 @@ export function SearchBar() {
     <div className='relative w-full max-w-xl'>
       <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
       <Input
-        placeholder='Fatura numarası, tedarikçi adı veya notlarda ara...'
+        placeholder={t('searchPlaceholder')}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className='pl-9 pr-9'

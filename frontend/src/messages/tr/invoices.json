@@ -215,10 +215,13 @@
         "min": "Min",
         "max": "Mak",
         "selectCategory": "Kategori Seç",
+        "noCategory": "Kategori Bulunmuyor",
         "searchSupplier": "Tedarikçi Ara",
         "supplierName": "Tedarikçi adı",
         "searching": "Aranıyor...",
-        "noSupplierFound": "Tedarikçi bulunamadı"
+        "noSupplierFound": "Tedarikçi bulunamadı",
+        "llmProvider": "Yapay Zeka Servisi",
+        "confidenceScore": "Güven Skoru"
     },
     "empty": {
         "title": "Henüz fatura bulunmuyor",

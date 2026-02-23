@@ -344,7 +344,7 @@ export default function InvoicesPage() {
         </Table>
       </div>
 
-      {invoicesData && (
+      {invoicesData?.page && (
         <DataTablePagination
           pageIndex={invoicesData.page.number}
           pageSize={invoicesData.page.size}
@@ -400,7 +400,7 @@ export default function InvoicesPage() {
       <ExportDialog
         open={isExportDialogOpen}
         onOpenChange={setIsExportDialogOpen}
-        totalCount={invoicesData?.page.totalElements || 0}
+        totalCount={invoicesData?.page?.totalElements || 0}
       />
     </div>
   );

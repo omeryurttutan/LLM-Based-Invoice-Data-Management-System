@@ -1,7 +1,13 @@
 {
     "title": "Panel",
     "dateSelect": "Tarih Aralığı Seçin",
+    "startDate": "Başlangıç Tarihi",
+    "endDate": "Bitiş Tarihi",
     "currencyLabel": "Para Birimi",
+    "startPeriod": "Başlangıç Dönemi",
+    "endPeriod": "Bitiş Dönemi",
+    "month": "Ay",
+    "year": "Yıl",
     "cards": {
         "totalInvoices": "Toplam Fatura",
         "totalAmount": "Toplam Tutar",
@@ -20,6 +26,17 @@
     "recent": {
         "title": "Son Hareketler",
         "viewAll": "Tümünü Gör"
+    },
+    "presets": {
+        "title": "Hızlı Seçim",
+        "today": "Bugün",
+        "yesterday": "Dün",
+        "last7days": "Son 7 Gün",
+        "last30days": "Son 30 Gün",
+        "thisMonth": "Bu Ay",
+        "lastMonth": "Geçen Ay",
+        "last3Months": "Son 3 Ay",
+        "thisYear": "Bu Yıl"
     },
     "pendingActions": {
         "title": "Bekleyen İşlemler",

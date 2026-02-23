@@ -1,5 +1,7 @@
 package com.faturaocr.infrastructure.security;
 
+import com.faturaocr.domain.user.valueobject.Permission;
+import com.faturaocr.domain.user.valueobject.Role;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.lang.NonNull;
@@ -18,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,9 +65,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         UUID.fromString(companyId),
                         role);
 
-                // Create authentication token with role as authority
-                List<SimpleGrantedAuthority> authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + role));
+                // Build authorities list:
+                // 1. ROLE_<role> - for hasRole() / hasAnyRole() checks
+                // 2. <role> - for hasAuthority() / hasAnyAuthority() role-name checks
+                // 3. Individual permissions - for hasAuthority('REPORT_VIEW') etc.
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+                authorities.add(new SimpleGrantedAuthority(role));
+
+                // Add individual permissions from the Role enum
+                try {
+                    Role roleEnum = Role.valueOf(role);
+                    for (Permission permission : roleEnum.getPermissions()) {
+                        authorities.add(new SimpleGrantedAuthority(permission.name()));
+                    }
+                } catch (IllegalArgumentException e) {
+                    LOGGER.warn("Unknown role '{}', skipping permission loading", role);
+                }
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(principal,
                         null, authorities);

@@ -91,33 +91,139 @@
             "description": "Sistem kullanıcılarını ve rollerini yönetin.",
             "newUser": "Yeni Kullanıcı",
             "listTitle": "Kullanıcı Listesi",
-            "listDescription": "Şirketinizdeki kayıtlı kullanıcılar burada listelenecek."
+            "listDescription": "Şirketinizdeki kayıtlı kullanıcılar burada listelenecek.",
+            "table": {
+                "name": "Ad Soyad",
+                "email": "E-posta",
+                "role": "Rol",
+                "status": "Durum",
+                "actions": "İşlemler",
+                "noUsers": "Kullanıcı bulunamadı",
+                "edit": "Düzenle",
+                "activate": "Aktifleştir",
+                "deactivate": "Devre Dışı Bırak"
+            },
+            "form": {
+                "newUser": "Yeni Kullanıcı Ekle",
+                "newDescription": "Sisteme yeni bir kullanıcı ekleyin.",
+                "editUser": "Kullanıcıyı Düzenle",
+                "editDescription": "Kullanıcı bilgilerini güncelleyin.",
+                "fullName": "Ad Soyad",
+                "nameRequired": "Ad Soyad en az 2 karakter olmalıdır.",
+                "email": "E-posta",
+                "emailInvalid": "Geçerli bir e-posta adresi giriniz.",
+                "role": "Rol",
+                "roleRequired": "Lütfen bir rol seçin.",
+                "selectRole": "Rol seçiniz",
+                "password": "Şifre",
+                "optional": "İsteğe bağlı",
+                "cancel": "İptal",
+                "save": "Kaydet",
+                "saving": "Kaydediliyor..."
+            },
+            "messages": {
+                "createSuccess": "Kullanıcı başarıyla oluşturuldu.",
+                "updateSuccess": "Kullanıcı bilgileri güncellendi.",
+                "activated": "Kullanıcı aktifleştirildi.",
+                "deactivated": "Kullanıcı devre dışı bırakıldı.",
+                "error": "Bir hata oluştu."
+            }
         },
         "company": {
             "title": "Şirket Bilgileri",
             "description": "Şirket detayları ve fatura ayarları.",
             "edit": "Düzenle",
             "profileTitle": "Şirket Profili",
-            "profileDescription": "Şirketinizin vergi ve adres bilgileri burada yer alacak."
+            "profileDescription": "Şirketinizin vergi ve adres bilgileri burada yer alacak.",
+            "retry": "Tekrar Dene",
+            "active": "Aktif",
+            "inactive": "Pasif",
+            "taxNumber": "Vergi Numarası",
+            "taxOffice": "Vergi Dairesi",
+            "currency": "Para Birimi",
+            "invoicePrefix": "Fatura Ön Eki",
+            "contactTitle": "İletişim Bilgileri",
+            "contactDescription": "Şirket iletişim detayları"
         },
         "auditLogs": {
             "title": "Denetim Logu",
             "description": "Sistemdeki tüm işlem geçmişini ve değişiklikleri izleyin.",
             "historyTitle": "İşlem Geçmişi",
-            "historyDescription": "Kullanıcı aktiviteleri ve sistem olayları burada listelenecek."
+            "historyDescription": "Kullanıcı aktiviteleri ve sistem olayları burada listelenecek.",
+            "table": {
+                "action": "İşlem",
+                "entity": "Kayıt/Nesne",
+                "user": "Kullanıcı",
+                "ip": "IP Adresi",
+                "date": "Tarih",
+                "details": "Detaylar",
+                "noLogs": "Kayıt bulunamadı",
+                "filterAction": "İşlem Filtrele"
+            },
+            "buttons": {
+                "back": "Önceki",
+                "next": "Sonraki"
+            },
+            "labels": {
+                "showing": "Sayfa {from} / {to}"
+            },
+            "messages": {
+                "error": "Denetim logları yüklenemedi."
+            }
         },
         "profile": {
             "title": "Profil",
             "description": "Kişisel bilgilerinizi ve tercihlerinizi güncelleyin.",
             "save": "Kaydet",
+            "retry": "Tekrar Dene",
             "profileTitle": "Kullanıcı Profili",
-            "profileDescription": "Ad, soyad, e-posta ve şifre değiştirme formu burada olacak."
+            "profileDescription": "Genel hesap bilgilerinizi güncelleyin.",
+            "passwordTitle": "Şifre Değiştir",
+            "passwordDescription": "Hesap şifrenizi güncelleyin.",
+            "form": {
+                "email": "E-posta Adresi",
+                "emailHelp": "E-posta adresiniz değiştirilemez.",
+                "role": "Rol",
+                "company": "Şirket",
+                "fullName": "Ad Soyad",
+                "nameRequired": "Ad Soyad en az 2 karakter olmalıdır.",
+                "saving": "Kaydediliyor...",
+                "currentPassword": "Mevcut Şifre",
+                "newPassword": "Yeni Şifre",
+                "confirmPassword": "Yeni Şifre (Tekrar)",
+                "passwordMin": "Şifre en az 6 karakter olmalıdır.",
+                "passwordMatch": "Şifreler eşleşmiyor.",
+                "changePassword": "Şifreyi Değiştir"
+            },
+            "messages": {
+                "updateSuccess": "Profil başarıyla güncellendi.",
+                "passwordSuccess": "Şifre başarıyla değiştirildi.",
+                "passwordError": "Şifre değiştirilemedi. Lütfen mevcut şifrenizi kontrol edin.",
+                "error": "Profil verileri yüklenemedi."
+            }
         },
         "settings": {
             "title": "Ayarlar",
             "description": "Uygulama genel yapılandırması ve tercihler.",
             "settingsTitle": "Uygulama Ayarları",
-            "settingsDescription": "Tema, bildirimler ve dil seçenekleri burada yönetilecek."
+            "settingsDescription": "Tema, bildirimler ve dil seçenekleri burada yönetilecek.",
+            "notificationsTitle": "Bildirim Tercihleri",
+            "notificationsDescription": "Bildirimleri nasıl alacağınızı yönetin.",
+            "emailNotifications": "E-posta Bildirimleri",
+            "emailNotificationsHint": "Önemli güncellemeleri e-posta ile alın.",
+            "systemNotifications": "Sistem Bildirimleri",
+            "systemNotificationsHint": "Uygulama içi anlık bildirimler alın.",
+            "save": "Ayarları Kaydet",
+            "saving": "Kaydediliyor...",
+            "generalTitle": "Uygulama Tercihleri",
+            "generalDescription": "Tema ve dil seçeneklerinizi yönetin.",
+            "theme": "Tema",
+            "language": "Dil",
+            "messages": {
+                "saveSuccess": "Ayarlar başarıyla kaydedildi.",
+                "error": "Ayarlar yüklenemedi.",
+                "saveError": "Ayarlar kaydedilemedi."
+            }
         },
         "upload": {
             "title": "Fatura Yükle",

@@ -1,18 +1,53 @@
 {
     "title": "Dışa Aktar",
+    "description": "Mevcut filtrelerinize uyan <strong>{count}</strong> faturayı dışa aktarın.",
+    "noData": "Dışa aktarılacak veri yok. Lütfen filtrelerinizi düzenleyin.",
+    "largeDataset": "Büyük veri seti ({count} kayıt). Dışa aktarma biraz zaman alabilir.",
     "format": "Format Seçin",
+    "sections": {
+        "general": "Genel Formatlar",
+        "accounting": "Muhasebe Formatları"
+    },
     "formats": {
         "excel": "Excel (.xlsx)",
-        "csv": "CSV (.csv)",
+        "csv": {
+            "label": "CSV (.csv)",
+            "description": "Virgülle ayrılmış değerler, veri içe aktarımına uygun."
+        },
         "logo": "Logo Muhasebe",
         "mikro": "Mikro Yazılım",
         "netsis": "Netsis",
-        "luca": "Luca"
+        "luca": "Luca",
+        "xlsx": {
+            "label": "Excel (.xlsx)",
+            "description": "Genel kullanıma uygun Excel elektronik tablo formatı."
+        }
     },
     "options": {
         "all": "Tüm Faturalar",
         "filtered": "Filtrelenmiş Sonuçlar",
-        "selected": "Seçili Faturalar ({count})"
+        "selected": "Seçili Faturalar ({count})",
+        "includeItems": "Fatura Kalemlerini Dahil Et",
+        "includeItemsDesc": "Her fatura kalemi ayrı bir satır olarak dışa aktarılır.",
+        "includeItemsMandatory": "Muhasebe formatları için kalemler her zaman dahildir."
     },
-    "downloading": "Hazırlanıyor..."
+    "fileExtension": "Dosya Uzantısı",
+    "accountingTooltip": "Muhasebe formatları, muhasebe yazılımına doğrudan aktarım için tasarlanmıştır.",
+    "importantInfo": "Önemli Bilgi",
+    "accountingWarning": "Muhasebe formatları <strong>her zaman fatura kalemlerini içerir</strong> ve doğrudan içe aktarım için biçimlendirilmiştir.",
+    "download": "İndir",
+    "exporting": "Dışa Aktarılıyor",
+    "downloading": "Hazırlanıyor...",
+    "success": {
+        "title": "Dışa Aktarma Başarılı",
+        "description": "{filename} dosyası indirildi."
+    },
+    "error": {
+        "title": "Dışa Aktarma Başarısız",
+        "description": "Dışa aktarma sırasında bir hata oluştu. Lütfen tekrar deneyin."
+    },
+    "formatsError": {
+        "title": "Format Yükleme Hatası",
+        "description": "Dışa aktarma formatları yüklenemedi. Varsayılan formatlar kullanılıyor."
+    }
 }

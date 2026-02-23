@@ -1,7 +1,13 @@
 {
     "title": "Dashboard",
     "dateSelect": "Select Date Range",
+    "startDate": "Start Date",
+    "endDate": "End Date",
     "currencyLabel": "Currency",
+    "startPeriod": "Start Period",
+    "endPeriod": "End Period",
+    "month": "Month",
+    "year": "Year",
     "cards": {
         "totalInvoices": "Total Invoices",
         "totalAmount": "Total Amount",
@@ -13,6 +19,7 @@
         "monthlyTrend": "Monthly Invoice Trend",
         "categoryDistribution": "Category Distribution",
         "statusDistribution": "Status Distribution",
+        "statusTimeline": "Status Timeline",
         "topSuppliers": "Top Suppliers",
         "other": "Other"
     },
@@ -20,10 +27,24 @@
         "title": "Recent Activity",
         "viewAll": "View All"
     },
-    "actions": {
+    "presets": {
+        "title": "Quick Selection",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last7days": "Last 7 Days",
+        "last30days": "Last 30 Days",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month",
+        "last3Months": "Last 3 Months",
+        "thisYear": "This Year"
+    },
+    "pendingActions": {
         "title": "Pending Actions",
-        "verify": "Verify ({count})",
-        "noActions": "No pending actions"
+        "description": "Invoices requiring verification",
+        "noPending": "No pending invoices",
+        "allProcessed": "All invoices processed",
+        "daysWaiting": "Waiting for {days} days",
+        "viewAll": "View All"
     },
     "performance": {
         "title": "LLM Extraction Performance",

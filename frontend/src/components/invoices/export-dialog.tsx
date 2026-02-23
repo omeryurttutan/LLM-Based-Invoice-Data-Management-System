@@ -275,7 +275,7 @@ export function ExportDialog({ open, onOpenChange, totalCount }: ExportDialogPro
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>{tCommon('cancel')}</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{tCommon('buttons.cancel')}</Button>
           <Button onClick={handleExport} disabled={isExporting || isEmptyDataset || isLoadingFormats}>
             {isExporting ? (
               <>

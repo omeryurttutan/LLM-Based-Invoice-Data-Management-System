@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -19,7 +19,7 @@ import { authService } from '@/services/auth-service';
 import { ApiError } from '@/types/auth';
 import { useTranslations } from 'next-intl';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const t = useTranslations('auth.register');
   const tVal = useTranslations('auth.validation');
   const tCommon = useTranslations('common');
@@ -49,11 +49,7 @@ export default function RegisterPage() {
     password: z
       .string()
       .min(1, tVal('required'))
-      .min(8, tVal('minLength', { min: 8 }))
-      .regex(/[A-Z]/, tVal('requirements.uppercase'))
-      .regex(/[a-z]/, tVal('requirements.lowercase'))
-      .regex(/[0-9]/, tVal('requirements.number'))
-      .regex(/[!@#$%^&*(),.?":{}|<>]/, tVal('requirements.special')),
+      .min(8, tVal('minLength', { min: 8 })),
     confirmPassword: z
       .string()
       .min(1, tVal('required')),
@@ -78,6 +74,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     watch,
+    setError: setFormError,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -119,10 +116,22 @@ export default function RegisterPage() {
     } catch (err) {
       const apiError = err as { response?: { data?: ApiError } };
 
-      if (apiError.response?.data?.message) {
-        setError(apiError.response.data.message);
+      if (apiError.response?.data?.fieldErrors && apiError.response.data.fieldErrors.length > 0) {
+        apiError.response.data.fieldErrors.forEach((fieldError) => {
+          setFormError(fieldError.field as keyof RegisterFormData, {
+            type: 'server',
+            message: fieldError.message,
+          });
+        });
+        setError(tCommon('messages.error.validation', { fallback: 'Lütfen formdaki hataları düzeltin.' }));
+      } else if (apiError.response?.data?.message) {
+        // Fallback to standard message translation if generic
+        if (apiError.response.data.message === 'Validation failed for one or more fields') {
+          setError(tCommon('messages.error.validation', { fallback: 'Lütfen tüm alanları doğru formatta doldurun.' }));
+        } else {
+          setError(apiError.response.data.message);
+        }
       } else if (apiError.response?.data?.details) {
-        // Show first validation error
         const firstError = Object.values(apiError.response.data.details)[0];
         setError(firstError as string);
       } else {
@@ -188,7 +197,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="companyName">{t('companyNameLabel', { fallback: 'Şirket Adı' })}</Label>
+            <Label htmlFor="companyName">{t('companyName', { fallback: 'Şirket Adı' })}</Label>
             <Input
               id="companyName"
               type="text"
@@ -294,5 +303,13 @@ export default function RegisterPage() {
         </div>
       </CardFooter>
     </Card>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <RegisterForm />
+    </React.Suspense>
   );
 }

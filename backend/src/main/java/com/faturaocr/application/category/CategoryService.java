@@ -13,12 +13,14 @@ import com.faturaocr.domain.category.port.CategoryRepository;
 import com.faturaocr.domain.invoice.port.InvoiceRepository;
 import com.faturaocr.domain.audit.annotation.Auditable;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ApplicationService
 @RequiredArgsConstructor
 public class CategoryService {
@@ -26,7 +28,9 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final InvoiceRepository invoiceRepository; // To check usage before delete
 
-    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "categories", "invoice-filter-options", "dashboard-categories"
+    }, allEntries = true)
     @Auditable(action = AuditActionType.CREATE, entityType = "CATEGORY")
     public CategoryResponse createCategory(CreateCategoryCommand command) {
         UUID companyId = CompanyContextHolder.getCompanyId();
@@ -57,7 +61,9 @@ public class CategoryService {
         return mapToResponse(savedCategory);
     }
 
-    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "categories", "invoice-filter-options", "dashboard-categories"
+    }, allEntries = true)
     @Auditable(action = AuditActionType.UPDATE, entityType = "CATEGORY")
     public CategoryResponse updateCategory(UUID id, UpdateCategoryCommand command) {
         UUID companyId = CompanyContextHolder.getCompanyId();
@@ -100,18 +106,26 @@ public class CategoryService {
         return mapToResponse(getCategoryOrThrow(id));
     }
 
-    @org.springframework.cache.annotation.Cacheable(value = "categories", key = "#companyId")
-    public List<CategoryResponse> listCategories(UUID companyId, boolean includeInactive) {
+    public List<CategoryResponse> listCategories(boolean activeOnly) {
+        UUID companyId = CompanyContextHolder.getCompanyId();
+        log.info("Listing categories for company: {}, activeOnly: {}", companyId, activeOnly);
+
         List<Category> categories;
-        if (includeInactive) {
-            categories = categoryRepository.findAllByCompanyId(companyId);
-        } else {
+        if (activeOnly) {
             categories = categoryRepository.findAllActiveByCompanyId(companyId);
+        } else {
+            categories = categoryRepository.findAllByCompanyId(companyId);
         }
-        return categories.stream().map(this::mapToResponse).collect(Collectors.toList());
+
+        log.debug("Found {} categories", categories.size());
+        return categories.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
-    @org.springframework.cache.annotation.CacheEvict(value = "categories", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = {
+            "categories", "invoice-filter-options", "dashboard-categories"
+    }, allEntries = true)
     @Auditable(action = AuditActionType.DELETE, entityType = "CATEGORY")
     public void deleteCategory(UUID id) {
         getCategoryOrThrow(id); // Verify exists and belongs to company
@@ -138,6 +152,7 @@ public class CategoryService {
         response.setIcon(category.getIcon());
         response.setParentId(category.getParentId());
         response.setActive(category.isActive());
+        response.setInvoiceCount(invoiceRepository.countByCategoryId(category.getId()));
         response.setCreatedAt(category.getCreatedAt());
         response.setUpdatedAt(category.getUpdatedAt());
 

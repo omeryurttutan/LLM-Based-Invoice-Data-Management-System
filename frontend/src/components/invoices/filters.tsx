@@ -17,7 +17,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 // Imports for icons needed above not imported yet
 import { ChevronsUpDown, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Slider } from '@/components/ui/slider';
 
 // Supplier Autocomplete using Command
@@ -28,6 +28,7 @@ interface FilterProps {
   onChange: (value: any) => void;
   options?: any[];
   label?: string;
+  isLoading?: boolean;
 }
 
 export function StatusFilter({ value, onChange, options }: FilterProps) {
@@ -80,10 +81,20 @@ export function DateRangeFilter({ value, onChange }: { value: { from?: string, t
   const locale = useLocale();
   const dateLocale = locale === 'tr' ? tr : enUS;
 
-  // Value is object with from/to
-  // We need to parse strings to Date objects for Calendar
-  const fromDate = value.from ? new Date(value.from) : undefined;
-  const toDate = value.to ? new Date(value.to) : undefined;
+  const fromDate = useMemo(() => value.from ? new Date(value.from) : undefined, [value.from]);
+  const toDate = useMemo(() => value.to ? new Date(value.to) : undefined, [value.to]);
+  const dateRange = { from: fromDate, to: toDate };
+
+  const [startMonth, setStartMonth] = useState<Date>(fromDate || new Date());
+  const [endMonth, setEndMonth] = useState<Date>(
+    toDate ? toDate : fromDate ? new Date(fromDate.getFullYear(), fromDate.getMonth() + 1) : new Date(new Date().getFullYear(), new Date().getMonth() + 1)
+  );
+
+  useEffect(() => {
+    if (fromDate) setStartMonth(fromDate);
+    if (toDate) setEndMonth(toDate);
+    else if (fromDate) setEndMonth(new Date(fromDate.getFullYear(), fromDate.getMonth() + 1));
+  }, [fromDate, toDate]);
 
   return (
     <div className='space-y-2'>
@@ -94,46 +105,77 @@ export function DateRangeFilter({ value, onChange }: { value: { from?: string, t
             <Button
               variant={"outline"}
               className={cn(
-                "w-[140px] justify-start text-left font-normal",
-                !fromDate && "text-muted-foreground"
+                "w-[260px] justify-start text-left font-normal",
+                !value.from && "text-muted-foreground"
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {fromDate ? format(fromDate, "dd.MM.yyyy") : <span>{t('startDate')}</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={fromDate}
-              onSelect={(date) => onChange({ ...value, from: date ? format(date, 'yyyy-MM-dd') : undefined })}
-              initialFocus
-              locale={dateLocale}
-            />
-          </PopoverContent>
-        </Popover>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-[140px] justify-start text-left font-normal",
-                !toDate && "text-muted-foreground"
+              {value.from ? (
+                value.to ? (
+                  <>
+                    {format(fromDate!, "dd MMM yyyy", { locale: dateLocale })} -{" "}
+                    {format(toDate!, "dd MMM yyyy", { locale: dateLocale })}
+                  </>
+                ) : (
+                  format(fromDate!, "dd MMM yyyy", { locale: dateLocale })
+                )
+              ) : (
+                <span>{t('dateRange') || 'Tarih Aralığı Seçin'}</span>
               )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {toDate ? format(toDate, "dd.MM.yyyy") : <span>{t('endDate')}</span>}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={toDate}
-              onSelect={(date) => onChange({ ...value, to: date ? format(date, 'yyyy-MM-dd') : undefined })}
-              initialFocus
-              locale={dateLocale}
-            />
+          <PopoverContent className="w-auto p-0 flex flex-col md:flex-row" align="start">
+            <div className="p-3">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium pl-3">{t('startDate') || 'Başlangıç Tarihi'}</span>
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={startMonth}
+                    month={startMonth}
+                    onMonthChange={setStartMonth}
+                    selected={dateRange}
+                    onSelect={(range, selectedDay) => {
+                      if (toDate && selectedDay > toDate) {
+                        onChange({ from: format(selectedDay, 'yyyy-MM-dd'), to: undefined });
+                      } else {
+                        onChange({ from: format(selectedDay, 'yyyy-MM-dd'), to: value.to });
+                      }
+                    }}
+                    numberOfMonths={1}
+                    locale={dateLocale}
+                    hideWeekdays
+                    captionLayout="dropdown"
+                    fromYear={2000}
+                    toYear={2050}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium pl-3">{t('endDate') || 'Bitiş Tarihi'}</span>
+                  <Calendar
+                    mode="range"
+                    defaultMonth={endMonth}
+                    month={endMonth}
+                    onMonthChange={setEndMonth}
+                    selected={dateRange}
+                    onSelect={(range, selectedDay) => {
+                      if (fromDate && selectedDay < fromDate) {
+                        onChange({ from: format(selectedDay, 'yyyy-MM-dd'), to: undefined });
+                      } else {
+                        onChange({ from: value.from, to: format(selectedDay, 'yyyy-MM-dd') });
+                      }
+                    }}
+                    numberOfMonths={1}
+                    locale={dateLocale}
+                    hideWeekdays
+                    captionLayout="dropdown"
+                    fromYear={2000}
+                    toYear={2050}
+                  />
+                </div>
+              </div>
+            </div>
           </PopoverContent>
         </Popover>
       </div>
@@ -143,23 +185,40 @@ export function DateRangeFilter({ value, onChange }: { value: { from?: string, t
 
 export function AmountRangeFilter({ value, onChange }: { value: { min?: number, max?: number }, onChange: (val: { min?: number, max?: number }) => void }) {
   const t = useTranslations('invoices.filter');
+
+  const handleBlur = () => {
+    if (value.min !== undefined && value.max !== undefined && value.min > value.max) {
+      onChange({ min: value.max, max: value.min });
+    }
+  };
+
   return (
     <div className='space-y-2'>
       <Label>{t('amountRange')}</Label>
       <div className='flex gap-2 items-center'>
         <Input
           type="number"
+          min={0}
           placeholder={t('min')}
-          value={value.min || ''}
-          onChange={(e) => onChange({ ...value, min: e.target.value ? Number(e.target.value) : undefined })}
+          value={value.min ?? ''}
+          onChange={(e) => {
+             const val = e.target.value ? Math.max(0, Number(e.target.value)) : undefined;
+             onChange({ ...value, min: val });
+          }}
+          onBlur={handleBlur}
           className='w-24'
         />
         <span>-</span>
         <Input
           type="number"
+          min={0}
           placeholder={t('max')}
-          value={value.max || ''}
-          onChange={(e) => onChange({ ...value, max: e.target.value ? Number(e.target.value) : undefined })}
+          value={value.max ?? ''}
+          onChange={(e) => {
+             const val = e.target.value ? Math.max(0, Number(e.target.value)) : undefined;
+             onChange({ ...value, max: val });
+          }}
+          onBlur={handleBlur}
           className='w-24'
         />
       </div>
@@ -167,7 +226,7 @@ export function AmountRangeFilter({ value, onChange }: { value: { min?: number, 
   );
 }
 
-export function CategoryFilter({ value, onChange, options }: FilterProps) {
+export function CategoryFilter({ value, onChange, options, isLoading }: FilterProps) {
   const t = useTranslations('invoices.filter');
   // value is current categoryId (CSV)
   const selectedValues = (value ? String(value).split(',') : []);
@@ -186,9 +245,15 @@ export function CategoryFilter({ value, onChange, options }: FilterProps) {
           <SelectValue placeholder={t('selectCategory')} />
         </SelectTrigger>
         <SelectContent>
-          {options?.map((opt: any) => (
-            <SelectItem key={opt.id} value={opt.id}>{opt.name}</SelectItem>
-          ))}
+          {isLoading ? (
+            <SelectItem disabled value="loading">{t('loading') || 'Yükleniyor...'}</SelectItem>
+          ) : (!options || options.length === 0) ? (
+            <SelectItem disabled value="empty">{t('noCategory') || 'Kategori Bulunmuyor'}</SelectItem>
+          ) : (
+            options.map((opt: any) => (
+              <SelectItem key={opt.id} value={opt.id}>{opt.name}</SelectItem>
+            ))
+          )}
         </SelectContent>
       </Select>
     </div>
@@ -340,71 +405,6 @@ export function SourceTypeFilter({ value, onChange, options }: FilterProps) {
           );
         })}
       </div>
-    </div>
-  );
-}
-
-export function LlmProviderFilter({ value, onChange, options, sourceType }: FilterProps & { sourceType?: string }) {
-  const t = useTranslations('invoices.filter');
-  // Only show if SourceType includes 'LLM'
-  const isLlmSelected = sourceType?.includes('LLM');
-
-  if (!isLlmSelected) return null;
-
-  const selectedValues = (value ? String(value).split(',') : []);
-
-  const toggleValue = (val: string) => {
-    if (selectedValues.includes(val)) {
-      const newValues = selectedValues.filter(v => v !== val);
-      onChange(newValues.length > 0 ? newValues.join(',') : undefined);
-    } else {
-      const newValues = [...selectedValues, val];
-      onChange(newValues.join(','));
-    }
-  };
-
-  return (
-    <div className='space-y-1'>
-      <Label>{t('llmProvider')}</Label>
-      <div className='flex flex-wrap gap-2'>
-        {options?.map((opt: any) => {
-          const isSelected = selectedValues.includes(opt);
-          return (
-            <Badge
-              key={opt}
-              variant={isSelected ? 'default' : 'outline'}
-              className='cursor-pointer'
-              onClick={() => toggleValue(opt)}
-            >
-              {opt}
-            </Badge>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-export function ConfidenceFilter({ value, onChange }: { value: { min?: number, max?: number }, onChange: (val: { min?: number, max?: number }) => void }) {
-  const t = useTranslations('invoices.filter');
-  const min = value.min ?? 0;
-  const max = value.max ?? 100;
-
-  return (
-    <div className='space-y-4'>
-      <div className="flex justify-between">
-        <Label>{t('confidenceScore')}</Label>
-        <span className="text-xs text-muted-foreground">{min} - {max}</span>
-      </div>
-      <Slider
-        value={[min, max]}
-        min={0}
-        max={100}
-        step={1}
-        minStepsBetweenThumbs={1}
-        onValueChange={(vals) => onChange({ min: vals[0], max: vals[1] })}
-        className="w-full"
-      />
     </div>
   );
 }

@@ -17,7 +17,12 @@ export const API_ENDPOINTS = {
   
   // Users
   USERS: '/users',
+  USER_DETAIL: (id: string) => `/users/${id}`,
+  USER_ACTIVATE: (id: string) => `/users/${id}/toggle-active`,
+  USER_ROLE: (id: string) => `/users/${id}/role`,
+
   PROFILE: '/profile',
+  PROFILE_PASSWORD: '/profile/password',
   
   // Companies
   COMPANIES: '/companies',
@@ -25,4 +30,7 @@ export const API_ENDPOINTS = {
   
   // Audit
   AUDIT_LOGS: '/audit-logs',
+
+  // Settings / Notifications
+  NOTIFICATION_PREFERENCES: '/notifications/preferences',
 };

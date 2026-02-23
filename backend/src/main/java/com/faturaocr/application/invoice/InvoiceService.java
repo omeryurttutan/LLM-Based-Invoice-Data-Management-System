@@ -41,6 +41,7 @@ import com.faturaocr.infrastructure.security.AuthenticatedUser;
 import com.faturaocr.infrastructure.security.CompanyContextHolder;
 import com.faturaocr.application.invoice.dto.InvoiceFilterRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -59,6 +60,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ApplicationService
 @RequiredArgsConstructor
 public class InvoiceService {
@@ -214,31 +216,66 @@ public class InvoiceService {
         return invoiceJpaRepository.findDistinctSupplierNames(companyId, search, Pageable.ofSize(50));
     }
 
-    @org.springframework.cache.annotation.Cacheable(value = "invoice-filter-options", key = "#root.target.getCompanyId()")
     public FilterOptionsResponse getFilterOptions() {
         UUID companyId = CompanyContextHolder.getCompanyId();
 
-        // Get dynamic data from DB
-        List<LlmProvider> distinctProviders = invoiceJpaRepository.findDistinctLlmProviders(companyId);
-        Object[] amountRange = invoiceJpaRepository.findMinMaxTotalAmount(companyId);
-        Object[] dateRange = invoiceJpaRepository.findMinMaxInvoiceDate(companyId);
-        Object[] confidenceRange = invoiceJpaRepository.findMinMaxConfidenceScore(companyId);
+        List<LlmProvider> distinctProviders = new ArrayList<>();
+        BigDecimal minAmount = BigDecimal.ZERO;
+        BigDecimal maxAmount = BigDecimal.ZERO;
+        LocalDate minDate = null;
+        LocalDate maxDate = null;
+        Double minConfidence = null;
+        Double maxConfidence = null;
 
-        // Process ranges safely
-        BigDecimal minAmount = amountRange != null && amountRange[0] != null ? (BigDecimal) amountRange[0]
-                : BigDecimal.ZERO;
-        BigDecimal maxAmount = amountRange != null && amountRange[1] != null ? (BigDecimal) amountRange[1]
-                : BigDecimal.ZERO;
+        try {
+            distinctProviders = invoiceJpaRepository.findDistinctLlmProviders(companyId);
 
-        LocalDate minDate = dateRange != null && dateRange[0] != null ? (LocalDate) dateRange[0] : null;
-        LocalDate maxDate = dateRange != null && dateRange[1] != null ? (LocalDate) dateRange[1] : null;
+            // Fetch ranges safely using Object type or catching ClassCastException
+            try {
+                List<Object[]> amountRangeList = invoiceJpaRepository.findMinMaxTotalAmount(companyId);
+                if (amountRangeList != null && !amountRangeList.isEmpty()) {
+                    Object[] amountRange = amountRangeList.get(0);
+                    if (amountRange != null && amountRange.length >= 2) {
+                        minAmount = amountRange[0] != null ? new BigDecimal(amountRange[0].toString())
+                                : BigDecimal.ZERO;
+                        maxAmount = amountRange[1] != null ? new BigDecimal(amountRange[1].toString())
+                                : BigDecimal.ZERO;
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to fetch amount range: {}", e.getMessage());
+            }
 
-        Double minConfidence = confidenceRange != null && confidenceRange[0] != null
-                ? ((BigDecimal) confidenceRange[0]).doubleValue()
-                : null;
-        Double maxConfidence = confidenceRange != null && confidenceRange[1] != null
-                ? ((BigDecimal) confidenceRange[1]).doubleValue()
-                : null;
+            try {
+                List<Object[]> dateRangeList = invoiceJpaRepository.findMinMaxInvoiceDate(companyId);
+                if (dateRangeList != null && !dateRangeList.isEmpty()) {
+                    Object[] dateRange = dateRangeList.get(0);
+                    if (dateRange != null && dateRange.length >= 2) {
+                        minDate = dateRange[0] != null ? LocalDate.parse(dateRange[0].toString()) : null;
+                        maxDate = dateRange[1] != null ? LocalDate.parse(dateRange[1].toString()) : null;
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to fetch date range: {}", e.getMessage());
+            }
+
+            try {
+                List<Object[]> confidenceRangeList = invoiceJpaRepository.findMinMaxConfidenceScore(companyId);
+                if (confidenceRangeList != null && !confidenceRangeList.isEmpty()) {
+                    Object[] confidenceRange = confidenceRangeList.get(0);
+                    if (confidenceRange != null && confidenceRange.length >= 2) {
+                        minConfidence = confidenceRange[0] != null ? Double.valueOf(confidenceRange[0].toString())
+                                : null;
+                        maxConfidence = confidenceRange[1] != null ? Double.valueOf(confidenceRange[1].toString())
+                                : null;
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to fetch confidence range: {}", e.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("Failed to fetch dynamic filter options: {}", e.getMessage());
+        }
 
         // Build Response
         return FilterOptionsResponse.builder()

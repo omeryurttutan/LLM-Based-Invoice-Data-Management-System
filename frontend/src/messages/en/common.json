@@ -91,33 +91,143 @@
             "description": "Manage system users and roles.",
             "newUser": "New User",
             "listTitle": "User List",
-            "listDescription": "Registered users in your company will be listed here."
+            "listDescription": "Registered users in your company will be listed here.",
+            "table": {
+                "name": "Name",
+                "email": "Email",
+                "role": "Role",
+                "status": "Status",
+                "actions": "Actions",
+                "noUsers": "No users found",
+                "edit": "Edit",
+                "activate": "Activate",
+                "deactivate": "Deactivate"
+            },
+            "form": {
+                "newUser": "Add New User",
+                "newDescription": "Add a new user to the system.",
+                "editUser": "Edit User",
+                "editDescription": "Update user information.",
+                "fullName": "Full Name",
+                "nameRequired": "Full name must be at least 2 characters.",
+                "email": "Email",
+                "emailInvalid": "Please enter a valid email address.",
+                "role": "Role",
+                "roleRequired": "Please select a role.",
+                "selectRole": "Select a role",
+                "password": "Password",
+                "optional": "Optional",
+                "cancel": "Cancel",
+                "save": "Save",
+                "saving": "Saving..."
+            },
+            "status": {
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "messages": {
+                "createSuccess": "User created successfully.",
+                "updateSuccess": "User updated successfully.",
+                "activated": "User activated.",
+                "deactivated": "User deactivated.",
+                "error": "An error occurred."
+            }
         },
         "company": {
             "title": "Company Information",
             "description": "Company details and invoice settings.",
             "edit": "Edit",
             "profileTitle": "Company Profile",
-            "profileDescription": "Your company's tax and address information will appear here."
+            "profileDescription": "Your company's tax and address information will appear here.",
+            "retry": "Retry",
+            "active": "Active",
+            "inactive": "Inactive",
+            "taxNumber": "Tax Number",
+            "taxOffice": "Tax Office",
+            "currency": "Currency",
+            "invoicePrefix": "Invoice Prefix",
+            "contactTitle": "Contact Information",
+            "contactDescription": "Company contact details"
         },
         "auditLogs": {
             "title": "Audit Log",
             "description": "Monitor all activity history and changes in the system.",
             "historyTitle": "Activity History",
-            "historyDescription": "User activities and system events will be listed here."
+            "historyDescription": "User activities and system events will be listed here.",
+            "table": {
+                "action": "Action",
+                "entity": "Entity",
+                "user": "User",
+                "ip": "IP Address",
+                "date": "Date",
+                "details": "Details",
+                "noLogs": "No logs found",
+                "filterAction": "Filter by action"
+            },
+            "buttons": {
+                "back": "Previous",
+                "next": "Next"
+            },
+            "labels": {
+                "showing": "Page {from} of {to}"
+            },
+            "messages": {
+                "error": "Failed to load audit logs."
+            }
         },
         "profile": {
             "title": "Profile",
             "description": "Update your personal information and preferences.",
             "save": "Save",
+            "retry": "Retry",
             "profileTitle": "User Profile",
-            "profileDescription": "Name, email and password change form will be here."
+            "profileDescription": "Update your general account information.",
+            "passwordTitle": "Change Password",
+            "passwordDescription": "Update your account password.",
+            "form": {
+                "email": "Email Address",
+                "emailHelp": "Your email address cannot be changed.",
+                "role": "Role",
+                "company": "Company",
+                "fullName": "Full Name",
+                "nameRequired": "Full name must be at least 2 characters.",
+                "saving": "Saving...",
+                "currentPassword": "Current Password",
+                "newPassword": "New Password",
+                "confirmPassword": "Confirm Password",
+                "passwordMin": "Password must be at least 6 characters.",
+                "passwordMatch": "Passwords do not match.",
+                "changePassword": "Change Password"
+            },
+            "messages": {
+                "updateSuccess": "Profile updated successfully.",
+                "passwordSuccess": "Password changed successfully.",
+                "passwordError": "Failed to change password. Please check your current password.",
+                "error": "Failed to load profile data."
+            }
         },
         "settings": {
             "title": "Settings",
             "description": "General application configuration and preferences.",
             "settingsTitle": "Application Settings",
-            "settingsDescription": "Theme, notifications and language options will be managed here."
+            "settingsDescription": "Theme, notifications and language options will be managed here.",
+            "notificationsTitle": "Notification Preferences",
+            "notificationsDescription": "Manage how you receive notifications.",
+            "emailNotifications": "Email Notifications",
+            "emailNotificationsHint": "Receive important updates via email.",
+            "systemNotifications": "System Notifications",
+            "systemNotificationsHint": "Receive in-app push notifications.",
+            "save": "Save Settings",
+            "saving": "Saving...",
+            "generalTitle": "Application Preferences",
+            "generalDescription": "Manage your theme and language settings.",
+            "theme": "Theme",
+            "language": "Language",
+            "messages": {
+                "saveSuccess": "Settings saved successfully.",
+                "error": "Failed to load settings.",
+                "saveError": "Failed to save settings."
+            }
         },
         "upload": {
             "title": "Upload Invoice",

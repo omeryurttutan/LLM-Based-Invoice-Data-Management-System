@@ -80,12 +80,7 @@ public class CategoryController {
     @ApiResponse(responseCode = "200", description = "List of categories retrieved")
     public ResponseEntity<List<CategoryResponse>> listCategories(
             @RequestParam(defaultValue = "false") boolean includeInactive) {
-        // We need CompanyContextHolder here because Service expects it for caching key
-        // Service also calls it internally, but we need it for the key.
-        // Actually Service calls it for key generation via SpEL #companyId
-        // So we must pass it.
-        UUID companyId = com.faturaocr.infrastructure.security.CompanyContextHolder.getCompanyId();
-        return ResponseEntity.ok(categoryService.listCategories(companyId, includeInactive));
+        return ResponseEntity.ok(categoryService.listCategories(!includeInactive));
     }
 
     @GetMapping("/{id}")

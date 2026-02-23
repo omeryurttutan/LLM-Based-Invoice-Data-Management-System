@@ -4,9 +4,11 @@ import com.faturaocr.domain.invoice.valueobject.Currency;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
 import com.faturaocr.domain.invoice.valueobject.LlmProvider;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -17,6 +19,8 @@ import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -48,6 +52,8 @@ public class FilterOptionsResponse {
     @Schema(description = "Min/Max confidence scores")
     private Range<Double> confidenceRange;
 
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Getter
     @Setter
     @ToString
@@ -62,6 +68,8 @@ public class FilterOptionsResponse {
         private String label;
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Getter
     @Setter
     @ToString
@@ -79,6 +87,8 @@ public class FilterOptionsResponse {
         private String color;
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Getter
     @Setter
     @ToString

@@ -8,12 +8,17 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import java.io.Serializable;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "Current user profile response")
-public class UserProfileResponse {
+public class UserProfileResponse implements Serializable {
     @Schema(description = "User ID", example = "123e4567-e89b-12d3-a456-426614174000")
     private UUID id;
 

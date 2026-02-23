@@ -59,6 +59,7 @@ export interface ApiError {
   error: string;
   message: string;
   details?: Record<string, string>;
+  fieldErrors?: Array<{ field: string; message: string; rejectedValue?: any }>;
 }
 
 // Form validation schemas (for react-hook-form + zod)

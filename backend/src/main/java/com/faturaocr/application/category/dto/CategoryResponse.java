@@ -33,6 +33,9 @@ public class CategoryResponse {
     @Schema(description = "Active status", example = "true")
     private boolean isActive;
 
+    @Schema(description = "Number of invoices in this category")
+    private long invoiceCount;
+
     @Schema(description = "Creation timestamp")
     private LocalDateTime createdAt;
 

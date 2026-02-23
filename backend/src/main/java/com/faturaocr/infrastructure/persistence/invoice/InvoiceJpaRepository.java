@@ -80,13 +80,13 @@ public interface InvoiceJpaRepository
 
         @Query("SELECT MIN(i.totalAmount), MAX(i.totalAmount) FROM InvoiceJpaEntity i " +
                         "WHERE i.companyId = :companyId AND i.isDeleted = false")
-        Object[] findMinMaxTotalAmount(@Param("companyId") UUID companyId);
+        List<Object[]> findMinMaxTotalAmount(@Param("companyId") UUID companyId);
 
         @Query("SELECT MIN(i.invoiceDate), MAX(i.invoiceDate) FROM InvoiceJpaEntity i " +
                         "WHERE i.companyId = :companyId AND i.isDeleted = false")
-        Object[] findMinMaxInvoiceDate(@Param("companyId") UUID companyId);
+        List<Object[]> findMinMaxInvoiceDate(@Param("companyId") UUID companyId);
 
         @Query("SELECT MIN(i.confidenceScore), MAX(i.confidenceScore) FROM InvoiceJpaEntity i " +
                         "WHERE i.companyId = :companyId AND i.isDeleted = false")
-        Object[] findMinMaxConfidenceScore(@Param("companyId") UUID companyId);
+        List<Object[]> findMinMaxConfidenceScore(@Param("companyId") UUID companyId);
 }

@@ -112,10 +112,12 @@ class InvoiceRepositoryIntegrationTest extends BaseIntegrationTest {
         createEntity("INV-MM-2", BigDecimal.valueOf(500));
         createEntity("INV-MM-3", BigDecimal.valueOf(50));
 
-        Object[] result = invoiceJpaRepository.findMinMaxTotalAmount(company.getId());
+        List<Object[]> resultList = invoiceJpaRepository.findMinMaxTotalAmount(company.getId());
 
         // result is Object[] { min, max }
-        assertThat(result).isNotNull();
+        assertThat(resultList).isNotNull();
+        assertThat(resultList).isNotEmpty();
+        Object[] result = resultList.get(0);
         assertThat(result.length).isEqualTo(2);
         assertThat((BigDecimal) result[0]).isEqualByComparingTo(BigDecimal.valueOf(50));
         assertThat((BigDecimal) result[1]).isEqualByComparingTo(BigDecimal.valueOf(500));

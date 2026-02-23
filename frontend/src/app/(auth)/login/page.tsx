@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -19,7 +19,7 @@ import { authService } from '@/services/auth-service';
 import { ApiError } from '@/types/auth';
 import { useTranslations } from 'next-intl';
 
-export default function LoginPage() {
+function LoginForm() {
   const t = useTranslations('auth.login');
   const tVal = useTranslations('auth.validation');
   const tAuth = useTranslations('auth');
@@ -192,5 +192,13 @@ export default function LoginPage() {
         </div>
       </CardFooter>
     </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </React.Suspense>
   );
 }

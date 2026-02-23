@@ -215,10 +215,13 @@
         "min": "Min",
         "max": "Max",
         "selectCategory": "Select Category",
+        "noCategory": "No category found",
         "searchSupplier": "Search Supplier",
         "supplierName": "Supplier Name",
         "searching": "Searching...",
-        "noSupplierFound": "No supplier found"
+        "noSupplierFound": "No supplier found",
+        "llmProvider": "LLM Provider",
+        "confidenceScore": "Confidence Score"
     },
     "empty": {
         "title": "No invoices found",

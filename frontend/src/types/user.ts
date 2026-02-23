@@ -1,10 +1,28 @@
-import { Role } from "./auth";
+import { UserRole } from "./auth";
 
-// Re-export User from auth or define specific user management types here
-export interface UserListItem {
+export interface UserResponse {
     id: string;
     email: string;
     fullName: string;
-    role: Role;
+    role: UserRole;
+    companyId: string;
+    companyName: string;
     isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface CreateUserRequest {
+    email: string;
+    fullName: string;
+    role: UserRole;
+    password?: string; // Optional if backend generates it or if the admin sets it
+}
+
+export interface UpdateUserRequest {
+    fullName: string;
+}
+
+export interface ChangeRoleRequest {
+    role: UserRole;
 }

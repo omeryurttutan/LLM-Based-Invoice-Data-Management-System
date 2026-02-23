@@ -27,7 +27,8 @@ apiClient.interceptors.response.use(
     // try refresh -> retry original request
     // else logout
     if (error.response?.status === 401) {
-      // useAuthStore.getState().logout(); // Optional auto-logout
+      useAuthStore.getState().logout(); // Auto-logout on token expiration
+      window.location.href = '/login'; // Redirect to login
     }
     return Promise.reject(error);
   }

@@ -8,7 +8,23 @@ export const invoiceService = {
     const response = await apiClient.get('/invoices', {
       params
     });
-    return response.data;
+    const data = response.data;
+    
+    // Normalize Spring Boot Page response:
+    // New format (3.2+): { content: [...], page: { number, size, totalElements, totalPages } }
+    // Old format: { content: [...], number: 0, size: 20, totalElements: 100, totalPages: 5, ... }
+    if (data && !data.page && data.content) {
+      return {
+        content: data.content,
+        page: {
+          number: data.number ?? 0,
+          size: data.size ?? 20,
+          totalElements: data.totalElements ?? 0,
+          totalPages: data.totalPages ?? 0,
+        }
+      };
+    }
+    return data;
   },
 
   async getFilterOptions(): Promise<FilterOptionsResponse> {
