@@ -1,33 +1,87 @@
 from typing import Dict, Any
 
+
 class PromptManager:
     """
     Manages extraction prompt templates and versions.
+    Supports system instruction (role) and user prompt (extraction instructions) split.
     """
-    
+
     LATEST_VERSION = "v1"
-    
+
+    # ─── Public API ─────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def get_system_instruction(version: str = "v1") -> str:
+        """
+        Get the system instruction (role definition) for the LLM.
+        Set via the model's system_instruction parameter in Gemini.
+        """
+        if version == "v1":
+            return PromptManager._v1_system_instruction()
+        return PromptManager._v1_system_instruction()
+
     @staticmethod
     def get_prompt(version: str = "v1") -> str:
         """
-        Get the prompt template for the specified version.
+        Get the user-facing extraction prompt for the specified version.
+        This is sent alongside the invoice image in the content array.
         """
         if version == "v1":
-            return PromptManager._v1_prompt()
-        else:
-            # Fallback to latest if version unknown
-            return PromptManager._v1_prompt()
+            return PromptManager._v1_user_prompt()
+        return PromptManager._v1_user_prompt()
 
     @staticmethod
-    def _v1_prompt() -> str:
-        return """
-You are an expert Turkish invoice data extraction system.
-Your task is to analyze the invoice image and extract ALL relevant fields into a structured JSON format.
+    def get_prompt_info(version: str = None) -> Dict[str, Any]:
+        """
+        Return metadata about the current prompt version.
+        Useful for debugging and result tracking.
+        """
+        ver = version or PromptManager.LATEST_VERSION
+        return {
+            "version": ver,
+            "latest_version": PromptManager.LATEST_VERSION,
+            "system_instruction_length": len(PromptManager.get_system_instruction(ver)),
+            "user_prompt_length": len(PromptManager.get_prompt(ver)),
+        }
 
-### ROLE
-Act as a professional data entry specialist for Turkish accounting. You verify every field twice.
+    @staticmethod
+    def get_openai_messages(version: str = "v1") -> list:
+        """
+        Get the prompt formatted as OpenAI chat messages array.
+        Same content as Gemini prompts, but packaged in OpenAI's message format.
+        
+        Returns:
+            List of message dicts with 'role' and 'content' keys.
+            The user message content will need the image block appended by the provider.
+        """
+        system_instruction = PromptManager.get_system_instruction(version)
+        user_prompt = PromptManager.get_prompt(version)
+        return [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": user_prompt},
+        ]
 
-### 1. EXPECTED JSON OUTPUT SCHEMA
+    # ─── V1 Templates ──────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _v1_system_instruction() -> str:
+        return (
+            "You are an expert Turkish invoice data extraction system. "
+            "You receive invoice images — which may be scans, photographs, or digital documents "
+            "with varying quality — and must visually analyze the document to extract ALL relevant "
+            "fields into a specific JSON format. "
+            "You act as a professional data entry specialist for Turkish accounting offices. "
+            "You verify every field twice before producing output. "
+            "You MUST preserve all Turkish characters exactly as they appear on the invoice: "
+            "Ç, ç, Ğ, ğ, I, ı, İ, i, Ö, ö, Ş, ş, Ü, ü."
+        )
+
+    @staticmethod
+    def _v1_user_prompt() -> str:
+        return """Analyze the attached invoice image and extract ALL data into the following JSON schema.
+
+### EXPECTED JSON OUTPUT SCHEMA
 Return a single JSON object with this exact schema:
 {
   "invoice_number": "string — fatura numarası",
@@ -56,18 +110,18 @@ Return a single JSON object with this exact schema:
   "notes": "string or null — varsa fatura üzerindeki notlar"
 }
 
-### 2. TURKISH INVOICE SPECIFIC INSTRUCTIONS
-- **Field Labels**: Look for "Fatura No", "Fatura Tarihi", "Vade Tarihi", "Toplam", "KDV", "Ara Toplam", "Genel Toplam", "Vergi Dairesi", "VKN", "TCKN".
-- **Number Format**: Turkish invoices use COMMA (,) as decimal separator (e.g., 1.234,56). You MUST convert this to standard dot format (1234.56) in the JSON.
-- **Date Format**: Turkish invoices use DD.MM.YYYY or DD/MM/YYYY. You MUST convert this to YYYY-MM-DD in the JSON.
-- **Currency**: Default to "TRY" if no symbol is found.
-- **Tax Rates**: Common rates are 1%, 10%, 20%. 
-- **Tax Inclusive/Exclusive**: "KDV Dahil" = Tax Inclusive, "KDV Hariç" = Tax Exclusive. This helps in calculating unit prices if needed.
+### TURKISH INVOICE-SPECIFIC INSTRUCTIONS
+- **Field Labels to look for**: "Fatura No", "Fatura Tarihi", "Vade Tarihi", "Toplam", "KDV", "Ara Toplam", "Genel Toplam", "Vergi Dairesi", "VKN", "TCKN".
+- **Number Format**: Turkish invoices use COMMA (,) as decimal separator (e.g., 1.234,56). Convert to standard dot format (1234.56) in the JSON.
+- **Date Format**: Turkish invoices use DD.MM.YYYY or DD/MM/YYYY. Always convert to YYYY-MM-DD in the JSON.
+- **Currency**: If not explicitly stated, default to "TRY".
+- **Tax Rates**: Common Turkish KDV rates are 1%, 10%, 20%.
+- **Tax Inclusive/Exclusive**: "KDV Dahil" = Tax Inclusive, "KDV Hariç" = Tax Exclusive.
+- **Turkish Characters**: Preserve ALL Turkish characters exactly (Ç, ç, Ğ, ğ, I, ı, İ, i, Ö, ö, Ş, ş, Ü, ü). Never transliterate.
 
-### 3. OUTPUT RULES
-- Return **ONLY valid JSON**. No markdown code blocks (```json), no explanations.
-- If a field is not visible, set it to **null** (do not use empty string).
-- **Items**: If individual items are not clear, create a single item with the totals.
-- **Numeric Fields**: Must be numbers, not strings.
-- **Calculations**: Validate that subtotal + tax_amount ~= total_amount.
-"""
+### OUTPUT RULES
+- Return **ONLY valid JSON**. No markdown code blocks (```json), no explanations, no extra text.
+- If a field is not visible or not found in the image, set it to **null** (not empty string "").
+- All monetary amounts must be **numbers** (not strings), using dot as decimal separator.
+- If individual items cannot be identified, create a single item with the totals.
+- Validate that subtotal + tax_amount ≈ total_amount."""

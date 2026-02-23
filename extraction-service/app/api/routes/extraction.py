@@ -48,12 +48,9 @@ async def extract_invoice(
 ):
     """
     Extract data from a single invoice file (PDF/Image).
+    Uses the fallback chain: Gemini 3 Flash → Gemini 2.5 Flash → GPT-5 nano.
     """
     try:
-        if provider and provider.upper() != "GEMINI":
-             # Phase 16 will handle other providers
-             raise HTTPException(status_code=501, detail=f"Provider {provider} not supported yet.")
-
         result = await extraction_service.extract_from_file(file)
         return result
 
@@ -66,9 +63,6 @@ async def extract_invoice(
     except ExtractionServiceException:
         raise
     except Exception as e:
-        # Preprocessing errors already raise HTTPExceptions in pipeline/service? 
-        # Actually pipeline raises ValueError/etc. Service should handle or let bubble.
-        # We catch generic here.
         logger.error("extraction_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -82,8 +76,12 @@ async def extract_invoice_base64(
     try:
         result = await extraction_service.extract_from_base64(request.image_data)
         return result
+    except LLMTimeoutError as e:
+        raise HTTPException(status_code=408, detail=str(e))
+    except LLMRateLimitError as e:
+        raise HTTPException(status_code=429, detail=str(e))
     except LLMError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         logger.error("extraction_failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
@@ -111,47 +109,93 @@ async def get_validation_config():
 @router.get("/extract/prompt-info")
 async def get_prompt_info():
     """
-    Get current prompt version and text.
+    Get current prompt version, metadata, and text.
     """
     from app.services.llm.prompt_manager import PromptManager
     pm = PromptManager()
-    version = PromptManager.LATEST_VERSION
+    info = pm.get_prompt_info()
+    info["prompt_text"] = pm.get_prompt(info["version"])
+    info["system_instruction"] = pm.get_system_instruction(info["version"])
+    return info
+
+@router.get("/extract/pipeline-status")
+async def get_pipeline_status():
+    """
+    Get health status of the extraction pipeline including LLM availability.
+    """
+    from app.services.llm.provider_health import ProviderHealthManager
+    from app.services.llm.fallback_chain import FallbackChain
+    
+    chain = FallbackChain()
+    health_manager = ProviderHealthManager()
+    
+    provider_statuses = {}
+    for name, provider in chain.providers.items():
+        health = health_manager.get_health(name)
+        provider_statuses[name] = {
+            "available": provider.is_available(),
+            "health_status": health.status.value,
+            "total_successes": health.total_successes,
+            "total_failures": health.total_failures,
+        }
+    
+    all_available = any(p.is_available() for p in chain.providers.values())
+    
     return {
-        "version": version,
-        "prompt_text": pm.get_prompt(version)
+        "status": "READY" if all_available else "UNAVAILABLE",
+        "providers": provider_statuses,
+        "chain_order": chain.chain_order,
+        "chain_enabled": settings.LLM_CHAIN_ENABLED,
     }
 
 @router.get("/providers")
 async def list_providers():
     """
-    List configured LLM providers and their priority order.
+    List configured LLM providers, their status, and chain order.
     """
+    from app.services.llm.fallback_chain import FallbackChain
+    from app.services.llm.provider_health import ProviderHealthManager
+
+    chain = FallbackChain()
+    health_manager = ProviderHealthManager()
+
+    provider_details = []
+    for name in chain.chain_order:
+        provider = chain.providers.get(name)
+        health = health_manager.get_health(name)
+        provider_details.append({
+            "name": name,
+            "available": provider.is_available() if provider else False,
+            "health_status": health.status.value,
+        })
+
     return {
-        "configured": settings.LLM_CHAIN_ORDER.split(","),
-        "enabled": settings.LLM_CHAIN_ENABLED
+        "chain_order": chain.chain_order,
+        "chain_enabled": settings.LLM_CHAIN_ENABLED,
+        "providers": provider_details,
     }
+
 
 @router.get("/providers/health")
 async def get_providers_health():
     """
-    Get health status of all providers.
+    Get detailed health metrics per provider (sliding window stats).
     """
     from app.services.llm.provider_health import ProviderHealthManager
     health_manager = ProviderHealthManager()
-    
-    # Ensure health entries exist for configured providers
+
     providers = settings.LLM_CHAIN_ORDER.split(",")
-    health_status = {}
-    
+    health_details = {}
+
     for p in providers:
         p_name = p.strip().upper()
-        status = health_manager.get_health(p_name)
-        health_status[p_name] = status
+        health_details[p_name] = health_manager.get_window_stats(p_name)
 
     return {
-        "providers": health_status,
+        "providers": health_details,
         "timestamp": time.time()
     }
+
 
 @router.post("/providers/{provider_name}/test")
 async def test_provider(provider_name: str):
@@ -160,20 +204,18 @@ async def test_provider(provider_name: str):
     """
     from app.services.llm.fallback_chain import FallbackChain
     chain = FallbackChain()
-    
+
     provider_name = provider_name.upper()
     if provider_name not in chain.providers:
         raise HTTPException(status_code=404, detail=f"Provider {provider_name} not found or not configured.")
-        
+
     provider = chain.providers[provider_name]
-    
+
     try:
         import base64
         # Small 1x1 pixel PNG
         dummy_image = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNiAAAABgADNjd8qAAAAABJRU5ErkJggg==")
-        
-        # Determine prompt based on provider type if necessary, or just use a simple string
-        response = provider.generate(dummy_image, "Test. Respond 'OK'.")
-        return {"provider": provider_name, "status": "SUCCESS", "response": response}
+        response_text, usage = await provider.generate(dummy_image, "Test. Respond 'OK'.")
+        return {"provider": provider_name, "status": "SUCCESS", "response": response_text}
     except Exception as e:
         return {"provider": provider_name, "status": "FAILED", "error": str(e)}

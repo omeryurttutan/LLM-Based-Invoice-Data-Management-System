@@ -7,31 +7,45 @@ from app.config.settings import settings
 from app.core.logging import logger
 from app.services.llm.base_provider import (
     BaseLLMProvider,
+    LLMProviderNames,
     LLMError,
     LLMTimeoutError,
     LLMRateLimitError,
     LLMServerError,
     LLMAuthenticationError,
-    LLMConnectionError
+    LLMConnectionError,
+    LLMResponseError,
 )
+from app.services.llm.prompt_manager import PromptManager
+
 
 class OpenAIProvider(BaseLLMProvider):
     """
-    Implementation of BaseLLMProvider for OpenAI GPT-5.2 (using gpt-4o as current proxy if 5.2 not avail).
-    Assuming 'gpt-4o' or config based model.
+    Implementation of BaseLLMProvider for OpenAI GPT-5 nano (Fallback 2).
+    Uses the official openai Python SDK with multimodal vision input.
+
+    This provider exists as the last fallback because:
+    - Completely different infrastructure from Google → true redundancy
+    - If all Google services are down, OpenAI likely still works
+    - Cost-efficient: $0.05/1M input, $0.40/1M output
     """
-    
+
     def __init__(self):
+        super().__init__(
+            timeout=settings.OPENAI_TIMEOUT,
+            max_retries=settings.OPENAI_MAX_RETRIES,
+            retry_delay=1.0,
+        )
         self.api_key = settings.OPENAI_API_KEY
         if not self.api_key:
             logger.warning("openai_api_key_missing", message="OPENAI_API_KEY is not set.")
-            
+
         self.client = AsyncOpenAI(api_key=self.api_key)
         self.model_name = settings.OPENAI_MODEL
-        
+
     @property
     def provider_name(self) -> str:
-        return "GPT"
+        return LLMProviderNames.GPT5_NANO
 
     def is_available(self) -> bool:
         """Check if the OpenAI provider is configured and available."""
@@ -43,7 +57,13 @@ class OpenAIProvider(BaseLLMProvider):
         retry=retry_if_exception_type((APIConnectionError, RateLimitError, APITimeoutError, APIError)),
         reraise=True
     )
-    async def generate(self, image_bytes: bytes, prompt: str) -> tuple[str, dict]:
+    async def generate(self, image_bytes: bytes, prompt: str, mime_type: str = "image/jpeg") -> tuple[str, dict]:
+        """
+        Send an image + prompt to GPT-5 nano and return structured JSON text.
+
+        Image is sent as base64 data URL in user message content array.
+        System instruction from PromptManager provides extraction context.
+        """
         if not self.api_key:
             raise LLMAuthenticationError("OpenAI API key is missing.")
 
@@ -51,16 +71,24 @@ class OpenAIProvider(BaseLLMProvider):
         try:
             # Prepare image as data URL
             base64_image = base64.b64encode(image_bytes).decode('utf-8')
-            data_url = f"data:image/jpeg;base64,{base64_image}"
+            data_url = f"data:{mime_type};base64,{base64_image}"
 
-            logger.info("llm_request_sent", provider=self.provider_name, model=self.model_name)
+            # Get system instruction from PromptManager (same content as Gemini)
+            system_instruction = PromptManager.get_system_instruction()
+
+            logger.info(
+                "llm_request_sent",
+                provider=self.provider_name,
+                model=self.model_name,
+                prompt_version=PromptManager.LATEST_VERSION,
+            )
 
             response = await self.client.chat.completions.create(
                 model=self.model_name,
                 messages=[
                     {
-                        "role": "system", 
-                        "content": "You are a helpful assistant. Output strict JSON." 
+                        "role": "system",
+                        "content": system_instruction
                     },
                     {
                         "role": "user",
@@ -69,48 +97,64 @@ class OpenAIProvider(BaseLLMProvider):
                             {
                                 "type": "image_url",
                                 "image_url": {
-                                    "url": f"data:image/jpeg;base64,{base64_image}"
+                                    "url": data_url
                                 }
                             }
                         ]
                     }
                 ],
                 temperature=settings.OPENAI_TEMPERATURE,
-                max_tokens=settings.OPENAI_MAX_TOKENS,
+                max_tokens=settings.OPENAI_MAX_OUTPUT_TOKENS,
                 timeout=settings.OPENAI_TIMEOUT
             )
-            
+
             duration = (time.time() - start_time) * 1000
-            logger.info("llm_response_received", provider=self.provider_name, duration_ms=duration)
-            
+            response_text = response.choices[0].message.content
+
             usage = {
                 "input_tokens": response.usage.prompt_tokens,
                 "output_tokens": response.usage.completion_tokens
             }
-            
-            return response.choices[0].message.content, usage
+
+            logger.info(
+                "llm_response_received",
+                provider=self.provider_name,
+                duration_ms=round(duration, 2),
+                response_size=len(response_text) if response_text else 0,
+                input_tokens=usage["input_tokens"],
+                output_tokens=usage["output_tokens"],
+            )
+
+            if not response_text:
+                raise LLMResponseError("Empty response received from GPT-5 nano")
+
+            return response_text, usage
 
         except AuthenticationError as e:
-            logger.error("llm_auth_error", error=str(e))
+            logger.error("llm_auth_error", provider=self.provider_name, error=str(e))
             raise LLMAuthenticationError(f"OpenAI Auth Error: {str(e)}")
-            
+
         except RateLimitError as e:
-            logger.warning("llm_rate_limit", error=str(e))
+            logger.warning("llm_rate_limit", provider=self.provider_name, error=str(e))
             raise LLMRateLimitError(f"OpenAI rate limit: {str(e)}")
-            
+
         except APITimeoutError as e:
-             logger.error("llm_timeout", error=str(e))
-             raise LLMTimeoutError(f"OpenAI timeout: {str(e)}")
-             
+            logger.error("llm_timeout", provider=self.provider_name, error=str(e))
+            raise LLMTimeoutError(f"OpenAI timeout: {str(e)}")
+
         except APIConnectionError as e:
-            logger.error("llm_connection_error", error=str(e))
+            logger.error("llm_connection_error", provider=self.provider_name, error=str(e))
             raise LLMConnectionError(f"OpenAI connection error: {str(e)}")
-            
+
         except APIError as e:
             # 5xx or generic
-            logger.error("llm_server_error", error=str(e))
+            logger.error("llm_server_error", provider=self.provider_name, error=str(e))
             raise LLMServerError(f"OpenAI server error: {str(e)}")
-            
+
+        except LLMError:
+            # Re-raise our custom errors without wrapping
+            raise
+
         except Exception as e:
-            logger.error("llm_unknown_error", error=str(e))
+            logger.error("llm_unknown_error", provider=self.provider_name, error=str(e))
             raise LLMError(f"Unexpected OpenAI error: {str(e)}")
