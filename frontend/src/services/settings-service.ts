@@ -36,24 +36,53 @@ function transformBackendToUI(backendPrefs: Record<string, Record<string, boolea
   };
 }
 
-function transformUIToBackend(uiPrefs: Record<string, boolean>): Record<string, boolean> {
-  // Send as flat map - backend will merge into existing preferences
-  return uiPrefs;
+function transformUIToBackend(uiPrefs: Record<string, boolean>, existingBackendPrefs?: Record<string, Record<string, boolean>>): Record<string, Record<string, boolean>> {
+  const emailEnabled = !!uiPrefs['EMAIL_NOTIFICATIONS'];
+  const inAppEnabled = !!uiPrefs['SYSTEM_NOTIFICATIONS'];
+
+  // Standard set of backend event types
+  const standardTypes = [
+    'EXTRACTION_COMPLETED',
+    'EXTRACTION_FAILED',
+    'INVOICE_APPROVED',
+    'INVOICE_REJECTED',
+    'BATCH_COMPLETED',
+    'BATCH_PARTIALLY_COMPLETED',
+    'ALL_PROVIDERS_DOWN',
+  ];
+
+  // Collect all known types from existing backend prefs + standard types
+  const allTypes = new Set(standardTypes);
+  if (existingBackendPrefs) {
+    for (const key of Object.keys(existingBackendPrefs)) {
+      allTypes.add(key);
+    }
+  }
+
+  const result: Record<string, Record<string, boolean>> = {};
+  for (const type of Array.from(allTypes)) {
+    result[type] = { email: emailEnabled, in_app: inAppEnabled, push: false };
+  }
+  return result;
 }
+
+let cachedBackendPrefs: Record<string, Record<string, boolean>> | null = null;
 
 export const settingsService = {
   getNotificationPreferences: async (): Promise<Record<string, boolean>> => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.NOTIFICATION_PREFERENCES);
+      cachedBackendPrefs = response.data;
       return transformBackendToUI(response.data);
     } catch {
       // Return defaults on error so settings page still renders
+      cachedBackendPrefs = null;
       return { ...DEFAULT_PREFERENCES };
     }
   },
 
   updateNotificationPreferences: async (preferences: Record<string, boolean>): Promise<void> => {
-    await apiClient.put(API_ENDPOINTS.NOTIFICATION_PREFERENCES, transformUIToBackend(preferences));
+    await apiClient.put(API_ENDPOINTS.NOTIFICATION_PREFERENCES, transformUIToBackend(preferences, cachedBackendPrefs || undefined));
   }
 };
 

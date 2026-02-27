@@ -31,7 +31,7 @@ export const navItems: NavItem[] = [
   // Management
   { title: "users", href: "/users", icon: Users, section: "management", roles: ["ADMIN"] },
   { title: "company", href: "/company", icon: Building2, section: "management", roles: ["ADMIN", "MANAGER"] },
-  { title: "audit", href: "/audit-logs", icon: ScrollText, section: "management", roles: ["ADMIN", "MANAGER"] },
+  { title: "audit", href: "/audit-logs", icon: ScrollText, section: "management", roles: ["ADMIN"] },
 
   // Other
   { title: "profile", href: "/profile", icon: UserCircle, section: "other" },

@@ -4,6 +4,7 @@ export interface UserProfileResponse {
     id: string;
     email: string;
     fullName: string;
+    phone?: string;
     role: UserRole;
     companyId: string;
     companyName: string;
@@ -14,6 +15,7 @@ export interface UserProfileResponse {
 
 export interface UpdateProfileRequest {
     fullName: string;
+    phone?: string;
 }
 
 export interface ChangePasswordRequest {

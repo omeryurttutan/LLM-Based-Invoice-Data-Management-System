@@ -15,16 +15,14 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { SidebarNavItem } from "@/components/layout/sidebar-nav-item"
 import { useSidebarStore } from "@/stores/sidebar-store"
-
+import { useAuthStore } from "@/stores/auth-store"
 import { navItems } from "@/components/layout/nav-config"
 import { useTranslations } from "next-intl"
-
-// Mock role for now - Phase 11 will implement auth
-const USER_ROLE = "ADMIN"
 
 export function Sidebar() {
   const pathname = usePathname()
   const { isCollapsed, toggle } = useSidebarStore()
+  const { user } = useAuthStore()
   // Hydration check for persist middleware
   const [isMounted, setIsMounted] = useState(false)
   const t = useTranslations('navigation.sidebar')
@@ -39,7 +37,8 @@ export function Sidebar() {
 
   const filteredNavItems = navItems.filter(item => {
     if (!item.roles) return true
-    return item.roles.includes(USER_ROLE)
+    if (!user || !user.role) return false
+    return item.roles.includes(user.role)
   })
 
   return (

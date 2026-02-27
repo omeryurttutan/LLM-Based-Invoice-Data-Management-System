@@ -85,7 +85,7 @@ management:
 
 # File Upload Configuration
 upload:
-  storage-path: ${UPLOAD_STORAGE_PATH:/data/invoices}
+  storage-path: ${UPLOAD_STORAGE_PATH:./uploads}
   max-file-size: ${UPLOAD_MAX_FILE_SIZE_MB:20}MB
   max-bulk-total-size: ${UPLOAD_MAX_BULK_TOTAL_SIZE_MB:200}MB
 
@@ -137,12 +137,12 @@ app:
 
     rate-limit:
       enabled: true
-      public-limit: 20
-      login-limit: 5
-      authenticated-limit: 500
-      upload-limit: 10
-      export-limit: 5
-      admin-limit: 50
+      public-limit: 100
+      login-limit: 10
+      authenticated-limit: 2000
+      upload-limit: 100
+      export-limit: 50
+      admin-limit: 1000
       window-seconds: 60
 
     headers:

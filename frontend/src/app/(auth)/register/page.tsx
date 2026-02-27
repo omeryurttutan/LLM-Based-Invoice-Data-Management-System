@@ -103,16 +103,10 @@ function RegisterForm() {
         taxNumber: data.taxNumber,
       });
 
-      setAuth(response.user, {
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
-        tokenType: response.tokenType,
-        expiresIn: response.expiresIn,
-      });
+      // Redirect to login
+      router.push('/login');
+      toast.success(tCommon('messages.success.registration', { fallback: 'Kayıt başarılı, lütfen giriş yapın.' }));
 
-      // Redirect to dashboard
-      router.push('/');
-      router.refresh();
     } catch (err) {
       const apiError = err as { response?: { data?: ApiError } };
 

@@ -86,26 +86,7 @@ public class UserManagementService {
     }
 
     @Transactional(readOnly = true)
-    @org.springframework.cache.annotation.Cacheable(value = "company-users", key = "#root.target.getCurrentUserId() != null ? #root.target.getCurrentUserId() : 'anon'") // companyId
-                                                                                                                                                                         // is
-                                                                                                                                                                         // in
-                                                                                                                                                                         // context,
-                                                                                                                                                                         // hard
-                                                                                                                                                                         // to
-                                                                                                                                                                         // use
-                                                                                                                                                                         // as
-                                                                                                                                                                         // key
-                                                                                                                                                                         // unless
-                                                                                                                                                                         // passed.
-    // Issue: listUsersByCompany relies on context companyId.
-    // I can't easily cache this unless I assume 1 user = 1 company and key by
-    // userId?
-    // Or key by companyId if I can get it.
-    // For now, let's NOT cache this one due to context dependency, or extract
-    // companyId.
-    // Wait, CompanyContextHolder is thread local.
-    // I will skip caching listUsersByCompany for now as it's less critical (admin
-    // only).
+    // Caching disabled: depends on thread-local CompanyContextHolder, not cacheable
     public Page<UserResponse> listUsersByCompany(Pageable pageable) {
         UUID companyId = CompanyContextHolder.getCompanyId();
         if (companyId == null) {
@@ -191,7 +172,7 @@ public class UserManagementService {
         return user;
     }
 
-    private UUID getCurrentUserId() {
+    public UUID getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof AuthenticatedUser authenticatedUser) {
             return authenticatedUser.userId();

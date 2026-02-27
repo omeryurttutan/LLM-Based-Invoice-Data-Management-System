@@ -46,10 +46,14 @@ public class CompanyController {
     public ApiResponse<CompanyResponse> getMyCompany() {
         UUID companyId = CompanyContextHolder.getCompanyId();
         if (companyId == null) {
-            return ApiResponse.error("No company context found");
+            return ApiResponse.success(null);
         }
-        CompanyResponse response = companyService.getCompanyById(companyId);
-        return ApiResponse.success(response);
+        try {
+            CompanyResponse response = companyService.getCompanyById(companyId);
+            return ApiResponse.success(response);
+        } catch (Exception e) {
+            return ApiResponse.success(null);
+        }
     }
 
     @GetMapping("/{id}")

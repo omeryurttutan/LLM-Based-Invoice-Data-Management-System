@@ -60,7 +60,7 @@ const getInvoiceSchema = (t: any) => z.object({
   items: z.array(z.object({
     description: z.string().min(1, t('form.validation.descriptionRequired')),
     quantity: z.coerce.number().min(0.0001, t('form.validation.quantityMin')),
-    unit: z.enum(['ADET', 'KG', 'LT', 'M', 'M2', 'M3', 'PAKET', 'KUTU', 'SAAT', 'GUN'] as const),
+    unit: z.enum(['ADET', 'KG', 'LT', 'M', 'M2', 'M3', 'PAKET', 'KUTU', 'SAAT', 'GUN', 'TON'] as const),
     unitPrice: z.coerce.number().min(0, t('form.validation.unitPriceMin')),
     taxRate: z.coerce.number().min(0).max(100),
     productCode: z.string().optional(),
@@ -203,6 +203,10 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                               date > new Date() || date < new Date("1900-01-01")
                             }
                             initialFocus
+                            captionLayout="dropdown"
+                            fromYear={2000}
+                            toYear={2050}
+                            locale={dateLocale}
                           />
                         </PopoverContent>
                       </Popover>
@@ -243,6 +247,10 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                             onSelect={field.onChange}
                             disabled={(date) => date < new Date("1900-01-01")}
                             initialFocus
+                            captionLayout="dropdown"
+                            fromYear={2000}
+                            toYear={2050}
+                            locale={dateLocale}
                           />
                         </PopoverContent>
                       </Popover>
@@ -461,7 +469,7 @@ export function InvoiceForm({ initialData, categories, onSubmit, isLoading }: In
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {['ADET', 'KG', 'LT', 'M', 'M2', 'M3', 'PAKET', 'KUTU', 'SAAT', 'GUN'].map(u => (
+                              {['ADET', 'KG', 'LT', 'M', 'M2', 'M3', 'PAKET', 'KUTU', 'SAAT', 'GUN', 'TON'].map(u => (
                                 <SelectItem key={u} value={u}>{t(`units.${u}`)}</SelectItem>
                               ))}
                             </SelectContent>

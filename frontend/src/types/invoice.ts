@@ -1,8 +1,8 @@
-export type InvoiceStatus = 'PENDING' | 'PROCESSING' | 'VERIFIED' | 'REJECTED';
+export type InvoiceStatus = 'PENDING' | 'PROCESSING' | 'VERIFIED' | 'REJECTED' | 'QUEUED' | 'FAILED' | 'REVIEW_REQUIRED';
 export type SourceType = 'LLM' | 'E_INVOICE' | 'MANUAL';
 export type LlmProvider = 'GEMINI' | 'GPT' | 'CLAUDE';
 export type Currency = 'TRY' | 'USD' | 'EUR' | 'GBP';
-export type UnitType = 'ADET' | 'KG' | 'LT' | 'M' | 'M2' | 'M3' | 'PAKET' | 'KUTU' | 'SAAT' | 'GUN';
+export type UnitType = 'ADET' | 'KG' | 'LT' | 'M' | 'M2' | 'M3' | 'PAKET' | 'KUTU' | 'SAAT' | 'GUN' | 'TON';
 
 export interface InvoiceItem {
   id?: string;

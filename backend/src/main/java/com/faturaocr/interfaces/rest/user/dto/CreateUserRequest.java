@@ -27,10 +27,8 @@ public class CreateUserRequest {
     private String fullName;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
-    // Note: Complex password validation logic can be added via custom annotation or
-    // pattern
-    // For now simple check
+    @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$", message = "Password must contain at least one digit, one lowercase, one uppercase, and one special character")
     @Schema(description = "Password", example = "StrongPass123!", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
 
