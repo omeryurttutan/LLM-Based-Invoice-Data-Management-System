@@ -36,11 +36,12 @@ export function UsersTable({ users, onRefresh, onEdit }: UsersTableProps) {
   const handleToggleStatus = async (user: UserResponse) => {
     try {
       setLoadingId(user.id);
-      await userService.toggleUserActive(user.id);
+      const res = await userService.toggleUserActive(user.id);
       toast.success(user.isActive ? t('messages.deactivated') : t('messages.activated'));
       onRefresh();
-    } catch (error) {
-      toast.error(t('messages.error'));
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || t('messages.error');
+      toast.error(errorMsg);
     } finally {
       setLoadingId(null);
     }
@@ -59,14 +60,14 @@ export function UsersTable({ users, onRefresh, onEdit }: UsersTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.length === 0 ? (
+          {!users || users.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
                 {t('table.noUsers')}
               </TableCell>
             </TableRow>
           ) : (
-            users.map((user) => (
+            users?.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.fullName}</TableCell>
                 <TableCell>{user.email}</TableCell>

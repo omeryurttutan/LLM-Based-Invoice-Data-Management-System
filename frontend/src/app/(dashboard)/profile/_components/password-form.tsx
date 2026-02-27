@@ -16,15 +16,22 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { profileService } from '@/services/profile-service';
+import { CheckCircle2 } from 'lucide-react';
 
 export function PasswordForm() {
   const t = useTranslations('common.pages.profile');
+  const tVal = useTranslations('auth.validation');
+  const tCommon = useTranslations('common');
   const [isLoading, setIsLoading] = useState(false);
 
   const formSchema = z.object({
-    currentPassword: z.string().min(6, { message: t('form.passwordMin') }),
-    newPassword: z.string().min(6, { message: t('form.passwordMin') }),
-    confirmPassword: z.string().min(6, { message: t('form.passwordMin') }),
+    currentPassword: z.string().min(1, { message: t('messages.passwordError') }),
+    newPassword: z.string()
+      .min(8, { message: tVal('requirements.length', { min: 8 }) })
+      .regex(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/, { 
+        message: tVal('requirements.title') 
+      }),
+    confirmPassword: z.string().min(1, { message: t('form.passwordMin') }),
   }).refine((data) => data.newPassword === data.confirmPassword, {
     message: t('form.passwordMatch'),
     path: ["confirmPassword"],
@@ -39,6 +46,16 @@ export function PasswordForm() {
     },
   });
 
+  const newPassword = form.watch('newPassword');
+
+  const passwordRequirements = [
+    { regex: /.{8,}/, text: tVal('requirements.length', { min: 8 }) },
+    { regex: /[A-Z]/, text: tVal('requirements.uppercase') },
+    { regex: /[a-z]/, text: tVal('requirements.lowercase') },
+    { regex: /[0-9]/, text: tVal('requirements.number') },
+    { regex: /[!@#$%^&*(),.?":{}|<>]/, text: tVal('requirements.special') },
+  ];
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
@@ -47,9 +64,14 @@ export function PasswordForm() {
         newPassword: values.newPassword,
       });
       toast.success(t('messages.passwordSuccess'));
-      form.reset();
-    } catch (error) {
-      toast.error(t('messages.passwordError'));
+      form.reset({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch (error: any) {
+      const message = error.response?.data?.message || t('messages.passwordError');
+      toast.error(message);
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -89,6 +111,28 @@ export function PasswordForm() {
                     <Input type="password" {...field} />
                   </FormControl>
                   <FormMessage />
+                  
+                  {/* Password requirements checklist */}
+                  {newPassword && (
+                    <div className="mt-2 space-y-1 bg-muted/30 p-3 rounded-md animate-in fade-in duration-300">
+                      <p className="text-xs font-semibold text-muted-foreground mb-1">
+                        {tVal('requirements.title')}
+                      </p>
+                      {passwordRequirements.map((req, index) => (
+                        <div
+                          key={index}
+                          className={`flex items-center text-xs transition-colors duration-200 ${req.regex.test(newPassword)
+                            ? 'text-green-600 dark:text-green-400'
+                            : 'text-muted-foreground'
+                            }`}
+                        >
+                          <CheckCircle2 className={`h-3 w-3 mr-1 transition-opacity duration-200 ${req.regex.test(newPassword) ? 'opacity-100' : 'opacity-30'
+                            }`} />
+                          {req.text}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </FormItem>
               )}
             />

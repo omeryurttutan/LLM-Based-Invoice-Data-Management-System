@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +32,7 @@ import {
 import { UserResponse, CreateUserRequest, UpdateUserRequest } from '@/types/user';
 import { userService } from '@/services/user-service';
 import { UserRole } from '@/types/auth';
+import { CheckCircle2 } from 'lucide-react';
 
 const roles: UserRole[] = ['ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN'];
 
@@ -44,13 +45,28 @@ interface UserFormDialogProps {
 
 export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserFormDialogProps) {
   const t = useTranslations('common.pages.users');
+  const tVal = useTranslations('auth.validation');
   const [isLoading, setIsLoading] = useState(false);
 
   const formSchema = z.object({
     email: z.string().email({ message: t('form.emailInvalid') }),
     fullName: z.string().min(2, { message: t('form.nameRequired') }),
     role: z.string().min(1, { message: t('form.roleRequired') }),
-    password: z.string().optional(),
+    password: z.string().optional()
+      .superRefine((val, ctx) => {
+        if (!user && (!val || val.length < 8)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: tVal('requirements.length', { min: 8 }),
+          });
+        }
+        if (val && val.length > 0 && !/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$/.test(val)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: tVal('requirements.title'),
+            });
+        }
+      }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -63,9 +79,40 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
     },
   });
 
+  const password = form.watch('password');
+
+  const passwordRequirements = [
+    { regex: /.{8,}/, text: tVal('requirements.length', { min: 8 }) },
+    { regex: /[A-Z]/, text: tVal('requirements.uppercase') },
+    { regex: /[a-z]/, text: tVal('requirements.lowercase') },
+    { regex: /[0-9]/, text: tVal('requirements.number') },
+    { regex: /[!@#$%^&*(),.?":{}|<>]/, text: tVal('requirements.special') },
+  ];
+
+  useEffect(() => {
+    if (open) {
+      if (user) {
+        form.reset({
+          email: user.email,
+          fullName: user.fullName,
+          role: user.role,
+          password: '',
+        });
+      } else {
+        form.reset({
+          email: '',
+          fullName: '',
+          role: 'ACCOUNTANT',
+          password: '',
+        });
+      }
+    }
+  }, [open, user, form]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
+
       if (user) {
         await userService.updateUser(user.id, {
           fullName: values.fullName,
@@ -166,11 +213,33 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('form.password')} ({t('form.optional')})</FormLabel>
+                    <FormLabel>{t('form.password')}</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
                     <FormMessage />
+                    
+                    {/* Password requirements checklist */}
+                    {password && (
+                        <div className="mt-2 space-y-1 bg-muted/30 p-3 rounded-md animate-in fade-in duration-300">
+                          <p className="text-xs font-semibold text-muted-foreground mb-1">
+                            {tVal('requirements.title')}
+                          </p>
+                          {passwordRequirements.map((req, index) => (
+                            <div
+                              key={index}
+                              className={`flex items-center text-xs transition-colors duration-200 ${req.regex.test(password)
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-muted-foreground'
+                                }`}
+                            >
+                              <CheckCircle2 className={`h-3 w-3 mr-1 transition-opacity duration-200 ${req.regex.test(password) ? 'opacity-100' : 'opacity-30'
+                                }`} />
+                              {req.text}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </FormItem>
                 )}
               />

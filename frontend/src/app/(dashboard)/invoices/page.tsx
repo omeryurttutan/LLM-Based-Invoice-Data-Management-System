@@ -95,11 +95,14 @@ export default function InvoicesPage() {
   const format = useFormatter();
   const queryClient = useQueryClient();
 
-  const statusConfig: Record<InvoiceStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+  const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
     PENDING: { label: t('status.pending'), variant: 'secondary' },
     PROCESSING: { label: t('status.processing'), variant: 'outline' },
     VERIFIED: { label: t('status.verified'), variant: 'default' },
     REJECTED: { label: t('status.rejected'), variant: 'destructive' },
+    QUEUED: { label: 'Queued', variant: 'outline' },
+    FAILED: { label: 'Failed', variant: 'destructive' },
+    REVIEW_REQUIRED: { label: 'Review Required', variant: 'secondary' },
   };
 
   const router = useRouter();
@@ -286,8 +289,8 @@ export default function InvoicesPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={statusConfig[invoice.status].variant}>
-                      {statusConfig[invoice.status].label}
+                    <Badge variant={statusConfig[invoice.status]?.variant || 'outline'}>
+                      {statusConfig[invoice.status]?.label || invoice.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>

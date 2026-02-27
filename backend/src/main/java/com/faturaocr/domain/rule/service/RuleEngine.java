@@ -31,7 +31,8 @@ public class RuleEngine {
 
     @Transactional
     public void evaluateAndExecute(TriggerPoint triggerPoint, Invoice invoice) {
-        List<AutomationRule> rules = ruleService.getActiveRules(invoice.getCompanyId(), triggerPoint);
+        List<AutomationRule> rules = new java.util.ArrayList<>(
+                ruleService.getActiveRules(invoice.getCompanyId(), triggerPoint));
 
         // Sort by priority (higher priority first typically, or lower? Assuming lower =
         // higher priority like 1 is first)

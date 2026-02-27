@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserProfileResponse } from '@/types/profile';
 import { profileService } from '@/services/profile-service';
@@ -29,12 +30,14 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
 
   const formSchema = z.object({
     fullName: z.string().min(2, { message: t('form.nameRequired') }),
+    phone: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: profile.fullName || '',
+      phone: profile.phone || '',
     },
   });
 
@@ -43,6 +46,7 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
       setIsLoading(true);
       const updated = await profileService.updateProfile({
         fullName: values.fullName,
+        phone: values.phone,
       });
       onUpdate(updated);
       toast.success(t('messages.updateSuccess'));
@@ -63,21 +67,21 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-md">
-            <FormItem>
-              <FormLabel>{t('form.email')}</FormLabel>
+            <div className="space-y-2">
+              <Label>{t('form.email')}</Label>
               <Input value={profile.email} disabled />
               <p className="text-[0.8rem] text-muted-foreground">{t('form.emailHelp')}</p>
-            </FormItem>
+            </div>
 
-            <FormItem>
-              <FormLabel>{t('form.role')}</FormLabel>
+            <div className="space-y-2">
+              <Label>{t('form.role')}</Label>
               <Input value={profile.role} disabled />
-            </FormItem>
+            </div>
 
-            <FormItem>
-              <FormLabel>{t('form.company')}</FormLabel>
+            <div className="space-y-2">
+              <Label>{t('form.company')}</Label>
               <Input value={profile.companyName} disabled />
-            </FormItem>
+            </div>
 
             <FormField
               control={form.control}
@@ -87,6 +91,20 @@ export function ProfileForm({ profile, onUpdate }: ProfileFormProps) {
                   <FormLabel>{t('form.fullName')}</FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('form.phone') || 'Phone'}</FormLabel>
+                  <FormControl>
+                    <Input placeholder="+905551234567" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

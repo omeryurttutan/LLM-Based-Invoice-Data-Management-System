@@ -9,12 +9,15 @@ import { Badge } from "@/components/ui/badge"
 import { useTranslations } from "next-intl"
 import { useState, useEffect, useCallback } from "react"
 import { companyService, CompanyResponse } from "@/services/company-service"
+import { CompanyFormDialog } from "./_components/company-form-dialog"
+import { Pencil } from "lucide-react"
 
 export default function CompanyPage() {
   const t = useTranslations('common.pages.company');
   const [company, setCompany] = useState<CompanyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const loadCompany = useCallback(async () => {
     try {
@@ -42,6 +45,14 @@ export default function CompanyPage() {
       <PageHeader
         title={t('title')}
         description={t('description')}
+        actions={
+          company && (
+            <Button onClick={() => setDialogOpen(true)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              {t('editProfile') || 'Edit Company'}
+            </Button>
+          )
+        }
       />
       
       {loading ? (
@@ -136,6 +147,15 @@ export default function CompanyPage() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {company && (
+        <CompanyFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          company={company}
+          onSuccess={loadCompany}
+        />
       )}
     </div>
   )

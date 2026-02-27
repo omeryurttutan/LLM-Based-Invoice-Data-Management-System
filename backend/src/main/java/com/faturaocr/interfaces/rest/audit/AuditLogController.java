@@ -36,9 +36,10 @@ public class AuditLogController {
 
     /**
      * List audit logs with optional filtering and pagination.
-     * MANAGER sees only their company's logs. ADMIN sees all.
+     * Accessible only by ADMIN.
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "List audit logs", description = "Retrieve paginated audit logs with filtering")
     @ApiResponse(responseCode = "200", description = "List of audit logs retrieved")
     public ResponseEntity<Page<AuditLogResponse>> listAuditLogs(
@@ -50,8 +51,10 @@ public class AuditLogController {
 
     /**
      * Get change history for a specific entity.
+     * Accessible only by ADMIN.
      */
     @GetMapping("/entity/{entityType}/{entityId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get entity history", description = "Retrieve change history for a specific entity")
     @ApiResponse(responseCode = "200", description = "Entity history retrieved")
     public ResponseEntity<Page<AuditLogResponse>> getEntityHistory(

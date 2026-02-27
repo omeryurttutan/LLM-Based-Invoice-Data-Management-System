@@ -52,14 +52,14 @@ export function AuditLogsTable({ logs }: AuditLogsTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {logs.length === 0 ? (
+          {!logs || logs.length === 0 ? (
             <TableRow>
               <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
                 {t('table.noLogs')}
               </TableCell>
             </TableRow>
           ) : (
-            logs.map((log) => (
+            logs?.map((log) => (
               <TableRow key={log.id}>
                 <TableCell>
                   <Badge variant="outline" className={`font-mono text-xs ${getActionColor(log.actionType)}`}>

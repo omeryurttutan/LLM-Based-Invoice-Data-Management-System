@@ -45,6 +45,7 @@ public class NotificationService {
             Map<String, Object> metadata) {
 
         Notification notification = new Notification();
+        notification.setId(UUID.randomUUID());
         notification.setUserId(userId);
         notification.setCompanyId(companyId);
         notification.setType(type);

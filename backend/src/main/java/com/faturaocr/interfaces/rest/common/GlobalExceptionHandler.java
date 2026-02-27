@@ -158,7 +158,7 @@ public class GlobalExceptionHandler {
 
                 ErrorResponse error = new ErrorResponse(
                                 "INTERNAL_ERROR",
-                                "An unexpected error occurred. Please try again later.",
+                                ex.getMessage() != null ? ex.getMessage() : "Unknown exception occurred",
                                 request.getDescription(false).replace("uri=", ""));
 
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);

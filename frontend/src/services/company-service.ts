@@ -29,4 +29,8 @@ export const companyService = {
       return null;
     }
   },
+  updateCompany: async (id: string, data: Partial<CompanyResponse>): Promise<CompanyResponse> => {
+    const response = await apiClient.put(`${API_ENDPOINTS.COMPANIES}/${id}`, data);
+    return response.data?.data || response.data;
+  },
 };

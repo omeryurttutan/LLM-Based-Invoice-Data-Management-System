@@ -134,7 +134,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/v1/system/**").hasRole("ADMIN")
 
                                                 // Manager and above (URL-based)
-                                                .requestMatchers("/api/v1/audit-logs/**").hasAnyRole("ADMIN", "MANAGER")
+                                                .requestMatchers("/api/v1/audit-logs/**").hasRole("ADMIN")
 
                                                 // All other endpoints require authentication
                                                 .anyRequest().authenticated())
