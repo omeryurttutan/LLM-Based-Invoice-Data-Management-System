@@ -57,10 +57,14 @@ export const apiClient = axios.create({
 // Request interceptor - add auth token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const { accessToken } = useAuthStore.getState();
+    const { accessToken, activeCompanyId } = useAuthStore.getState();
 
     if (accessToken && config.headers) {
       config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    if (activeCompanyId && config.headers) {
+      config.headers['X-Company-Id'] = activeCompanyId;
     }
 
     return config;

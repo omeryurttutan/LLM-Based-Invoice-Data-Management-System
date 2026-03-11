@@ -1,6 +1,7 @@
 package com.faturaocr.application.invoice.service;
 
 import com.faturaocr.domain.invoice.entity.Invoice;
+import com.faturaocr.domain.invoice.entity.InvoiceItem;
 import com.faturaocr.domain.invoice.port.FileStoragePort;
 import com.faturaocr.domain.invoice.port.InvoiceRepository;
 import com.faturaocr.domain.invoice.service.FileValidationService;
@@ -92,7 +93,7 @@ public class InvoiceUploadService {
             try {
                 invoice.setLlmProvider(LlmProvider.valueOf(result.getProvider().toUpperCase()));
             } catch (IllegalArgumentException e) {
-                // Ignore unknown provider
+                log.warn("Unknown LLM provider: {}", result.getProvider());
             }
         }
 
@@ -106,15 +107,54 @@ public class InvoiceUploadService {
             invoice.setSupplierName(data.getSupplierName());
             invoice.setSupplierTaxNumber(data.getSupplierTaxId());
             invoice.setSupplierAddress(data.getSupplierAddress());
+            invoice.setBuyerTaxNumber(data.getBuyerTaxNumber());
             invoice.setTotalAmount(data.getTotalAmount());
             invoice.setTaxAmount(data.getTaxAmount());
-            // Map items if needed, mostly for full implementation
+            invoice.setSubtotal(data.getSubtotal());
+            invoice.setNotes(data.getNotes());
+
+            // Map currency
+            if (data.getCurrency() != null) {
+                try {
+                    invoice.setCurrency(com.faturaocr.domain.invoice.valueobject.Currency
+                            .valueOf(data.getCurrency().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    log.warn("Unknown currency: {}, defaulting to TRY", data.getCurrency());
+                    invoice.setCurrency(com.faturaocr.domain.invoice.valueobject.Currency.TRY);
+                }
+            }
+
+            // Map items
+            if (data.getItems() != null && !data.getItems().isEmpty()) {
+                for (int i = 0; i < data.getItems().size(); i++) {
+                    ExtractionResult.InvoiceItemData itemData = data.getItems().get(i);
+                    InvoiceItem item = new InvoiceItem();
+                    item.setLineNumber(i + 1);
+                    item.setDescription(itemData.getDescription());
+                    item.setQuantity(
+                            itemData.getQuantity() != null ? itemData.getQuantity() : java.math.BigDecimal.ONE);
+                    item.setUnit(itemData.getUnit());
+                    item.setUnitPrice(
+                            itemData.getUnitPrice() != null ? itemData.getUnitPrice() : java.math.BigDecimal.ZERO);
+                    item.setTaxRate(itemData.getTaxRate() != null ? itemData.getTaxRate() : java.math.BigDecimal.ZERO);
+                    item.setTaxAmount(
+                            itemData.getTaxAmount() != null ? itemData.getTaxAmount() : java.math.BigDecimal.ZERO);
+                    item.setTotalAmount(
+                            itemData.getLineTotal() != null ? itemData.getLineTotal() : java.math.BigDecimal.ZERO);
+                    // Calculate subtotal: lineTotal - taxAmount
+                    if (itemData.getLineTotal() != null && itemData.getTaxAmount() != null) {
+                        item.setSubtotal(itemData.getLineTotal().subtract(itemData.getTaxAmount()));
+                    } else {
+                        item.setSubtotal(item.getUnitPrice().multiply(item.getQuantity()));
+                    }
+                    invoice.addItem(item);
+                }
+            }
         }
 
-        // Auto-verify logic could go here based on confidence score
+        // Set status based on confidence score
         if (invoice.getConfidenceScore() != null && invoice.getConfidenceScore().doubleValue() > 90.0) {
-            // invoice.setStatus(InvoiceStatus.VERIFIED); // Optional based on requirements
-            invoice.setStatus(InvoiceStatus.PENDING); // Default to PENDING for review
+            invoice.setStatus(InvoiceStatus.PENDING);
         } else {
             invoice.setStatus(InvoiceStatus.PENDING);
         }

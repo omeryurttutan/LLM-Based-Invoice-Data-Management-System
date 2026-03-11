@@ -15,69 +15,69 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class RbacIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private TestDataSeeder testDataSeeder;
+        @Autowired
+        private TestDataSeeder testDataSeeder;
 
-    private Company testCompany;
-    private String adminToken;
-    private String managerToken;
-    private String accountantToken;
-    private String internToken;
+        private Company testCompany;
+        private String adminToken;
+        private String managerToken;
+        private String accountantToken;
+        private String internToken;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        testCompany = testDataSeeder.seedCompany("RBAC Test Company", "2222222222");
+        @BeforeEach
+        void setUp() throws Exception {
+                testCompany = testDataSeeder.seedCompany("RBAC Test Company", "2222222222");
 
-        testDataSeeder.seedUser(testCompany.getId(), "admin@rbac.com", "Password123!", Role.ADMIN);
-        testDataSeeder.seedUser(testCompany.getId(), "manager@rbac.com", "Password123!", Role.MANAGER);
-        testDataSeeder.seedUser(testCompany.getId(), "accountant@rbac.com", "Password123!", Role.ACCOUNTANT);
-        testDataSeeder.seedUser(testCompany.getId(), "intern@rbac.com", "Password123!", Role.INTERN);
+                testDataSeeder.seedUser(testCompany.getId(), "admin@rbac.com", "Password123!", Role.ADMIN);
+                testDataSeeder.seedUser(testCompany.getId(), "manager@rbac.com", "Password123!", Role.MANAGER);
+                testDataSeeder.seedUser(testCompany.getId(), "accountant@rbac.com", "Password123!", Role.ACCOUNTANT);
+                testDataSeeder.seedUser(testCompany.getId(), "intern@rbac.com", "Password123!", Role.INTERN);
 
-        adminToken = testDataSeeder.loginAndGetToken(mockMvc, "admin@rbac.com", "Password123!");
-        managerToken = testDataSeeder.loginAndGetToken(mockMvc, "manager@rbac.com", "Password123!");
-        accountantToken = testDataSeeder.loginAndGetToken(mockMvc, "accountant@rbac.com", "Password123!");
-        internToken = testDataSeeder.loginAndGetToken(mockMvc, "intern@rbac.com", "Password123!");
-    }
+                adminToken = testDataSeeder.loginAndGetToken(mockMvc, "admin@rbac.com", "Password123!");
+                managerToken = testDataSeeder.loginAndGetToken(mockMvc, "manager@rbac.com", "Password123!");
+                accountantToken = testDataSeeder.loginAndGetToken(mockMvc, "accountant@rbac.com", "Password123!");
+                internToken = testDataSeeder.loginAndGetToken(mockMvc, "intern@rbac.com", "Password123!");
+        }
 
-    @Test
-    void getInvoices_ShouldBeAccessibleByAllRoles() throws Exception {
-        mockMvc.perform(get("/api/v1/invoices")
-                .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk());
+        @Test
+        void getInvoices_ShouldBeAccessibleByAllRoles() throws Exception {
+                mockMvc.perform(get("/api/v1/invoices")
+                                .header("Authorization", "Bearer " + adminToken))
+                                .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/v1/invoices")
-                .header("Authorization", "Bearer " + managerToken))
-                .andExpect(status().isOk());
+                mockMvc.perform(get("/api/v1/invoices")
+                                .header("Authorization", "Bearer " + managerToken))
+                                .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/v1/invoices")
-                .header("Authorization", "Bearer " + accountantToken))
-                .andExpect(status().isOk());
+                mockMvc.perform(get("/api/v1/invoices")
+                                .header("Authorization", "Bearer " + accountantToken))
+                                .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/v1/invoices")
-                .header("Authorization", "Bearer " + internToken))
-                .andExpect(status().isOk());
-    }
+                mockMvc.perform(get("/api/v1/invoices")
+                                .header("Authorization", "Bearer " + internToken))
+                                .andExpect(status().isOk());
+        }
 
-    @Test
-    void adminUsers_ShouldOnlyBeAccessibleByAdmin() throws Exception {
-        // ADMIN -> OK
-        mockMvc.perform(get("/api/v1/admin/users")
-                .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isOk());
+        @Test
+        void adminUsers_ShouldOnlyBeAccessibleByAdmin() throws Exception {
+                // ADMIN -> OK
+                mockMvc.perform(get("/api/v1/admin/users")
+                                .header("Authorization", "Bearer " + adminToken))
+                                .andExpect(status().isOk());
 
-        // MANAGER -> Forbidden
-        mockMvc.perform(get("/api/v1/admin/users")
-                .header("Authorization", "Bearer " + managerToken))
-                .andExpect(status().isForbidden());
+                // MANAGER -> Forbidden
+                mockMvc.perform(get("/api/v1/admin/users")
+                                .header("Authorization", "Bearer " + managerToken))
+                                .andExpect(status().isForbidden());
 
-        // ACCOUNTANT -> Forbidden
-        mockMvc.perform(get("/api/v1/admin/users")
-                .header("Authorization", "Bearer " + accountantToken))
-                .andExpect(status().isForbidden());
+                // ACCOUNTANT -> Forbidden
+                mockMvc.perform(get("/api/v1/admin/users")
+                                .header("Authorization", "Bearer " + accountantToken))
+                                .andExpect(status().isForbidden());
 
-        // INTERN -> Forbidden
-        mockMvc.perform(get("/api/v1/admin/users")
-                .header("Authorization", "Bearer " + internToken))
-                .andExpect(status().isForbidden());
-    }
+                // INTERN -> Forbidden
+                mockMvc.perform(get("/api/v1/admin/users")
+                                .header("Authorization", "Bearer " + internToken))
+                                .andExpect(status().isForbidden());
+        }
 }

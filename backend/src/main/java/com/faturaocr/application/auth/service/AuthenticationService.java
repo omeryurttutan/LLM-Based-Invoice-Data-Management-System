@@ -189,7 +189,10 @@ public class AuthenticationService {
                 user.getEmailValue(),
                 user.getFullName(),
                 user.getRole().name(),
-                user.getCompanyId());
+                user.getCompanyId(),
+                user.getCompanyAccesses() != null ? user.getCompanyAccesses().stream()
+                        .map(a -> new AuthResponse.CompanyBasicInfo(a.getCompanyId(), a.getCompanyName()))
+                        .toList() : java.util.List.of());
     }
 
     /**
@@ -277,7 +280,10 @@ public class AuthenticationService {
                 user.getEmailValue(),
                 user.getFullName(),
                 user.getRole().name(),
-                user.getCompanyId());
+                user.getCompanyId(),
+                user.getCompanyAccesses() != null ? user.getCompanyAccesses().stream()
+                        .map(a -> new AuthResponse.CompanyBasicInfo(a.getCompanyId(), a.getCompanyName()))
+                        .toList() : java.util.List.of());
 
         return AuthResponse.of(accessToken, refreshToken, expiresIn, userInfo);
     }

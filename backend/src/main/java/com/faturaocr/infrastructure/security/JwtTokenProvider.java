@@ -51,8 +51,13 @@ public class JwtTokenProvider {
         claims.put("userId", user.getId().toString());
         claims.put("email", user.getEmailValue());
         claims.put("role", user.getRole().name());
-        claims.put("companyId", user.getCompanyId().toString());
+        claims.put("companyId", user.getCompanyId() != null ? user.getCompanyId().toString() : "");
         claims.put("fullName", user.getFullName());
+
+        java.util.List<String> accessibleCompanyIds = user.getCompanyAccesses().stream()
+                .map(acc -> acc.getCompanyId().toString())
+                .toList();
+        claims.put("accessibleCompanyIds", accessibleCompanyIds);
 
         return Jwts.builder()
                 .claims(claims)

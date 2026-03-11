@@ -14,14 +14,14 @@ class Settings(BaseSettings):
     GEMINI_TIMEOUT: int = 30
     GEMINI_MAX_RETRIES: int = 2
     GEMINI_TEMPERATURE: float = 0.1
-    GEMINI_MAX_OUTPUT_TOKENS: int = 4096
+    GEMINI_MAX_OUTPUT_TOKENS: int = 8192
 
     # Gemini 2.5 Flash (Fallback 1) — shares GEMINI_API_KEY
     GEMINI_2_5_FLASH_MODEL: str = "gemini-2.5-flash"
     GEMINI_2_5_FLASH_TIMEOUT: int = 30
     GEMINI_2_5_FLASH_MAX_RETRIES: int = 2
     GEMINI_2_5_FLASH_TEMPERATURE: float = 0.1
-    GEMINI_2_5_FLASH_MAX_OUTPUT_TOKENS: int = 4096
+    GEMINI_2_5_FLASH_MAX_OUTPUT_TOKENS: int = 8192
 
     # OpenAI GPT-5 nano (Fallback 2)
     OPENAI_API_KEY: Optional[str] = None

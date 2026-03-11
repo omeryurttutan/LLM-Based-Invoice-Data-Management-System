@@ -32,6 +32,18 @@ public record AuthResponse(
 
             @Schema(description = "User role", example = "MANAGER") String role,
 
-            @Schema(description = "Company ID", example = "987e6543-e21b-56d3-a456-426614174000") UUID companyId) {
+            @Schema(description = "Company ID", example = "987e6543-e21b-56d3-a456-426614174000") UUID companyId,
+
+            @Schema(description = "Accessible Companies") java.util.List<CompanyBasicInfo> accessibleCompanies) {
+
+        public UserInfo(UUID id, String email, String fullName, String role, UUID companyId) {
+            this(id, email, fullName, role, companyId, java.util.List.of());
+        }
+    }
+
+    @Schema(description = "Basic company details for switcher")
+    public record CompanyBasicInfo(
+            @Schema(description = "Company ID", example = "987e6543-e21b-56d3-a456-426614174000") UUID id,
+            @Schema(description = "Company Name", example = "Example Corp") String name) {
     }
 }

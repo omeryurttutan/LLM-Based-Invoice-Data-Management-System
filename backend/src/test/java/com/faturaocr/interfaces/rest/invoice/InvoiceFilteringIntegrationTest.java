@@ -91,7 +91,7 @@ class InvoiceFilteringIntegrationTest {
         when(invoiceService.getSuppliers(any())).thenReturn(List.of("Supplier A", "Supplier B"));
 
         mockMvc.perform(get("/api/v1/invoices/suppliers")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0]").value("Supplier A"))
                 .andExpect(jsonPath("$[1]").value("Supplier B"));

@@ -20,29 +20,29 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DashboardServiceTest {
 
-    @Mock
-    private DashboardQueryRepository dashboardQueryRepository;
+        @Mock
+        private DashboardQueryRepository dashboardQueryRepository;
 
-    @InjectMocks
-    private DashboardService dashboardService;
+        @InjectMocks
+        private DashboardService dashboardService;
 
-    @Test
-    @DisplayName("Should get dashboard stats")
-    void shouldGetDashboardStats() {
-        // Given
-        DashboardStatsResponse expectedResponse = DashboardStatsResponse.builder()
-                .summary(DashboardStatsResponse.Summary.builder()
-                        .totalInvoices(100)
-                        .build())
-                .build();
-        when(dashboardQueryRepository.getDashboardStats(TestFixtures.COMPANY_ID, null, null, null))
-                .thenReturn(expectedResponse);
+        @Test
+        @DisplayName("Should get dashboard stats")
+        void shouldGetDashboardStats() {
+                // Given
+                DashboardStatsResponse expectedResponse = DashboardStatsResponse.builder()
+                                .summary(DashboardStatsResponse.Summary.builder()
+                                                .totalInvoices(100)
+                                                .build())
+                                .build();
+                when(dashboardQueryRepository.getDashboardStats(TestFixtures.COMPANY_ID, null, null, null))
+                                .thenReturn(expectedResponse);
 
-        // When
-        DashboardStatsResponse response = dashboardService.getStats(TestFixtures.COMPANY_ID, null, null, null);
+                // When
+                DashboardStatsResponse response = dashboardService.getStats(TestFixtures.COMPANY_ID, null, null, null);
 
-        // Then
-        assertThat(response).isEqualTo(expectedResponse);
-        verify(dashboardQueryRepository).getDashboardStats(TestFixtures.COMPANY_ID, null, null, null);
-    }
+                // Then
+                assertThat(response).isEqualTo(expectedResponse);
+                verify(dashboardQueryRepository).getDashboardStats(TestFixtures.COMPANY_ID, null, null, null);
+        }
 }

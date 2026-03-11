@@ -18,6 +18,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { authService } from '@/services/auth-service';
 import { ApiError } from '@/types/auth';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 function RegisterForm() {
   const t = useTranslations('auth.register');

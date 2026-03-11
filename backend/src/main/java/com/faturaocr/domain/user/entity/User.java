@@ -17,6 +17,7 @@ import java.util.UUID;
 public class User extends BaseEntity {
 
     private UUID companyId;
+    private java.util.List<UserCompanyAccess> companyAccesses = new java.util.ArrayList<>();
     @AuditMask(AuditMask.MaskType.EMAIL)
     private Email email;
     @AuditExclude
@@ -112,6 +113,20 @@ public class User extends BaseEntity {
         markAsUpdated();
     }
 
+    public void addCompanyAccess(UUID companyId, String companyName) {
+        boolean exists = this.companyAccesses.stream()
+                .anyMatch(a -> a.getCompanyId().equals(companyId));
+        if (!exists) {
+            this.companyAccesses.add(
+                    UserCompanyAccess.builder()
+                            .userId(this.getId())
+                            .companyId(companyId)
+                            .companyName(companyName)
+                            .build());
+            markAsUpdated();
+        }
+    }
+
     // Getters and helper methods for specific needs like validation/logic can
     // remain if needed,
     // but standard getters are covered by @Getter.
@@ -132,6 +147,13 @@ public class User extends BaseEntity {
 
         public Builder companyId(UUID companyId) {
             user.companyId = companyId;
+            return this;
+        }
+
+        public Builder companyAccesses(java.util.List<UserCompanyAccess> accesses) {
+            if (accesses != null) {
+                user.companyAccesses.addAll(accesses);
+            }
             return this;
         }
 
@@ -197,9 +219,9 @@ public class User extends BaseEntity {
 
         public User build() {
             // Validation
-            if (user.companyId == null) {
-                throw new IllegalStateException("Company ID is required");
-            }
+            // We don't strictly require defaultCompanyId as admins might not have one,
+            // but we might require at least one access if not admin. Skipping validation
+            // of defaultCompanyId to allow multi-tenant flexibility.
             if (user.email == null) {
                 throw new IllegalStateException("Email is required");
             }

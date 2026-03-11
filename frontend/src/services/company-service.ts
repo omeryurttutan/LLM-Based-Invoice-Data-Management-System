@@ -20,6 +20,21 @@ export interface CompanyResponse {
   updatedAt: string;
 }
 
+export interface CreateCompanyRequest {
+  name: string;
+  taxNumber: string;
+  taxOffice?: string;
+  address?: string;
+  city?: string;
+  district?: string;
+  postalCode?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  defaultCurrency?: string;
+  invoicePrefix?: string;
+}
+
 export const companyService = {
   getMyCompany: async (): Promise<CompanyResponse | null> => {
     try {
@@ -31,6 +46,10 @@ export const companyService = {
   },
   updateCompany: async (id: string, data: Partial<CompanyResponse>): Promise<CompanyResponse> => {
     const response = await apiClient.put(`${API_ENDPOINTS.COMPANIES}/${id}`, data);
+    return response.data?.data || response.data;
+  },
+  createCompany: async (data: CreateCompanyRequest): Promise<CompanyResponse> => {
+    const response = await apiClient.post(API_ENDPOINTS.COMPANIES, data);
     return response.data?.data || response.data;
   },
 };

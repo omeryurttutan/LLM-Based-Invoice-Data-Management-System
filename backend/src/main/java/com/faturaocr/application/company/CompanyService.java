@@ -16,6 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.faturaocr.infrastructure.security.AuthenticatedUser;
+import com.faturaocr.infrastructure.security.CompanyContextHolder;
 
 import java.util.UUID;
 
@@ -48,12 +52,27 @@ public class CompanyService {
         company.setInvoicePrefix(command.getInvoicePrefix());
 
         Company savedCompany = companyRepository.save(company);
+
+        // Assign company to the user who created it
+        UUID currentUserId = getCurrentUserId();
+        if (currentUserId != null) {
+            userRepository.findById(currentUserId).ifPresent(user -> {
+                user.addCompanyAccess(savedCompany.getId(), savedCompany.getName());
+                userRepository.save(user);
+            });
+        }
+
         return CompanyResponse.fromDomain(savedCompany);
     }
 
     @Transactional
     @Auditable(action = AuditActionType.UPDATE, entityType = "COMPANY")
     public CompanyResponse updateCompany(UUID id, UpdateCompanyCommand command) {
+        UUID contextCompanyId = CompanyContextHolder.getCompanyId();
+        if (contextCompanyId != null && !contextCompanyId.equals(id) && !isCurrentUserAdmin()) {
+            throw new DomainException("Access to update this company is denied");
+        }
+
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Company", id));
 
@@ -126,5 +145,21 @@ public class CompanyService {
         company.deactivate();
         Company savedCompany = companyRepository.save(company);
         return CompanyResponse.fromDomain(savedCompany);
+    }
+
+    private UUID getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof AuthenticatedUser authenticatedUser) {
+            return authenticatedUser.userId();
+        }
+        return null;
+    }
+
+    private boolean isCurrentUserAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof AuthenticatedUser authenticatedUser) {
+            return authenticatedUser.isAdmin();
+        }
+        return false;
     }
 }

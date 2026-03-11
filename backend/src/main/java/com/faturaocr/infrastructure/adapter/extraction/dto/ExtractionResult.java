@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 public class ExtractionResult {
-    @JsonProperty("invoice_data")
+    @JsonProperty("data")
     private InvoiceData invoiceData;
 
     @JsonProperty("confidence_score")
@@ -23,53 +23,71 @@ public class ExtractionResult {
 
     @Data
     public static class InvoiceData {
-        @JsonProperty("invoice_number")
+        @JsonProperty("fatura_no")
         private String invoiceNumber;
 
-        @JsonProperty("invoice_date")
-        private LocalDate invoiceDate; // JSON format YYYY-MM-DD usually works
+        @JsonProperty("tarih")
+        private LocalDate invoiceDate;
 
-        @JsonProperty("due_date")
+        @JsonProperty("vade_tarihi")
         private LocalDate dueDate;
 
-        @JsonProperty("supplier_name")
+        @JsonProperty("gonderici_unvan")
         private String supplierName;
 
-        @JsonProperty("supplier_tax_id")
+        @JsonProperty("gonderici_vkn")
         private String supplierTaxId;
 
-        @JsonProperty("supplier_address")
+        @JsonProperty("gonderici_adres")
         private String supplierAddress;
 
-        @JsonProperty("total_amount")
-        private BigDecimal totalAmount;
+        @JsonProperty("alici_unvan")
+        private String buyerName;
 
-        @JsonProperty("tax_amount")
+        @JsonProperty("alici_vkn")
+        private String buyerTaxNumber;
+
+        @JsonProperty("kalemler")
+        private List<InvoiceItemData> items;
+
+        @JsonProperty("ara_toplam")
+        private BigDecimal subtotal;
+
+        @JsonProperty("vergi_toplam")
         private BigDecimal taxAmount;
 
-        @JsonProperty("currency")
+        @JsonProperty("genel_toplam")
+        private BigDecimal totalAmount;
+
+        @JsonProperty("para_birimi")
         private String currency;
 
-        @JsonProperty("items")
-        private List<InvoiceItemData> items;
+        @JsonProperty("notlar")
+        private String notes;
     }
 
     @Data
     public static class InvoiceItemData {
-        @JsonProperty("description")
+        @JsonProperty("aciklama")
         private String description;
 
-        @JsonProperty("quantity")
+        @JsonProperty("miktar")
         private BigDecimal quantity;
 
-        @JsonProperty("unit_price")
+        @JsonProperty("birim")
+        private String unit;
+
+        @JsonProperty("birim_fiyat")
         private BigDecimal unitPrice;
 
-        @JsonProperty("total_price")
-        private BigDecimal totalPrice;
+        @JsonProperty("toplam_tutar")
+        private BigDecimal lineTotal;
 
-        @JsonProperty("tax_rate")
+        @JsonProperty("kdv_orani")
         private BigDecimal taxRate;
+
+        @JsonProperty("kdv_tutari")
+        private BigDecimal taxAmount;
     }
 
     @Data

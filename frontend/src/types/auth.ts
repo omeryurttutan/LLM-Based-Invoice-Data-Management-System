@@ -12,6 +12,7 @@ export interface User {
   role: UserRole;
   companyId: string;
   companyName: string;
+  accessibleCompanies: { id: string; name: string }[];
   isActive: boolean;
   createdAt: string;
   updatedAt?: string;

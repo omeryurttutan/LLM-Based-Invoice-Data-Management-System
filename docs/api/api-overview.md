@@ -27,7 +27,7 @@ The API uses **JWT (JSON Web Token)** Bearer Authentication.
 ## OpenAPI / Swagger UI
 
 Interactive documentation is available at:
-`http://localhost:8080/api/docs`
+`http://localhost:8082/api/docs`
 
 This UI allows you to explore endpoints and test requests directly.
 

@@ -21,8 +21,11 @@ import java.util.UUID;
 @lombok.Setter
 public class UserJpaEntity extends BaseJpaEntity {
 
-    @Column(name = "company_id", nullable = false)
+    @Column(name = "default_company_id")
     private UUID companyId;
+
+    @jakarta.persistence.OneToMany(mappedBy = "user", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<UserCompanyAccessJpaEntity> companyAccesses = new java.util.ArrayList<>();
 
     @Column(name = "email", nullable = false)
     private String email;

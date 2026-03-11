@@ -31,7 +31,21 @@ public class CompanyContextFilter extends OncePerRequestFilter {
 
             if (authentication != null &&
                     authentication.getPrincipal() instanceof AuthenticatedUser user) {
-                CompanyContextHolder.setCompanyId(user.companyId());
+
+                String headerCompanyId = request.getHeader("X-Company-Id");
+                if (org.springframework.util.StringUtils.hasText(headerCompanyId)) {
+                    if (user.accessibleCompanyIds().contains(headerCompanyId) ||
+                            (user.companyId() != null && headerCompanyId.equals(user.companyId().toString())) ||
+                            user.isAdmin()) {
+                        CompanyContextHolder.setCompanyId(java.util.UUID.fromString(headerCompanyId));
+                    } else {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                                "Access to the requested company context is denied");
+                        return;
+                    }
+                } else {
+                    CompanyContextHolder.setCompanyId(user.companyId());
+                }
             }
 
             filterChain.doFilter(request, response);

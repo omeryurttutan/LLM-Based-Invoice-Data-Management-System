@@ -32,6 +32,9 @@ public class CacheConfig {
                 objectMapper.registerModule(new JavaTimeModule());
                 objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                 objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+                objectMapper.activateDefaultTyping(
+                                objectMapper.getPolymorphicTypeValidator(),
+                                ObjectMapper.DefaultTyping.NON_FINAL);
 
                 GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 

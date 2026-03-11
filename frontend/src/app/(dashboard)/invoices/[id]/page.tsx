@@ -96,6 +96,9 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
     PROCESSING: { label: t('status.processing'), variant: 'outline' },
     VERIFIED: { label: t('status.verified'), variant: 'default' },
     REJECTED: { label: t('status.rejected'), variant: 'destructive' },
+    QUEUED: { label: 'Queued', variant: 'secondary' },
+    FAILED: { label: 'Failed', variant: 'destructive' },
+    REVIEW_REQUIRED: { label: 'Review Required', variant: 'outline' },
   };
 
   const router = useRouter();

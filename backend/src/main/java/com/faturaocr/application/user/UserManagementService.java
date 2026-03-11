@@ -8,6 +8,7 @@ import com.faturaocr.domain.audit.valueobject.AuditActionType;
 import com.faturaocr.domain.common.exception.DomainException;
 import com.faturaocr.domain.common.exception.EntityNotFoundException;
 import com.faturaocr.domain.user.entity.User;
+import com.faturaocr.domain.company.port.CompanyRepository;
 import com.faturaocr.domain.user.port.UserRepository;
 import com.faturaocr.domain.user.valueobject.Email;
 import com.faturaocr.domain.user.valueobject.Role;
@@ -30,6 +31,7 @@ import java.util.UUID;
 public class UserManagementService {
 
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -57,6 +59,10 @@ public class UserManagementService {
                 .role(command.getRole() != null ? command.getRole() : Role.ACCOUNTANT)
                 .isActive(true)
                 .build();
+
+        companyRepository.findById(companyId).ifPresent(company -> {
+            user.addCompanyAccess(companyId, company.getName());
+        });
 
         User savedUser = userRepository.save(user);
         return UserResponse.fromDomain(savedUser);

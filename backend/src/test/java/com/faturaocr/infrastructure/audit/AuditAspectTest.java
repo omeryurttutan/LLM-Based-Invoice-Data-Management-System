@@ -76,7 +76,7 @@ class AuditAspectTest {
         when(auditable.description()).thenReturn("");
 
         // CREATE: no old state loaded, entity ID from result
-        when(joinPoint.getArgs()).thenReturn(new Object[]{});
+        when(joinPoint.getArgs()).thenReturn(new Object[] {});
 
         TestResponse result = new TestResponse(UUID.randomUUID());
         when(joinPoint.proceed()).thenReturn(result);
@@ -135,7 +135,7 @@ class AuditAspectTest {
         when(auditable.action()).thenReturn(AuditActionType.DELETE);
         when(auditable.entityType()).thenReturn("COMPANY");
         when(auditable.description()).thenReturn("");
-        when(joinPoint.getArgs()).thenReturn(new Object[]{UUID.randomUUID()});
+        when(joinPoint.getArgs()).thenReturn(new Object[] { UUID.randomUUID() });
         when(joinPoint.proceed()).thenThrow(new RuntimeException("Test exception"));
 
         // Act & Assert

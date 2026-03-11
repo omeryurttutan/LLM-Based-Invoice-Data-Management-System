@@ -48,7 +48,7 @@ function LoginForm() {
 
   // Check for session expired message
   const sessionExpired = searchParams.get('session') === 'expired';
-  const redirectTo = searchParams.get('redirect') || '/';
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
 
   const {
     register,

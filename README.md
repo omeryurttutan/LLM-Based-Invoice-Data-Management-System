@@ -29,12 +29,11 @@ The system follows a hybrid microservices architecture:
 
 ### Prerequisites
 
-- **Java 17 & Maven** (for Backend)
+- **Docker & Docker Compose** (Recommended)
 - **Node.js 20+ & npm** (for Frontend)
-- **Python 3.11+** (for Extraction Service)
-- **PostgreSQL 15+, Redis 7+, RabbitMQ 3.x** (Running locally on custom ports)
+- **Java 17 & Python 3.11** (if running without Docker)
 
-### Installation
+### Installation & Run
 
 1. **Clone the repository**
    ```bash
@@ -43,18 +42,34 @@ The system follows a hybrid microservices architecture:
    ```
 
 2. **Configure Environment**
-   - Backend: `backend/src/main/resources/application.yml` is already configured for local ports.
-   - Extraction Service: `extraction-service/.env` is already configured.
+   - Extraction Service: Ensure `extraction-service/.env` has your API keys.
+   - Root: Create a `.env` file in the root or export `KVKK_ENCRYPTION_KEY`.
 
-3. **Run Services**
-   - **Backend**: `cd backend && mvn spring-boot:run`
-   - **Frontend**: `cd frontend && npm install && npm run dev`
-   - **Extraction**: `cd extraction-service && pip install -r requirements.txt && python app/main.py`
+3. **Run Infrastructure & Extraction Service (Docker)**
+   ```bash
+   docker compose up --build -d
+   ```
+   *This starts: Postgres, Redis, RabbitMQ, and Extraction Service.*
+
+4. **Run Backend (Manual)**
+   ```bash
+   cd backend
+   export KVKK_ENCRYPTION_KEY=$(openssl rand -base64 32)
+   mvn spring-boot:run
+   ```
+
+5. **Run Frontend (Manual)**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
 ### Access the Application
 - **Frontend:** [http://localhost:3001](http://localhost:3001)
 - **Backend API (Swagger):** [http://localhost:8082/api/docs](http://localhost:8082/api/docs)
-- **RabbitMQ Management:** [http://localhost:15673](http://localhost:15673) (if configured locally)
+- **Extraction Service:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **RabbitMQ Management:** [http://localhost:15673](http://localhost:15673)
 
 ## 📂 Project Structure
 

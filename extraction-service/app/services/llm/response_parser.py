@@ -52,7 +52,7 @@ class ResponseParser:
 
     @staticmethod
     def _clean_text(text: str) -> str:
-        """Strip markdown code fences and whitespace."""
+        """Strip markdown code fences, repair malformed JSON, and handle truncation."""
         text = text.strip()
         # Remove ```json ... ``` or ``` ... ```
         if text.startswith("```"):
@@ -62,7 +62,33 @@ class ResponseParser:
                 if last_fence > first_newline:
                     cleaned = text[first_newline + 1:last_fence].strip()
                     logger.warning("response_cleanup_applied", reason="Markdown code fences stripped")
-                    return cleaned
+                    text = cleaned
+
+        # Fix missing closing brace before comma in arrays: },\n    , → },\n    {  
+        # Pattern: a value (number/string/null/bool) followed by newline+spaces+comma+newline+spaces+open-brace
+        # This catches cases where LLM forgets } before , in array items
+        text = re.sub(r'(\d+\.?\d*)\s*\n(\s*),\s*\n(\s*)\{', r'\1\n\2},\n\3{', text)
+        text = re.sub(r'(null|true|false)\s*\n(\s*),\s*\n(\s*)\{', r'\1\n\2},\n\3{', text)
+        text = re.sub(r'"\s*\n(\s*),\s*\n(\s*)\{', r'"\n\1},\n\2{', text)
+
+        # Fix truncated numbers at the end (e.g., "3295." → "3295.0")
+        text = re.sub(r'(\d+)\.$', r'\g<1>.0', text)
+        text = re.sub(r'(\d+)\.\s*$', r'\g<1>.0', text)
+
+        # Handle truncated JSON: auto-close unclosed brackets and braces
+        if text.startswith('{') or text.startswith('['):
+            open_braces = text.count('{') - text.count('}')
+            open_brackets = text.count('[') - text.count(']')
+            if open_braces > 0 or open_brackets > 0:
+                logger.warning("response_cleanup_applied", reason=f"Auto-closing {open_brackets} brackets and {open_braces} braces")
+                # Remove trailing comma if present
+                text = text.rstrip()
+                text = re.sub(r',\s*$', '', text)
+                # Also remove trailing incomplete key-value like '"key":' or '"key': 
+                text = re.sub(r',?\s*"[^"]*"\s*:\s*$', '', text)
+                text += ']' * open_brackets
+                text += '}' * open_braces
+
         return text
 
     @staticmethod

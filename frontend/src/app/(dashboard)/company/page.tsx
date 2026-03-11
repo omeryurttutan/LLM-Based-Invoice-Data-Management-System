@@ -10,7 +10,10 @@ import { useTranslations } from "next-intl"
 import { useState, useEffect, useCallback } from "react"
 import { companyService, CompanyResponse } from "@/services/company-service"
 import { CompanyFormDialog } from "./_components/company-form-dialog"
-import { Pencil } from "lucide-react"
+import { CreateCompanyDialog } from "./_components/create-company-dialog"
+import { Pencil, Plus } from "lucide-react"
+import authService from "@/services/auth-service"
+import { useAuthStore } from "@/stores/auth-store"
 
 export default function CompanyPage() {
   const t = useTranslations('common.pages.company');
@@ -18,6 +21,8 @@ export default function CompanyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const setUser = useAuthStore(state => state.setUser);
 
   const loadCompany = useCallback(async () => {
     try {
@@ -46,15 +51,21 @@ export default function CompanyPage() {
         title={t('title')}
         description={t('description')}
         actions={
-          company && (
-            <Button onClick={() => setDialogOpen(true)}>
-              <Pencil className="mr-2 h-4 w-4" />
-              {t('editProfile') || 'Edit Company'}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setAddDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t('addClient') || 'Add Client'}
             </Button>
-          )
+            {company && (
+              <Button onClick={() => setDialogOpen(true)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                {t('editProfile') || 'Edit Company'}
+              </Button>
+            )}
+          </div>
         }
       />
-      
+
       {loading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -157,6 +168,21 @@ export default function CompanyPage() {
           onSuccess={loadCompany}
         />
       )}
+
+      <CreateCompanyDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
+        onSuccess={async () => {
+          try {
+            const updatedUser = await authService.getCurrentUser();
+            setUser(updatedUser);
+          } catch (e) {
+            console.error("Failed to refresh user data", e);
+          }
+          // The company switcher in the header should now be updated!
+          // Optional: we can set the new company as active, or just let them select it.
+        }}
+      />
     </div>
   )
 }

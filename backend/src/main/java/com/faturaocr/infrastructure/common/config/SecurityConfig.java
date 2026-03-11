@@ -169,7 +169,7 @@ public class SecurityConfig {
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                 configuration.setAllowedHeaders(
                                 List.of("Authorization", "Content-Type", "Accept", "X-Requested-With",
-                                                "X-Internal-API-Key"));
+                                                "X-Internal-API-Key", "X-Company-Id"));
                 configuration.setExposedHeaders(List.of("Authorization", "X-RateLimit-Limit", "X-RateLimit-Remaining",
                                 "X-RateLimit-Reset", "Content-Disposition"));
                 configuration.setAllowCredentials(true);

@@ -39,7 +39,7 @@ public class UserManagementController {
     private final UserManagementService userManagementService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new user")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "User created successfully")
@@ -49,7 +49,7 @@ public class UserManagementController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'MANAGER')")
     @Operation(summary = "List users for company")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "List of users retrieved")
     public ApiResponse<Page<UserResponse>> listUsers(Pageable pageable) {
@@ -58,7 +58,7 @@ public class UserManagementController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'MANAGER')")
     @Operation(summary = "Get user details")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User found"),
@@ -70,7 +70,7 @@ public class UserManagementController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'MANAGER')")
     @Operation(summary = "Update user")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User updated successfully")
     public ApiResponse<UserResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody UpdateUserRequest request) {
@@ -79,7 +79,7 @@ public class UserManagementController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'MANAGER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete user")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "User deleted successfully")
@@ -88,7 +88,7 @@ public class UserManagementController {
     }
 
     @PatchMapping("/{id}/toggle-active")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'MANAGER')")
     @Operation(summary = "Toggle user active status")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User status toggled")
     public ApiResponse<UserResponse> toggleUserActive(@PathVariable UUID id) {
@@ -98,7 +98,7 @@ public class UserManagementController {
     }
 
     @PatchMapping("/{id}/role")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'MANAGER')")
     @Operation(summary = "Change user role")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User role updated")
     public ApiResponse<UserResponse> changeUserRole(@PathVariable UUID id,

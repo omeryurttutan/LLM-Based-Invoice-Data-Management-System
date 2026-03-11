@@ -128,6 +128,27 @@ public class UserRepositoryAdapter implements UserRepository {
         // Let's assume JPA handles it.
         entity.setDeleted(user.isDeleted());
 
+        if (user.getCompanyAccesses() != null) {
+            java.util.List<UserCompanyAccessJpaEntity> accessJpaEntities = user.getCompanyAccesses().stream()
+                    .map(access -> {
+                        UserCompanyAccessJpaEntity accessEntity = new UserCompanyAccessJpaEntity();
+                        if (access.getId() != null) {
+                            accessEntity.setId(access.getId());
+                        }
+                        accessEntity.setUser(entity);
+
+                        com.faturaocr.infrastructure.persistence.company.CompanyJpaEntity companyRef = new com.faturaocr.infrastructure.persistence.company.CompanyJpaEntity();
+                        companyRef.setId(access.getCompanyId());
+                        companyRef.setName(access.getCompanyName());
+                        accessEntity.setCompany(companyRef);
+
+                        accessEntity.setRole(UserJpaEntity.RoleJpa.valueOf(access.getRole().name()));
+                        accessEntity.setActive(access.isActive());
+                        return accessEntity;
+                    }).collect(java.util.stream.Collectors.toList());
+            entity.setCompanyAccesses(accessJpaEntities);
+        }
+
         return entity;
     }
 
@@ -146,6 +167,19 @@ public class UserRepositoryAdapter implements UserRepository {
                 .failedLoginAttempts(entity.getFailedLoginAttempts())
                 .lockedUntil(entity.getLockedUntil())
                 .lastLoginAt(entity.getLastLoginAt())
+                .companyAccesses(
+                        entity.getCompanyAccesses() != null
+                                ? entity.getCompanyAccesses().stream()
+                                        .map(a -> com.faturaocr.domain.user.entity.UserCompanyAccess.builder()
+                                                .id(a.getId())
+                                                .userId(entity.getId())
+                                                .companyId(a.getCompany().getId())
+                                                .companyName(a.getCompany().getName())
+                                                .role(Role.valueOf(a.getRole().name()))
+                                                .isActive(a.isActive())
+                                                .build())
+                                        .collect(java.util.stream.Collectors.toList())
+                                : new java.util.ArrayList<>())
                 .build();
     }
 }

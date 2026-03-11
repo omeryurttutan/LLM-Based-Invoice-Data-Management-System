@@ -9,7 +9,13 @@ public record AuthenticatedUser(
         UUID userId,
         String email,
         UUID companyId,
+        java.util.List<String> accessibleCompanyIds,
         String role) {
+
+    public AuthenticatedUser(UUID userId, String email, UUID companyId, String role) {
+        this(userId, email, companyId, java.util.List.of(), role);
+    }
+
     public boolean isAdmin() {
         return "ADMIN".equals(role);
     }

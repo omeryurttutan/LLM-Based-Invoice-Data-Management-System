@@ -58,11 +58,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String companyId = claims.get("companyId", String.class);
                 String email = claims.get("email", String.class);
 
+                @SuppressWarnings("unchecked")
+                List<String> accessibleCompanyIds = claims.get("accessibleCompanyIds", List.class);
+
                 // Create authentication principal
                 AuthenticatedUser principal = new AuthenticatedUser(
                         userId,
                         email,
-                        UUID.fromString(companyId),
+                        StringUtils.hasText(companyId) ? UUID.fromString(companyId) : null,
+                        accessibleCompanyIds != null ? accessibleCompanyIds : new ArrayList<>(),
                         role);
 
                 // Build authorities list:

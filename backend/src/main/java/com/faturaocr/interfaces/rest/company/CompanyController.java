@@ -35,7 +35,7 @@ public class CompanyController {
     private final com.faturaocr.application.user.UserManagementService userManagementService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CompanyResponse> createCompany(@Valid @RequestBody CreateCompanyRequest request) {
         CompanyResponse response = companyService.createCompany(request.toCommand());
@@ -64,7 +64,7 @@ public class CompanyController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
     public ApiResponse<CompanyResponse> updateCompany(@PathVariable UUID id,
             @Valid @RequestBody UpdateCompanyRequest request) {
         CompanyResponse response = companyService.updateCompany(id, request.toCommand());
@@ -93,7 +93,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}/users")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'MANAGER')")
     public ApiResponse<Page<com.faturaocr.application.user.dto.UserResponse>> getUsersByCompany(
             @PathVariable UUID id,
             Pageable pageable) {

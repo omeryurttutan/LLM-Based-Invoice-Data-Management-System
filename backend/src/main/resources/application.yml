@@ -88,6 +88,7 @@ upload:
   storage-path: ${UPLOAD_STORAGE_PATH:./uploads}
   max-file-size: ${UPLOAD_MAX_FILE_SIZE_MB:20}MB
   max-bulk-total-size: ${UPLOAD_MAX_BULK_TOTAL_SIZE_MB:200}MB
+  extraction-service-url: ${EXTRACTION_SERVICE_URL:http://localhost:8000}
 
   servlet:
     multipart:
