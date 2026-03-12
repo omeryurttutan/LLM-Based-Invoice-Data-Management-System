@@ -13,8 +13,8 @@ ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 ALTER TABLE users ADD CONSTRAINT users_role_check 
     CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN'));
 
--- Allow SUPER_ADMIN users to have NULL company_id (platform-level)
-ALTER TABLE users ALTER COLUMN company_id DROP NOT NULL;
+-- Note: company_id was already renamed to default_company_id in V44
+-- and NOT NULL was already dropped there, so no action needed here.
 
 -- ============================================================================
 -- SECTION 2: SUBSCRIPTION & QUOTA FIELDS ON COMPANIES
