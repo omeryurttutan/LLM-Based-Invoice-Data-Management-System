@@ -54,8 +54,10 @@ public class Company extends BaseEntity {
             int maxUsers, int maxInvoices, int dailyInvoiceLimit,
             int usedInvoiceCount, int dailyInvoiceCount, LocalDate dailyCountDate,
             LocalDateTime suspendedAt, String suspensionReason) {
-        super(id != null ? id : UUID.randomUUID());
-        validateTaxNumber(taxNumber);
+        super(id); // from BaseDomainEntity
+        // Do NOT validate tax number here, because this constructor is used by MapStruct/Builder
+        // to hydrate existing records from the database. Legacy records might have invalid
+        // tax numbers (like the demo company), and we don't want the system to crash on load.
         this.name = name;
         this.taxNumber = taxNumber;
         this.taxOffice = taxOffice;
