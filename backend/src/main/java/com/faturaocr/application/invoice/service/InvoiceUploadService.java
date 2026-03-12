@@ -8,6 +8,10 @@ import com.faturaocr.domain.invoice.service.FileValidationService;
 import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
 import com.faturaocr.domain.invoice.valueobject.LlmProvider;
 import com.faturaocr.domain.invoice.valueobject.SourceType;
+import com.faturaocr.application.invoice.DuplicateDetectionService;
+import com.faturaocr.application.invoice.dto.DuplicateCheckRequest;
+import com.faturaocr.application.invoice.dto.DuplicateCheckResult;
+import com.faturaocr.domain.invoice.valueobject.DuplicateConfidence;
 import com.faturaocr.infrastructure.adapter.extraction.PythonExtractionClient;
 import com.faturaocr.infrastructure.adapter.extraction.dto.ExtractionResult;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +32,15 @@ public class InvoiceUploadService {
     private final FileStoragePort fileStoragePort;
     private final InvoiceRepository invoiceRepository;
     private final PythonExtractionClient pythonExtractionClient;
+    private final DuplicateDetectionService duplicateDetectionService;
+    private final com.faturaocr.application.company.QuotaService quotaService;
 
     public Invoice uploadAndExtract(MultipartFile file, UUID companyId, UUID userId) {
         log.info("Starting single file upload for company: {}, user: {}, file: {}", companyId, userId,
                 file.getOriginalFilename());
+
+        // 0. Check quota BEFORE ANY processing (LLM cost protection)
+        quotaService.checkInvoiceQuota(companyId);
 
         // 1. Validate
         fileValidationService.validateFile(file);
@@ -69,8 +78,48 @@ public class InvoiceUploadService {
             // 5. Update Invoice
             updateInvoiceWithResult(invoice, result);
 
+            // 6. Check for duplicates
+            if (invoice.getInvoiceNumber() != null) {
+                DuplicateCheckRequest duplicateCheckRequest = DuplicateCheckRequest.builder()
+                        .invoiceNumber(invoice.getInvoiceNumber())
+                        .invoiceDate(invoice.getInvoiceDate())
+                        .totalAmount(invoice.getTotalAmount())
+                        .supplierName(invoice.getSupplierName())
+                        .supplierTaxNumber(invoice.getSupplierTaxNumber())
+                        .companyId(companyId)
+                        .excludeInvoiceId(invoice.getId())
+                        .build();
+
+                DuplicateCheckResult duplicateCheckResult = duplicateDetectionService.checkForDuplicates(duplicateCheckRequest);
+
+                if (duplicateCheckResult.isHasDuplicates()) {
+                    DuplicateConfidence confidence = duplicateCheckResult.getHighestConfidence();
+                    if (confidence == DuplicateConfidence.HIGH || confidence == DuplicateConfidence.MEDIUM) {
+                        log.warn("Duplicate invoice detected during extraction for company: {}, invoice number: {}", companyId, invoice.getInvoiceNumber());
+                        
+                        invoice.setStatus(InvoiceStatus.FAILED);
+                        String reason = "Mükerrer fatura tespiti: ";
+                        if (!duplicateCheckResult.getDuplicates().isEmpty()) {
+                            reason += duplicateCheckResult.getDuplicates().get(0).getMatchReason();
+                        }
+                        invoice.setRejectionReason(reason);
+                        
+                        // Prevent unique constraint violation
+                        invoice.setInvoiceNumber(null);
+                    }
+                }
+            }
+
             invoice = invoiceRepository.save(invoice);
-            log.info("Extraction completed for invoice {}", invoice.getId());
+            
+            if (invoice.getStatus() == InvoiceStatus.FAILED) {
+                log.warn("Extraction resulted in FAILED status for invoice {} due to duplication", invoice.getId());
+            } else {
+                // Increment invoice quota counter on successful extraction
+                quotaService.incrementInvoiceCount(companyId);
+                log.info("Extraction completed for invoice {}", invoice.getId());
+            }
+
             return invoice;
 
         } catch (Exception e) {

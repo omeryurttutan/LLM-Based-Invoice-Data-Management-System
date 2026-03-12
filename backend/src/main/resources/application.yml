@@ -129,6 +129,10 @@ app:
     audit-masking:
       enabled: true
 
+  super-admin:
+    email: ${SUPER_ADMIN_EMAIL:}
+    password: ${SUPER_ADMIN_PASSWORD:}
+
   security:
     password:
       bcrypt-strength: 12

@@ -66,6 +66,40 @@ public class CompanyJpaEntity {
     @Column(name = "is_active")
     private boolean isActive;
 
+    // --- SaaS Subscription & Quota ---
+    @Column(name = "subscription_status")
+    private String subscriptionStatus;
+
+    @Column(name = "trial_ends_at")
+    private LocalDateTime trialEndsAt;
+
+    @Column(name = "plan_id")
+    private String planId;
+
+    @Column(name = "max_users")
+    private int maxUsers;
+
+    @Column(name = "max_invoices")
+    private int maxInvoices;
+
+    @Column(name = "daily_invoice_limit")
+    private int dailyInvoiceLimit;
+
+    @Column(name = "used_invoice_count")
+    private int usedInvoiceCount;
+
+    @Column(name = "daily_invoice_count")
+    private int dailyInvoiceCount;
+
+    @Column(name = "daily_count_date")
+    private java.time.LocalDate dailyCountDate;
+
+    @Column(name = "suspended_at")
+    private LocalDateTime suspendedAt;
+
+    @Column(name = "suspension_reason")
+    private String suspensionReason;
+
     @Column(name = "is_deleted")
     private boolean isDeleted;
 

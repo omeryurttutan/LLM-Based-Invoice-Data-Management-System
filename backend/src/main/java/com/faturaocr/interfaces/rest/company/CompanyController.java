@@ -35,7 +35,7 @@ public class CompanyController {
     private final com.faturaocr.application.user.UserManagementService userManagementService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAuthority('COMPANY_CREATE')")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CompanyResponse> createCompany(@Valid @RequestBody CreateCompanyRequest request) {
         CompanyResponse response = companyService.createCompany(request.toCommand());
@@ -72,21 +72,21 @@ public class CompanyController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('COMPANY_DELETE')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompany(@PathVariable UUID id) {
         companyService.deleteCompany(id);
     }
 
     @PatchMapping("/{id}/activate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('SUBSCRIPTION_MANAGE')")
     public ApiResponse<CompanyResponse> activateCompany(@PathVariable UUID id) {
         CompanyResponse response = companyService.activateCompany(id);
         return ApiResponse.success("Company activated successfully", response);
     }
 
     @PatchMapping("/{id}/deactivate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('SUBSCRIPTION_MANAGE')")
     public ApiResponse<CompanyResponse> deactivateCompany(@PathVariable UUID id) {
         CompanyResponse response = companyService.deactivateCompany(id);
         return ApiResponse.success("Company deactivated successfully", response);

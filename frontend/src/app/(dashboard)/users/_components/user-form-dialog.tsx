@@ -134,8 +134,19 @@ export function UserFormDialog({ open, onOpenChange, user, onSuccess }: UserForm
       onSuccess();
       onOpenChange(false);
       form.reset();
-    } catch (error) {
-      toast.error(t('messages.error'));
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message;
+      if (errorMsg === 'Kendi rolünüzü değiştiremezsiniz' || errorMsg === 'Cannot change your own role') {
+        toast.error(t('messages.unauthorizedRoleChange'));
+      } else if (errorMsg === 'Cannot remove the last admin of the company') {
+        toast.error(t('messages.lastAdmin'));
+      } else if (errorMsg?.includes('SUPER_ADMIN')) {
+        toast.error('SUPER_ADMIN rolü atanamaz veya değiştirilemez');
+      } else if (errorMsg?.includes('limitinize')) {
+        toast.error(errorMsg);
+      } else {
+        toast.error(errorMsg || t('messages.error'));
+      }
       console.error('Failed to save user', error);
     } finally {
       setIsLoading(false);

@@ -33,6 +33,7 @@ public class UserManagementService {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.faturaocr.application.company.QuotaService quotaService;
 
     @Transactional
     @Auditable(action = AuditActionType.CREATE, entityType = "USER")
@@ -47,6 +48,14 @@ public class UserManagementService {
         if (userRepository.existsByEmailAndCompanyId(email, companyId)) {
             throw new DomainException("User with email " + command.getEmail() + " already exists in this company");
         }
+
+        // Prevent SUPER_ADMIN assignment
+        if (command.getRole() == Role.SUPER_ADMIN) {
+            throw new DomainException("SUPER_ADMIN rolü atanamaz");
+        }
+
+        // Check user quota
+        quotaService.checkUserQuota(companyId);
 
         String encodedPassword = passwordEncoder.encode(command.getPassword());
 
@@ -151,10 +160,20 @@ public class UserManagementService {
     public UserResponse changeUserRole(UUID id, ChangeRoleCommand command) {
         User user = getUserInContext(id);
 
+        // SUPER_ADMIN role can NEVER be assigned through the UI
+        if (command.getRole() == Role.SUPER_ADMIN) {
+            throw new DomainException("SUPER_ADMIN rolü atanamaz");
+        }
+
+        // Cannot change SUPER_ADMIN's role
+        if (user.getRole() == Role.SUPER_ADMIN) {
+            throw new DomainException("SUPER_ADMIN kullanıcısının rolü değiştirilemez");
+        }
+
         // Cannot change own role
         UUID currentUserId = getCurrentUserId();
         if (id.equals(currentUserId)) {
-            throw new DomainException("Cannot change your own role");
+            throw new DomainException("Kendi rolünüzü değiştiremezsiniz");
         }
 
         // Last admin protection: if demoting an admin, ensure they're not the last one

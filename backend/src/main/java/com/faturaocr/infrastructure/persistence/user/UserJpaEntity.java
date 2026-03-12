@@ -69,6 +69,6 @@ public class UserJpaEntity extends BaseJpaEntity {
     private LocalDateTime passwordChangedAt;
 
     public enum RoleJpa {
-        ADMIN, MANAGER, ACCOUNTANT, INTERN
+        SUPER_ADMIN, ADMIN, MANAGER, ACCOUNTANT, INTERN
     }
 }

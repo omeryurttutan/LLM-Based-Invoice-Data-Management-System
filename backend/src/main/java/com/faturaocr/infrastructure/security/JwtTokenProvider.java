@@ -53,6 +53,7 @@ public class JwtTokenProvider {
         claims.put("role", user.getRole().name());
         claims.put("companyId", user.getCompanyId() != null ? user.getCompanyId().toString() : "");
         claims.put("fullName", user.getFullName());
+        claims.put("isSuperAdmin", user.getRole() == com.faturaocr.domain.user.valueobject.Role.SUPER_ADMIN);
 
         java.util.List<String> accessibleCompanyIds = user.getCompanyAccesses().stream()
                 .map(acc -> acc.getCompanyId().toString())

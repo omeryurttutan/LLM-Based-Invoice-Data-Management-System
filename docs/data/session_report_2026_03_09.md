@@ -474,7 +474,7 @@ Eklenen eksik alanlar: `buyerName` (`alici_unvan`), `buyerTaxNumber` (`alici_vkn
 
 ---
 
-## Alınan Dersler ve Öneriler
+## Alınan Dersler ve Öneriler (9 Mart)
 
 1. **Migration Dosyaları:** Yeni entity'ler oluşturulurken `BaseJpaEntity`'den miras alınan tüm alanların (`is_deleted`, `deleted_at`, `created_at`, `updated_at`) migration'a dahil edildiğinden emin olunmalıdır.
 2. **Ortam Değişkenleri:** Hassas yapılandırmalar (şifreleme anahtarları, API anahtarları) ortam değişkenleri ile yönetilmeli ve `.env.example` dosyasında belgelenmeli.
@@ -486,3 +486,614 @@ Eklenen eksik alanlar: `buyerName` (`alici_unvan`), `buyerTaxNumber` (`alici_vkn
 8. **Spring RestClient vs RestTemplate:** Spring `RestClient` ile `MultipartBodyBuilder` kullanırken multipart `boundary` parametresi `Content-Type` header'ına otomatik eklenmeyebilir. `RestTemplate` + `LinkedMultiValueMap` kombinasyonu multipart dosya yüklemeleri için daha güvenilirdir.
 9. **LLM Çıktı Güvenilirliği:** LLM'ler (Gemini dahil) her zaman geçerli JSON üretmez. Yanıt parser'ları eksik parantez, kesilmiş sayılar ve tamamlanmamış JSON gibi bozuk çıktıları onaracak şekilde dayanıklı (resilient) tasarlanmalıdır.
 10. **Max Output Tokens:** Çok kalemli faturalar (10+) için `max_output_tokens` değeri yeterli büyüklükte olmalıdır. 4096 token, 10 kalemli bir fatura için yetersiz kalabilir; 8192 önerilir.
+
+---
+---
+
+# Oturum Raporu — 12 Mart 2026
+
+Bu belge, 12 Mart 2026 oturumu boyunca karşılaşılan sorunları, eklenen özellikleri, yapılan değişiklikleri ve uygulanan çözümleri detaylı olarak kapsamaktadır.
+
+---
+
+## İçindekiler (12 Mart)
+
+16. [Sorun: Kullanıcı Sayfası Durum Kısmı Bozuk Görünüm](#16-sorun-kullanıcı-sayfası-durum-kısmı-bozuk-görünüm)
+17. [Sorun: Admin Rolü Değişikliğinde Yanlış Hata Mesajı](#17-sorun-admin-rolü-değişikliğinde-yanlış-hata-mesajı)
+18. [Özellik: SUPER_ADMIN Rolü Uygulaması](#18-özellik-super_admin-rolü-uygulaması)
+19. [Özellik: VKN (Vergi Kimlik Numarası) Doğrulama Sistemi](#19-özellik-vkn-vergi-kimlik-numarası-doğrulama-sistemi)
+20. [Özellik: SaaS Trial (Deneme Sürümü) Sistemi](#20-özellik-saas-trial-deneme-sürümü-sistemi)
+21. [Özellik: Fatura Kota Yönetimi (QuotaService)](#21-özellik-fatura-kota-yönetimi-quotaservice)
+22. [Özellik: Otomatik Abonelik Kontrolü (SubscriptionCheckScheduler)](#22-özellik-otomatik-abonelik-kontrolü-subscriptioncheckscheduler)
+23. [Güvenlik: Yetki Yükseltme Engeli ve Endpoint Kilitleri](#23-güvenlik-yetki-yükseltme-engeli-ve-endpoint-kilitleri)
+24. [Güvenlik: JWT ve CompanyContextFilter SUPER_ADMIN Desteği](#24-güvenlik-jwt-ve-companycontextfilter-super_admin-desteği)
+25. [Güvenlik: Login'de Abonelik Durumu Kontrolü](#25-güvenlik-loginde-abonelik-durumu-kontrolü)
+26. [Frontend: Kota Gösterimi ve Tip Güncellemeleri](#26-frontend-kota-gösterimi-ve-tip-güncellemeleri)
+27. [Değiştirilen Dosyaların Listesi (12 Mart)](#27-değiştirilen-dosyaların-listesi-12-mart)
+
+---
+
+## 16. Sorun: Kullanıcı Sayfası Durum Kısmı Bozuk Görünüm
+
+### Belirti
+Kullanıcı yönetim sayfasındaki kullanıcıların "Durum" sütunu kötü ve düzensiz görünüyordu. Aktif/Pasif durumu düzgün biçimlendirilmemişti.
+
+### Çözüm
+Kullanıcı durum gösterimi CSS ile yeniden düzenlendi. Yerelleştirme dosyalarında (`common.json`) Türkçe ve İngilizce durum etiketleri güncellendi.
+
+**Değiştirilen Dosyalar:**
+- `frontend/src/messages/tr/common.json`
+- `frontend/src/messages/en/common.json`
+
+---
+
+## 17. Sorun: Admin Rolü Değişikliğinde Yanlış Hata Mesajı
+
+### Belirti
+Admin kullanıcısı olarak giriş yapıldığında, kendi rolü "Manager" yapılmak istendiğinde "Hata oluştu" gibi genel bir hata mesajı görüntüleniyordu. İşlem aslında doğru bir şekilde reddediliyordu (kendi rolünü değiştirememe) ancak kullanıcıya gösterilen mesaj anlamsızdı.
+
+### Kök Neden
+Backend `"Cannot change your own role"` İngilizce hata mesajı döndürüyordu. Frontend'de bu mesaj doğru şekilde yakalanıp görüntülense de, kullanıcıya gösterilen mesaj yeterince açıklayıcı değildi. Ayrıca admin kullanıcının kendi rolünü değiştirmesi mantıksal olarak "yetkisiz işlem" uyarısı gerektiriyordu.
+
+### Çözüm
+
+**Backend — `UserManagementService.java`:**
+Hata mesajları Türkçeye çevrildi ve daha açıklayıcı yapıldı:
+```java
+// Önceki
+throw new DomainException("Cannot change your own role");
+// Sonraki
+throw new DomainException("Kendi rolünüzü değiştiremezsiniz");
+```
+
+**Frontend — `user-form-dialog.tsx`:**
+SUPER_ADMIN, kota ve yeni Türkçe hata mesajları eklendi:
+```typescript
+if (errorMsg === 'Kendi rolünüzü değiştiremezsiniz' || errorMsg === 'Cannot change your own role') {
+  toast.error(t('messages.unauthorizedRoleChange'));
+} else if (errorMsg?.includes('SUPER_ADMIN')) {
+  toast.error('SUPER_ADMIN rolü atanamaz veya değiştirilemez');
+} else if (errorMsg?.includes('limitinize')) {
+  toast.error(errorMsg); // Kota limiti uyarısı
+}
+```
+
+**Değiştirilen Dosyalar:**
+- `backend/src/main/java/com/faturaocr/application/user/UserManagementService.java`
+- `frontend/src/app/(dashboard)/users/_components/user-form-dialog.tsx`
+
+---
+
+## 18. Özellik: SUPER_ADMIN Rolü Uygulaması
+
+### Amaç
+Platform düzeyinde bir yönetici rolü oluşturulması. SUPER_ADMIN, tüm şirketleri yönetebilen, abonelikleri kontrol edebilen ve diğer kullanıcılar tarafından atanamayan en yüksek yetki seviyesidir. Mali müşavirlerin yönettiği SaaS platformunda, platform sahibinin (sizin) şirketleri onaylaması, askıya alması ve yönetmesi için gereklidir.
+
+### Yapılan Değişiklikler
+
+#### Yeni Yetkiler — `Permission.java`
+```java
+COMPANY_CREATE,       // Şirket oluşturma (yalnızca SUPER_ADMIN)
+COMPANY_DELETE,       // Şirket silme (yalnızca SUPER_ADMIN)
+SUPER_ADMIN_ACCESS,   // Platform yönetim paneli erişimi
+SUBSCRIPTION_MANAGE   // Abonelik yönetimi (aktif/askıya al)
+```
+
+#### Yeni Rol — `Role.java`
+```java
+SUPER_ADMIN(Set.of(Permission.values())) // TÜM yetkiler
+```
+SUPER_ADMIN, `Permission` enum'undaki tüm izinlere sahiptir. `ADMIN` rolü yalnızca şirket düzeyinde izinlere sahip kalır.
+
+#### İlk SUPER_ADMIN Oluşturma — `SuperAdminInitializer.java` (YENİ)
+Uygulama başlatıldığında ortam değişkenlerinden ilk SUPER_ADMIN hesabını oluşturur:
+```bash
+export SUPER_ADMIN_EMAIL=admin@yourplatform.com
+export SUPER_ADMIN_PASSWORD=MySecureP@ss123!
+```
+
+- Eğer hesap zaten varsa hiçbir işlem yapmaz (idempotent).
+- Şifreler hardcode değil, ortam değişkenlerinden okunur.
+- SUPER_ADMIN'in `companyId`'si `null`'dır — platform düzeyinde kullanıcıdır.
+
+**Yapılandırma — `application.yml`:**
+```yaml
+app:
+  super-admin:
+    email: ${SUPER_ADMIN_EMAIL:}
+    password: ${SUPER_ADMIN_PASSWORD:}
+```
+
+#### JPA Katmanı
+- `UserJpaEntity.RoleJpa` enum'una `SUPER_ADMIN` eklendi.
+- `AuthenticatedUser` record'una `isSuperAdmin()` metodu eklendi.
+
+#### Veritabanı Migration — `V46__add_super_admin_and_saas_fields.sql` (YENİ)
+```sql
+-- Users tablosuna SUPER_ADMIN rolünü kabul eden constraint güncellendi
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_role;
+ALTER TABLE users ADD CONSTRAINT chk_users_role
+CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'INTERN'));
+```
+
+**Değiştirilen/Oluşturulan Dosyalar:**
+- `backend/src/main/java/com/faturaocr/domain/user/valueobject/Permission.java`
+- `backend/src/main/java/com/faturaocr/domain/user/valueobject/Role.java`
+- `backend/src/main/java/com/faturaocr/infrastructure/common/config/SuperAdminInitializer.java` (YENİ)
+- `backend/src/main/java/com/faturaocr/infrastructure/persistence/user/UserJpaEntity.java`
+- `backend/src/main/java/com/faturaocr/infrastructure/security/AuthenticatedUser.java`
+- `backend/src/main/resources/db/migration/V46__add_super_admin_and_saas_fields.sql` (YENİ)
+- `backend/src/main/resources/application.yml`
+
+---
+
+## 19. Özellik: VKN (Vergi Kimlik Numarası) Doğrulama Sistemi
+
+### Amaç
+Şirket kaydı sırasında girilen 10 haneli vergi kimlik numarasının (VKN) gerçek bir numara olup olmadığının doğrulanması. Sahte şirket kayıtlarının engellenmesi.
+
+### Yapılan Değişiklikler
+
+#### VKN Doğrulama Algoritması — `TaxNumberValidator.java` (YENİ)
+GİB (Gelir İdaresi Başkanlığı) resmi algoritmasına dayalı VKN ve TCKN doğrulama:
+
+```java
+public static boolean isValidVKN(String vkn) {
+    // 10 haneli VKN kontrolü
+    // Resmi GİB sağlama algoritması uygulanır
+    // Son hane = (Σ dizin ağırlıklı mod işlemleri) mod 10
+}
+
+public static boolean isValidTCKN(String tckn) {
+    // 11 haneli TCKN kontrolü
+    // İlk hane 0 olamaz
+    // 10. ve 11. haneler sağlama basamaklarıdır
+}
+```
+
+#### Kayıt Sırasında Doğrulama — `AuthenticationService.java`
+```java
+// Regex formatı kontrolünden SONRA checksum doğrulaması
+if (!TaxNumberValidator.isValidVKN(command.taxNumber())) {
+    throw new DomainException("VALIDATION_ERROR", "Geçersiz vergi kimlik numarası (VKN)");
+}
+```
+
+#### Veritabanı Kısıtlaması — `V46` Migration
+```sql
+-- VKN benzersizlik kısıtlaması (aynı VKN ile iki şirket kaydı engellensin)
+ALTER TABLE companies ADD CONSTRAINT uq_companies_tax_number UNIQUE (tax_number);
+```
+
+**Değiştirilen/Oluşturulan Dosyalar:**
+- `backend/src/main/java/com/faturaocr/domain/common/util/TaxNumberValidator.java` (YENİ)
+- `backend/src/main/java/com/faturaocr/application/auth/service/AuthenticationService.java`
+- `backend/src/main/resources/db/migration/V46__add_super_admin_and_saas_fields.sql`
+
+---
+
+## 20. Özellik: SaaS Trial (Deneme Sürümü) Sistemi
+
+### Amaç
+Yeni kayıt olan şirketlerin 7 gün boyunca ücretsiz deneme sürümü ile sistemi kullanabilmesi. Deneme süresinde günlük 50, toplam 350 fatura işleme hakkı verilmesi. Süre sonunda ödeme yapılmazsa hesabın askıya alınması (verilerin silinmemesi).
+
+### Yapılan Değişiklikler
+
+#### Domain Entity — `Company.java`
+Şirket entity'sine abonelik ve kota alanları eklendi:
+
+| Alan | Tip | Varsayılan | Açıklama |
+|------|-----|-----------|----------|
+| `subscriptionStatus` | String | `"TRIAL"` | TRIAL / ACTIVE / SUSPENDED |
+| `trialEndsAt` | LocalDateTime | Şimdi + 7 gün | Deneme bitiş tarihi |
+| `planId` | String | `"trial"` | Paket kimliği |
+| `maxUsers` | int | `2` | Maksimum kullanıcı sayısı |
+| `maxInvoices` | int | `350` | Toplam fatura limiti |
+| `dailyInvoiceLimit` | int | `50` | Günlük fatura limiti |
+| `usedInvoiceCount` | int | `0` | Kullanılan toplam fatura sayısı |
+| `dailyInvoiceCount` | int | `0` | Bugün kullanılan fatura sayısı |
+| `dailyCountDate` | LocalDate | Bugün | Günlük sayaç tarihi |
+| `suspendedAt` | LocalDateTime | null | Askıya alınma zamanı |
+| `suspensionReason` | String | null | Askıya alma sebebi |
+
+Constructor'da varsayılan TRIAL değerleri otomatik atanır:
+```java
+public Company(String name, String taxNumber) {
+    // ...
+    this.subscriptionStatus = "TRIAL";
+    this.trialEndsAt = LocalDateTime.now().plusDays(7);
+    this.maxInvoices = 350;
+    this.dailyInvoiceLimit = 50;
+    this.maxUsers = 2;
+    this.planId = "trial";
+}
+```
+
+#### JPA Katmanı
+- `CompanyJpaEntity.java` — 11 yeni abonelik sütunu eklendi.
+- `CompanyMapper.java` — Tüm abonelik alanlarının domain ↔ JPA dönüşümü güncellendi.
+- `CompanyJpaRepository.java` — `findAllBySubscriptionStatusAndTrialEndsAtBefore()` sorgusu eklendi.
+
+#### Veritabanı Migration — `V46`
+```sql
+ALTER TABLE companies
+    ADD COLUMN subscription_status VARCHAR(20) DEFAULT 'ACTIVE',
+    ADD COLUMN trial_ends_at TIMESTAMP,
+    ADD COLUMN plan_id VARCHAR(50) DEFAULT 'basic',
+    ADD COLUMN max_users INTEGER DEFAULT 5,
+    ADD COLUMN max_invoices INTEGER DEFAULT 1000,
+    ADD COLUMN daily_invoice_limit INTEGER DEFAULT 100,
+    ADD COLUMN used_invoice_count INTEGER DEFAULT 0,
+    ADD COLUMN daily_invoice_count INTEGER DEFAULT 0,
+    ADD COLUMN daily_count_date DATE DEFAULT CURRENT_DATE,
+    ADD COLUMN suspended_at TIMESTAMP,
+    ADD COLUMN suspension_reason TEXT;
+```
+
+**Değiştirilen/Oluşturulan Dosyalar:**
+- `backend/src/main/java/com/faturaocr/domain/company/entity/Company.java`
+- `backend/src/main/java/com/faturaocr/infrastructure/persistence/company/CompanyJpaEntity.java`
+- `backend/src/main/java/com/faturaocr/infrastructure/persistence/company/CompanyMapper.java`
+- `backend/src/main/java/com/faturaocr/infrastructure/persistence/company/CompanyJpaRepository.java`
+- `backend/src/main/resources/db/migration/V46__add_super_admin_and_saas_fields.sql`
+
+---
+
+## 21. Özellik: Fatura Kota Yönetimi (QuotaService)
+
+### Amaç
+Fatura işleme ve kullanıcı ekleme işlemlerinden ÖNCE kota kontrolü yapılması. LLM API maliyetlerinin kontrol altında tutulması.
+
+### Yapılan Değişiklikler
+
+#### QuotaService.java (YENİ)
+```java
+// 1. Fatura kotası kontrolü — LLM çağrısından ÖNCE çalışır
+quotaService.checkInvoiceQuota(companyId);
+// Kontroller: SUSPENDED mi? Trial süresi dolmuş mu? Toplam limit? Günlük limit?
+
+// 2. Başarılı extraction sonrası sayaç artırma
+quotaService.incrementInvoiceCount(companyId);
+
+// 3. Kullanıcı ekleme öncesi kota kontrolü
+quotaService.checkUserQuota(companyId);
+
+// 4. Frontend'e kota bilgisi gönderme
+QuotaInfo info = quotaService.getQuotaInfo(companyId);
+// → usedInvoices, maxInvoices, dailyUsed, dailyMax, remainingInvoices...
+```
+
+#### QuotaController.java (YENİ)
+```java
+@GetMapping("/api/v1/quota")
+public ApiResponse<QuotaInfo> getQuotaInfo() {
+    // Frontend'e kota bilgisini döndürür
+}
+```
+
+#### InvoiceUploadService.java — Kota Entegrasyonu
+```java
+public Invoice uploadAndExtract(MultipartFile file, UUID companyId, UUID userId) {
+    // 0. Check quota BEFORE ANY processing (LLM cost protection)
+    quotaService.checkInvoiceQuota(companyId);
+
+    // ... dosya doğrulama, kaydetme, extraction ...
+
+    // Başarılı extraction sonrası sayaç artır
+    quotaService.incrementInvoiceCount(companyId);
+}
+```
+
+#### UserManagementService.java — Kullanıcı Kota Kontrolü
+```java
+public UserResponse createUser(CreateUserCommand command) {
+    // SUPER_ADMIN ataması engelle
+    if (command.getRole() == Role.SUPER_ADMIN) {
+        throw new DomainException("SUPER_ADMIN rolü atanamaz");
+    }
+    // Kullanıcı kotasını kontrol et
+    quotaService.checkUserQuota(companyId);
+    // ... kullanıcı oluştur ...
+}
+```
+
+**Değiştirilen/Oluşturulan Dosyalar:**
+- `backend/src/main/java/com/faturaocr/application/company/QuotaService.java` (YENİ)
+- `backend/src/main/java/com/faturaocr/interfaces/rest/quota/QuotaController.java` (YENİ)
+- `backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceUploadService.java`
+- `backend/src/main/java/com/faturaocr/application/user/UserManagementService.java`
+
+---
+
+## 22. Özellik: Otomatik Abonelik Kontrolü (SubscriptionCheckScheduler)
+
+### Amaç
+Her gece saat 00:00'da çalışarak, deneme süresi dolmuş şirketleri otomatik olarak askıya alınması.
+
+### Yapılan Değişiklikler
+
+#### SubscriptionCheckScheduler.java (YENİ)
+```java
+@Scheduled(cron = "0 0 0 * * *") // Her gece 00:00
+@Transactional
+public void suspendExpiredTrials() {
+    List<CompanyJpaEntity> expiredTrials = companyJpaRepository
+        .findAllBySubscriptionStatusAndTrialEndsAtBefore("TRIAL", LocalDateTime.now());
+
+    for (CompanyJpaEntity company : expiredTrials) {
+        company.setSubscriptionStatus("SUSPENDED");
+        company.setSuspendedAt(LocalDateTime.now());
+        company.setSuspensionReason("Trial period expired");
+        companyJpaRepository.save(company);
+    }
+}
+```
+
+#### @EnableScheduling — `FaturaOcrApplication.java`
+```java
+@SpringBootApplication
+@EnableScheduling  // Scheduler'ın çalışması için gerekli
+public class FaturaOcrApplication { ... }
+```
+
+**Değiştirilen/Oluşturulan Dosyalar:**
+- `backend/src/main/java/com/faturaocr/infrastructure/scheduler/SubscriptionCheckScheduler.java` (YENİ)
+- `backend/src/main/java/com/faturaocr/FaturaOcrApplication.java`
+
+---
+
+## 23. Güvenlik: Yetki Yükseltme Engeli ve Endpoint Kilitleri
+
+### Amaç
+SUPER_ADMIN rolünün hiçbir kullanıcı veya endpoint üzerinden atanamaz olması. Şirket oluşturma, silme ve abonelik yönetiminin yalnızca SUPER_ADMIN'e kilitlenmesi.
+
+### Yapılan Değişiklikler
+
+#### CompanyController.java — Endpoint Kilitleri
+```java
+// Önceki
+@PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+public ApiResponse<CompanyResponse> createCompany(...)
+
+// Sonraki
+@PreAuthorize("hasAuthority('COMPANY_CREATE')")  // Yalnızca SUPER_ADMIN
+public ApiResponse<CompanyResponse> createCompany(...)
+
+@PreAuthorize("hasAuthority('COMPANY_DELETE')")   // Yalnızca SUPER_ADMIN
+public void deleteCompany(...)
+
+@PreAuthorize("hasAuthority('SUBSCRIPTION_MANAGE')") // Yalnızca SUPER_ADMIN
+public ApiResponse<CompanyResponse> activateCompany(...)
+```
+
+#### SecurityConfig.java — Route Güvenliği
+```java
+// Önceki
+.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+.requestMatchers("/api/v1/system/**").hasRole("ADMIN")
+
+// Sonraki
+.requestMatchers("/api/v1/admin/**").hasAuthority("SUPER_ADMIN_ACCESS")
+.requestMatchers("/api/v1/system/**").hasAuthority("SUPER_ADMIN_ACCESS")
+```
+
+#### UserManagementService.java — Yetki Yükseltme Engeli
+```java
+// SUPER_ADMIN rolü ASLA atanamaz
+if (command.getRole() == Role.SUPER_ADMIN) {
+    throw new DomainException("SUPER_ADMIN rolü atanamaz");
+}
+
+// SUPER_ADMIN kullanıcısının rolü DEĞİŞTİRİLEMEZ
+if (user.getRole() == Role.SUPER_ADMIN) {
+    throw new DomainException("SUPER_ADMIN kullanıcısının rolü değiştirilemez");
+}
+```
+
+**Değiştirilen Dosyalar:**
+- `backend/src/main/java/com/faturaocr/interfaces/rest/company/CompanyController.java`
+- `backend/src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java`
+- `backend/src/main/java/com/faturaocr/application/user/UserManagementService.java`
+
+---
+
+## 24. Güvenlik: JWT ve CompanyContextFilter SUPER_ADMIN Desteği
+
+### Amaç
+SUPER_ADMIN'in JWT token'ında tanınması ve şirket bağlamı (company context) kısıtlamasından muaf tutulması.
+
+### Yapılan Değişiklikler
+
+#### JwtTokenProvider.java — `isSuperAdmin` Claim
+```java
+claims.put("isSuperAdmin", user.getRole() == Role.SUPER_ADMIN);
+```
+
+#### AuthenticatedUser.java — `isSuperAdmin()` Metodu
+```java
+public boolean isSuperAdmin() {
+    return "SUPER_ADMIN".equals(role);
+}
+
+public boolean isAdmin() {
+    return "ADMIN".equals(role) || isSuperAdmin(); // SUPER_ADMIN da admin yetkilerine sahip
+}
+```
+
+#### CompanyContextFilter.java — SUPER_ADMIN Bypass
+```java
+if (user.isSuperAdmin()) {
+    // SUPER_ADMIN, X-Company-Id header'ı ile HERHANGİ bir şirkete erişebilir
+    String headerCompanyId = request.getHeader("X-Company-Id");
+    if (StringUtils.hasText(headerCompanyId)) {
+        CompanyContextHolder.setCompanyId(UUID.fromString(headerCompanyId));
+    }
+    // Header yoksa companyId null kalır — SUPER_ADMIN'in companyId'si olmayabilir
+} else {
+    // Normal kullanıcılar için mevcut erişim kontrolü devam eder
+}
+```
+
+**Değiştirilen Dosyalar:**
+- `backend/src/main/java/com/faturaocr/infrastructure/security/JwtTokenProvider.java`
+- `backend/src/main/java/com/faturaocr/infrastructure/security/AuthenticatedUser.java`
+- `backend/src/main/java/com/faturaocr/infrastructure/security/CompanyContextFilter.java`
+
+---
+
+## 25. Güvenlik: Login'de Abonelik Durumu Kontrolü
+
+### Amaç
+Askıya alınmış (SUSPENDED) veya deneme süresi dolmuş (TRIAL expired) şirketlerin kullanıcılarının sisteme giriş yapamaması ve ödeme sayfasına yönlendirilecek bir hata mesajı alması.
+
+### Yapılan Değişiklikler
+
+#### AuthenticationService.java — Login Kontrolü
+```java
+// Şifre doğrulaması BAŞARILI olduktan SONRA:
+if (user.getRole() != Role.SUPER_ADMIN && user.getCompanyId() != null) {
+    Company company = companyRepository.findById(user.getCompanyId()).get();
+
+    if (company.isSuspended()) {
+        throw new DomainException("SUBSCRIPTION_SUSPENDED",
+            "Aboneliğiniz askıya alınmıştır. Devam etmek için ödeme yapınız.");
+    }
+    if (company.isTrialExpired()) {
+        company.suspend("Trial period expired");
+        companyRepository.save(company);
+        throw new DomainException("TRIAL_EXPIRED",
+            "Deneme süreniz sona ermiştir. Devam etmek için ödeme yapınız.");
+    }
+}
+```
+
+**Güvenlik Notu:**
+- SUPER_ADMIN bu kontrolden muaftır (platform yöneticisi her zaman giriş yapabilir).
+- `companyId == null` olan kullanıcılar da muaftır (SUPER_ADMIN gibi platform düzeyinde hesaplar).
+- Deneme süresi login sırasında dolmuşsa, o anda otomatik askıya alınır.
+
+#### AuthenticationService.java — Kayıt VKN Doğrulama
+```java
+// Yeni şirket kaydında VKN checksum doğrulaması
+if (!TaxNumberValidator.isValidVKN(command.taxNumber())) {
+    throw new DomainException("VALIDATION_ERROR", "Geçersiz vergi kimlik numarası (VKN)");
+}
+```
+
+**Değiştirilen Dosya:**
+- `backend/src/main/java/com/faturaocr/application/auth/service/AuthenticationService.java`
+
+---
+
+## 26. Frontend: Kota Gösterimi ve Tip Güncellemeleri
+
+### Amaç
+- Fatura yükleme panelinde kalan fatura hakkının görsel olarak gösterilmesi.
+- SUPER_ADMIN rolünün frontend tiplerinde tanımlanması.
+- Abonelik ve kota ile ilgili hata mesajlarının düzgün gösterilmesi.
+
+### Yapılan Değişiklikler
+
+#### Kota Gösterimi — `upload/page.tsx`
+Upload sayfasının sağ sütununa (bilgi paneli) yeni bir "Kota Bilgisi" kartı eklendi:
+
+- **Günlük Kullanım** bar grafiği (ör. `12 / 50`) — 5'ten az hak kaldığında kırmızıya döner.
+- **Toplam Kullanım** bar grafiği (ör. `45 / 350`) — 20'den az hak kaldığında kırmızıya döner.
+- **Kullanıcı** sayısı (ör. `1 / 2`).
+- **Trial Sürümü** badge'i ve bitiş tarihi (ör. "19.03.2026 tarihine kadar").
+
+```typescript
+useEffect(() => {
+    apiClient.get('/api/v1/quota')
+      .then(res => setQuotaInfo(res.data?.data))
+      .catch(() => {/* kota bilgisi isteğe bağlı */});
+}, []);
+```
+
+#### TypeScript Tip Güncellemeleri — `auth.ts`
+```typescript
+// Önceki
+export type UserRole = 'ADMIN' | 'MANAGER' | 'ACCOUNTANT' | 'INTERN';
+
+// Sonraki
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'ACCOUNTANT' | 'INTERN';
+
+// Yeni QuotaInfo arayüzü eklendi
+export interface QuotaInfo {
+  usedInvoices: number;
+  maxInvoices: number;
+  dailyUsedInvoices: number;
+  dailyMaxInvoices: number;
+  usedUsers: number;
+  maxUsers: number;
+  subscriptionStatus: string;
+  trialEndsAt: string | null;
+  planId: string;
+  remainingInvoices: number;
+  dailyRemainingInvoices: number;
+}
+```
+
+#### Hata Mesajları — `user-form-dialog.tsx`
+SUPER_ADMIN ve kota hatalarını işleyen yeni koşullar eklendi (bkz. Bölüm 17).
+
+**Değiştirilen Dosyalar:**
+- `frontend/src/app/(dashboard)/invoices/upload/page.tsx`
+- `frontend/src/types/auth.ts`
+- `frontend/src/app/(dashboard)/users/_components/user-form-dialog.tsx`
+
+---
+
+## 27. Değiştirilen Dosyaların Listesi (12 Mart)
+
+### Yeni Oluşturulan Dosyalar
+
+| # | Dosya | Açıklama |
+|---|-------|----------|
+| 1 | `backend/src/main/java/com/faturaocr/domain/common/util/TaxNumberValidator.java` | GİB resmi algoritması ile VKN/TCKN doğrulama utility sınıfı |
+| 2 | `backend/src/main/java/com/faturaocr/application/company/QuotaService.java` | Fatura + kullanıcı kota yönetimi servisi |
+| 3 | `backend/src/main/java/com/faturaocr/infrastructure/common/config/SuperAdminInitializer.java` | İlk SUPER_ADMIN hesabını env var'dan oluşturan CommandLineRunner |
+| 4 | `backend/src/main/java/com/faturaocr/infrastructure/scheduler/SubscriptionCheckScheduler.java` | Gece otomatik trial askıya alma scheduler'ı |
+| 5 | `backend/src/main/java/com/faturaocr/interfaces/rest/quota/QuotaController.java` | `GET /api/v1/quota` — Frontend'e kota bilgisi döndüren endpoint |
+| 6 | `backend/src/main/resources/db/migration/V46__add_super_admin_and_saas_fields.sql` | SUPER_ADMIN + SaaS abonelik + kota alanları + VKN unique constraint |
+
+### Düzenlenen Dosyalar
+
+| # | Dosya | Değişiklik Özeti |
+|---|-------|-----------------|
+| 7 | `backend/.../Permission.java` | `COMPANY_CREATE`, `COMPANY_DELETE`, `SUPER_ADMIN_ACCESS`, `SUBSCRIPTION_MANAGE` eklendi |
+| 8 | `backend/.../Role.java` | `SUPER_ADMIN` rolü tüm yetkilerle eklendi |
+| 9 | `backend/.../Company.java` | 11 abonelik/kota alanı, `isSuspended()`, `isTrialExpired()`, `incrementInvoiceCount()`, VKN doğrulama |
+| 10 | `backend/.../CompanyJpaEntity.java` | 11 yeni sütun (subscription, kota, trial) |
+| 11 | `backend/.../CompanyMapper.java` | Yeni alanların domain ↔ JPA dönüşümü |
+| 12 | `backend/.../CompanyJpaRepository.java` | `findAllBySubscriptionStatusAndTrialEndsAtBefore()` sorgusu |
+| 13 | `backend/.../UserJpaEntity.java` | `RoleJpa` enum'una `SUPER_ADMIN` eklendi |
+| 14 | `backend/.../UserJpaRepository.java` | `countByCompanyIdAndIsActiveTrue()` sorgusu |
+| 15 | `backend/.../UserRepository.java` (port) | `countActiveByCompanyId()`, `findByEmailValue()` |
+| 16 | `backend/.../UserRepositoryAdapter.java` | İki yeni metod implementasyonu |
+| 17 | `backend/.../AuthenticationService.java` | VKN doğrulama, TRIAL kayıt, SUSPENDED login kontrolü |
+| 18 | `backend/.../SecurityConfig.java` | `/admin/**` ve `/system/**` → `SUPER_ADMIN_ACCESS` yetkisi |
+| 19 | `backend/.../CompanyController.java` | create/delete/activate/deactivate → SUPER_ADMIN kilidi |
+| 20 | `backend/.../UserManagementService.java` | Yetki yükseltme engeli + kullanıcı kotası + QuotaService DI |
+| 21 | `backend/.../InvoiceUploadService.java` | Fatura kotası kontrolü (LLM öncesi) + sayaç artırma |
+| 22 | `backend/.../JwtTokenProvider.java` | `isSuperAdmin` JWT claim |
+| 23 | `backend/.../AuthenticatedUser.java` | `isSuperAdmin()` metodu |
+| 24 | `backend/.../CompanyContextFilter.java` | SUPER_ADMIN company context bypass |
+| 25 | `backend/.../FaturaOcrApplication.java` | `@EnableScheduling` eklendi |
+| 26 | `backend/.../application.yml` | `app.super-admin.email/password` yapılandırması |
+| 27 | `frontend/src/types/auth.ts` | `SUPER_ADMIN` role type + `QuotaInfo` interface |
+| 28 | `frontend/.../upload/page.tsx` | Kota gösterimi kartı (günlük/toplam bar grafik, trial badge) |
+| 29 | `frontend/.../user-form-dialog.tsx` | SUPER_ADMIN + kota hata mesajları |
+| 30 | `frontend/.../common.json` (tr + en) | Durum etiketleri güncellendi |
+
+---
+
+## Alınan Dersler ve Öneriler (12 Mart)
+
+1. **SUPER_ADMIN Güvenliği:** SUPER_ADMIN hiçbir zaman API üzerinden atanamaz; yalnızca uygulama başlangıcında ortam değişkenlerinden oluşturulur. Bu, SQL injection, privilege escalation ve API kötüye kullanımını engeller.
+2. **Kota Kontrolü Zamanlaması:** LLM API çağrısı (maliyet) yapılmadan ÖNCE kota kontrolü yapılmalıdır. Kota aşıldığında dosya doğrulama bile gereksizdir.
+3. **VKN Doğrulama:** Format kontrolü (`^\\d{10}$` regex) yeterli değildir; GİB checksum algoritması ile gerçek VKN olduğu doğrulanmalıdır. Bu, sahte kayıtları ve bot saldırılarını engellemede ek bir güvenlik katmanıdır.
+4. **SaaS Trial Yönetimi:** Deneme süresi hem login sırasında hem de gece scheduler ile kontrol edilmelidir. Sadece scheduler'a bel bağlamak, gün içinde süre dolan kullanıcıların sistemi kullanmaya devam etmesine neden olabilir.
+5. **Soft Delete Prensibi:** Askıya alınan şirketlerin verileri ASLA silinmez. `SUSPENDED` durumu verileri korur, yalnızca erişimi kısıtlar. Bu hem yasal uyumluluk (veri saklama yükümlülüğü) hem de müşteri geri kazanımı için kritiktir.
+6. **Environment Variable Güvenliği:** SUPER_ADMIN şifresi asla kaynak kodunda veya yapılandırma dosyasında yer almamalıdır. `application.yml`'de yalnızca `${SUPER_ADMIN_PASSWORD:}` (boş varsayılan) bulunmalıdır.
+7. **CompanyContext Null Güvenliği:** SUPER_ADMIN'in `companyId`'si `null` olabilir. Tüm şirket bağlamına bağlı servislerin bu durumu ele alması gerekir.

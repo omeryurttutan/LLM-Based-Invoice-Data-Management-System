@@ -26,6 +26,17 @@ public class CompanyMapper {
                 .defaultCurrency(entity.getDefaultCurrency())
                 .invoicePrefix(entity.getInvoicePrefix())
                 .isActive(entity.isActive())
+                .subscriptionStatus(entity.getSubscriptionStatus())
+                .trialEndsAt(entity.getTrialEndsAt())
+                .planId(entity.getPlanId())
+                .maxUsers(entity.getMaxUsers())
+                .maxInvoices(entity.getMaxInvoices())
+                .dailyInvoiceLimit(entity.getDailyInvoiceLimit())
+                .usedInvoiceCount(entity.getUsedInvoiceCount())
+                .dailyInvoiceCount(entity.getDailyInvoiceCount())
+                .dailyCountDate(entity.getDailyCountDate())
+                .suspendedAt(entity.getSuspendedAt())
+                .suspensionReason(entity.getSuspensionReason())
                 .build();
     }
 
@@ -50,8 +61,19 @@ public class CompanyMapper {
         entity.setInvoicePrefix(domain.getInvoicePrefix());
         entity.setActive(domain.isActive());
         entity.setDeleted(domain.isDeleted());
+        entity.setSubscriptionStatus(domain.getSubscriptionStatus());
+        entity.setTrialEndsAt(domain.getTrialEndsAt());
+        entity.setPlanId(domain.getPlanId());
+        entity.setMaxUsers(domain.getMaxUsers());
+        entity.setMaxInvoices(domain.getMaxInvoices());
+        entity.setDailyInvoiceLimit(domain.getDailyInvoiceLimit());
+        entity.setUsedInvoiceCount(domain.getUsedInvoiceCount());
+        entity.setDailyInvoiceCount(domain.getDailyInvoiceCount());
+        entity.setDailyCountDate(domain.getDailyCountDate());
+        entity.setSuspendedAt(domain.getSuspendedAt());
+        entity.setSuspensionReason(domain.getSuspensionReason());
 
-        // Not setting audit fields as they are handled by JPA listeners or preserved
         return entity;
     }
 }
+

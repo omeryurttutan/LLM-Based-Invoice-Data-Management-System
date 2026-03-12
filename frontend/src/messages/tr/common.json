@@ -121,11 +121,17 @@
                 "save": "Kaydet",
                 "saving": "Kaydediliyor..."
             },
+            "status": {
+                "active": "Aktif",
+                "inactive": "Pasif"
+            },
             "messages": {
                 "createSuccess": "Kullanıcı başarıyla oluşturuldu.",
                 "updateSuccess": "Kullanıcı bilgileri güncellendi.",
                 "activated": "Kullanıcı aktifleştirildi.",
                 "deactivated": "Kullanıcı devre dışı bırakıldı.",
+                "unauthorizedRoleChange": "Yetkisiz işlem: Kendi rolünüzü değiştiremezsiniz.",
+                "lastAdmin": "Geçersiz işlem: Şirketin son yöneticisinin rolünü değiştiremezsiniz.",
                 "error": "Bir hata oluştu."
             }
         },

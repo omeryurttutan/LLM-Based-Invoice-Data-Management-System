@@ -32,19 +32,29 @@ public class CompanyContextFilter extends OncePerRequestFilter {
             if (authentication != null &&
                     authentication.getPrincipal() instanceof AuthenticatedUser user) {
 
-                String headerCompanyId = request.getHeader("X-Company-Id");
-                if (org.springframework.util.StringUtils.hasText(headerCompanyId)) {
-                    if (user.accessibleCompanyIds().contains(headerCompanyId) ||
-                            (user.companyId() != null && headerCompanyId.equals(user.companyId().toString())) ||
-                            user.isAdmin()) {
+                // SUPER_ADMIN bypasses company context — platform-level user
+                if (user.isSuperAdmin()) {
+                    String headerCompanyId = request.getHeader("X-Company-Id");
+                    if (org.springframework.util.StringUtils.hasText(headerCompanyId)) {
+                        // SUPER_ADMIN can access any company
                         CompanyContextHolder.setCompanyId(java.util.UUID.fromString(headerCompanyId));
-                    } else {
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                                "Access to the requested company context is denied");
-                        return;
                     }
+                    // If no header, companyId stays null — SUPER_ADMIN doesn't need it
                 } else {
-                    CompanyContextHolder.setCompanyId(user.companyId());
+                    String headerCompanyId = request.getHeader("X-Company-Id");
+                    if (org.springframework.util.StringUtils.hasText(headerCompanyId)) {
+                        if (user.accessibleCompanyIds().contains(headerCompanyId) ||
+                                (user.companyId() != null && headerCompanyId.equals(user.companyId().toString())) ||
+                                user.isAdmin()) {
+                            CompanyContextHolder.setCompanyId(java.util.UUID.fromString(headerCompanyId));
+                        } else {
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                                    "Access to the requested company context is denied");
+                            return;
+                        }
+                    } else {
+                        CompanyContextHolder.setCompanyId(user.companyId());
+                    }
                 }
             }
 

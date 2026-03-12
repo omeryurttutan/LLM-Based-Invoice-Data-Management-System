@@ -8,7 +8,26 @@ import java.util.Set;
  * User roles with associated permissions.
  */
 public enum Role {
-    ADMIN("Administrator with full system access", EnumSet.allOf(Permission.class)),
+    SUPER_ADMIN("Platform super administrator with system-wide access", EnumSet.allOf(Permission.class)),
+
+    ADMIN("Company administrator with full company access", EnumSet.of(
+            Permission.INVOICE_VIEW,
+            Permission.INVOICE_CREATE,
+            Permission.INVOICE_EDIT,
+            Permission.INVOICE_DELETE,
+            Permission.INVOICE_VERIFY,
+            Permission.REPORT_VIEW,
+            Permission.EXPORT_DATA,
+            Permission.USER_VIEW,
+            Permission.USER_CREATE,
+            Permission.USER_EDIT,
+            Permission.USER_DELETE,
+            Permission.USER_ASSIGN_ROLE,
+            Permission.COMPANY_VIEW,
+            Permission.COMPANY_EDIT,
+            Permission.SYSTEM_SETTINGS,
+            Permission.AUDIT_LOG_VIEW,
+            Permission.CATEGORY_MANAGE)),
 
     MANAGER("Manager with invoice management and reporting", EnumSet.of(
             Permission.INVOICE_VIEW,

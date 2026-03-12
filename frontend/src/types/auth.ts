@@ -1,7 +1,7 @@
 
 
 // User role enum matching backend
-export type UserRole = 'ADMIN' | 'MANAGER' | 'ACCOUNTANT' | 'INTERN';
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'ACCOUNTANT' | 'INTERN';
 export type Role = UserRole;
 
 // User entity
@@ -75,3 +75,19 @@ export interface RegisterFormData {
   confirmPassword: string;
   fullName: string;
 }
+
+// Quota info from backend
+export interface QuotaInfo {
+  usedInvoices: number;
+  maxInvoices: number;
+  dailyUsedInvoices: number;
+  dailyMaxInvoices: number;
+  usedUsers: number;
+  maxUsers: number;
+  subscriptionStatus: string;
+  trialEndsAt: string | null;
+  planId: string;
+  remainingInvoices: number;
+  dailyRemainingInvoices: number;
+}
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UploadZone } from "@/components/upload/upload-zone";
 import { FileList } from "@/components/upload/file-list";
 import { DuplicateDialog } from "@/components/upload/duplicate-dialog";
@@ -9,9 +9,11 @@ import { useUpload } from "@/hooks/use-upload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, BarChart3, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { apiClient } from "@/lib/api-client";
+import type { QuotaInfo } from "@/types/auth";
 
 export default function UploadPage() {
   const {
@@ -28,6 +30,13 @@ export default function UploadPage() {
   const { uploadMutation, bulkUploadMutation } = useUpload();
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const t = useTranslations('invoices');
+  const [quotaInfo, setQuotaInfo] = useState<QuotaInfo | null>(null);
+
+  useEffect(() => {
+    apiClient.get('/api/v1/quota')
+      .then(res => setQuotaInfo(res.data?.data))
+      .catch(() => {/* quota info is optional display */});
+  }, []);
   // const [duplicateFile, setDuplicateFile] = useState<{name: string, id: string} | null>(null); // Unused for now
 
   const handleFilesSelected = (newFiles: File[]) => {
@@ -133,6 +142,71 @@ export default function UploadPage() {
 
         {/* Right Column: Info / Status */}
         <div className="space-y-6">
+          {/* Quota Info Card */}
+          {quotaInfo && (
+            <Card className={quotaInfo.subscriptionStatus === 'TRIAL' ? 'border-amber-500/50 bg-amber-500/5' : ''}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Kota Bilgisi
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {quotaInfo.subscriptionStatus === 'TRIAL' && (
+                  <div className="flex items-center gap-2 text-amber-600 text-xs font-medium">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    Deneme Sürümü
+                    {quotaInfo.trialEndsAt && (
+                      <span className="ml-auto text-muted-foreground">
+                        {new Date(quotaInfo.trialEndsAt).toLocaleDateString('tr-TR')} tarihine kadar
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Daily Quota */}
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Günlük Kullanım</span>
+                    <span className="font-medium">{quotaInfo.dailyUsedInvoices} / {quotaInfo.dailyMaxInvoices}</span>
+                  </div>
+                  <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-500 rounded-full ${
+                        quotaInfo.dailyRemainingInvoices <= 5 ? 'bg-red-500' : 'bg-primary'
+                      }`}
+                      style={{ width: `${Math.min(100, (quotaInfo.dailyUsedInvoices / quotaInfo.dailyMaxInvoices) * 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{quotaInfo.dailyRemainingInvoices} fatura hakkı kaldı</p>
+                </div>
+
+                {/* Total Quota */}
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Toplam Kullanım</span>
+                    <span className="font-medium">{quotaInfo.usedInvoices} / {quotaInfo.maxInvoices}</span>
+                  </div>
+                  <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-500 rounded-full ${
+                        quotaInfo.remainingInvoices <= 20 ? 'bg-red-500' : 'bg-emerald-500'
+                      }`}
+                      style={{ width: `${Math.min(100, (quotaInfo.usedInvoices / quotaInfo.maxInvoices) * 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{quotaInfo.remainingInvoices} toplam fatura hakkı</p>
+                </div>
+
+                <Separator />
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Kullanıcı</span>
+                  <span className="font-medium">{quotaInfo.usedUsers} / {quotaInfo.maxUsers}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">{t('upload.info.title')}</CardTitle>

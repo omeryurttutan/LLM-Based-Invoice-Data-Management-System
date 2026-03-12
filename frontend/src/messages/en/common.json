@@ -130,6 +130,8 @@
                 "updateSuccess": "User updated successfully.",
                 "activated": "User activated.",
                 "deactivated": "User deactivated.",
+                "unauthorizedRoleChange": "Unauthorized: You cannot change your own role.",
+                "lastAdmin": "Invalid operation: You cannot change the role of the last admin.",
                 "error": "An error occurred."
             }
         },

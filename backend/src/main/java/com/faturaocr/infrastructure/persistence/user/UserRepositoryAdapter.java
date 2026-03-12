@@ -99,6 +99,19 @@ public class UserRepositoryAdapter implements UserRepository {
         return jpaRepository.countByCompanyIdAndRole(companyId, UserJpaEntity.RoleJpa.valueOf(role.name()));
     }
 
+    @Override
+    public long countActiveByCompanyId(UUID companyId) {
+        return jpaRepository.countByCompanyIdAndIsActiveTrue(companyId);
+    }
+
+    @Override
+    public Optional<User> findByEmailValue(String email) {
+        if (email == null) {
+            return Optional.empty();
+        }
+        return jpaRepository.findByEmail(email).map(this::toDomainEntity);
+    }
+
     // Mapping methods
     private UserJpaEntity toJpaEntity(User user) {
         UserJpaEntity entity = new UserJpaEntity();

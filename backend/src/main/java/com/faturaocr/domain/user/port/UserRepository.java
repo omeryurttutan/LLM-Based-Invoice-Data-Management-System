@@ -34,4 +34,8 @@ public interface UserRepository {
     void deleteById(UUID id);
 
     long countByCompanyIdAndRole(UUID companyId, Role role);
+
+    long countActiveByCompanyId(UUID companyId);
+
+    Optional<User> findByEmailValue(String email);
 }

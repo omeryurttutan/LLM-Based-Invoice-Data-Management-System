@@ -18,4 +18,7 @@ public interface CompanyJpaRepository extends JpaRepository<CompanyJpaEntity, UU
     Page<CompanyJpaEntity> findAllByIsDeletedFalse(Pageable pageable);
 
     Page<CompanyJpaEntity> findAllByIsActiveTrueAndIsDeletedFalse(Pageable pageable);
+
+    java.util.List<CompanyJpaEntity> findAllBySubscriptionStatusAndTrialEndsAtBefore(
+            String subscriptionStatus, java.time.LocalDateTime before);
 }

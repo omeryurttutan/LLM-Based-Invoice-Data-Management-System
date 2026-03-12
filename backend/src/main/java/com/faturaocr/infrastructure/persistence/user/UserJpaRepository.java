@@ -27,4 +27,6 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
     java.util.List<UserJpaEntity> findAllByCompanyId(UUID companyId);
 
     long countByCompanyIdAndRole(UUID companyId, UserJpaEntity.RoleJpa role);
+
+    long countByCompanyIdAndIsActiveTrue(UUID companyId);
 }

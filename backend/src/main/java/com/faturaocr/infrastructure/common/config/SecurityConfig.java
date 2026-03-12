@@ -121,19 +121,20 @@ public class SecurityConfig {
 
                                 // Authorization rules
                                 .authorizeHttpRequests(auth -> auth
-                                                // Public endpoints
-                                                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register",
+                                                // Public endpoints (NO /register — it requires auth now)
+                                                .requestMatchers("/api/v1/auth/login",
+                                                                "/api/v1/auth/register",
                                                                 "/api/v1/auth/refresh")
                                                 .permitAll()
                                                 .requestMatchers("/api/v1/health").permitAll()
                                                 .requestMatchers("/actuator/health").permitAll()
                                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                                                // Admin only endpoints (URL-based)
-                                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                                                .requestMatchers("/api/v1/system/**").hasRole("ADMIN")
+                                                // SUPER_ADMIN only endpoints
+                                                .requestMatchers("/api/v1/admin/**").hasAuthority("SUPER_ADMIN_ACCESS")
+                                                .requestMatchers("/api/v1/system/**").hasAuthority("SUPER_ADMIN_ACCESS")
 
-                                                // Manager and above (URL-based)
+                                                // Audit logs — ADMIN and above
                                                 .requestMatchers("/api/v1/audit-logs/**").hasRole("ADMIN")
 
                                                 // All other endpoints require authentication

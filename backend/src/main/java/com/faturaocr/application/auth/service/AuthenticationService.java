@@ -9,6 +9,7 @@ import com.faturaocr.domain.audit.entity.AuditLog;
 import com.faturaocr.domain.audit.port.AuditLogRepository;
 import com.faturaocr.domain.audit.valueobject.AuditActionType;
 import com.faturaocr.domain.common.exception.DomainException;
+import com.faturaocr.domain.common.util.TaxNumberValidator;
 import com.faturaocr.domain.user.entity.User;
 import com.faturaocr.domain.user.port.UserRepository;
 import com.faturaocr.domain.user.valueobject.Email;
@@ -83,12 +84,18 @@ public class AuthenticationService {
             if (command.taxNumber() == null || !command.taxNumber().matches("^\\d{10}$")) {
                 throw new DomainException("VALIDATION_ERROR", "Tax number must be exactly 10 digits");
             }
+            // Validate VKN checksum
+            if (!TaxNumberValidator.isValidVKN(command.taxNumber())) {
+                throw new DomainException("VALIDATION_ERROR", "Geçersiz vergi kimlik numarası (VKN)");
+            }
 
             Company newCompany = new Company(command.companyName(), command.taxNumber());
+            // TRIAL defaults are set automatically in Company constructor:
+            // 7 days trial, 350 total invoices, 50 daily, 2 max users
             Company savedCompany = companyRepository.save(newCompany);
             actualCompanyId = savedCompany.getId();
-            userRole = Role.ADMIN; // First user is ADMIN
-            LOGGER.info("Created new company with ID: {}", actualCompanyId);
+            userRole = Role.ADMIN; // First user is company ADMIN (not SUPER_ADMIN)
+            LOGGER.info("Created new TRIAL company with ID: {}", actualCompanyId);
         } else {
             // Check if email already exists in the existing company
             if (userRepository.existsByEmailAndCompanyId(email, actualCompanyId)) {
@@ -158,6 +165,24 @@ public class AuthenticationService {
             loginAttemptService.loginFailed(command.email());
             handleFailedLogin(user); // Keep DB logic for persistent history/locking if needed
             throw new DomainException("AUTH_INVALID_CREDENTIALS", "Invalid email or password");
+        }
+
+        // Check company subscription status (SUPER_ADMIN is exempt)
+        if (user.getRole() != Role.SUPER_ADMIN && user.getCompanyId() != null) {
+            var companyOpt = companyRepository.findById(user.getCompanyId());
+            if (companyOpt.isPresent()) {
+                Company company = companyOpt.get();
+                if (company.isSuspended()) {
+                    throw new DomainException("SUBSCRIPTION_SUSPENDED",
+                            "Aboneliğiniz askıya alınmıştır. Devam etmek için ödeme yapınız.");
+                }
+                if (company.isTrialExpired()) {
+                    company.suspend("Trial period expired");
+                    companyRepository.save(company);
+                    throw new DomainException("TRIAL_EXPIRED",
+                            "Deneme süreniz sona ermiştir. Devam etmek için ödeme yapınız.");
+                }
+            }
         }
 
         // Successful login

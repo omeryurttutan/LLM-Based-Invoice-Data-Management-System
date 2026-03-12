@@ -25,11 +25,17 @@ public enum Permission {
     // Company permissions
     COMPANY_VIEW("View company details"),
     COMPANY_EDIT("Edit company settings"),
+    COMPANY_CREATE("Create new companies"),
+    COMPANY_DELETE("Delete companies"),
 
     // System permissions
     SYSTEM_SETTINGS("Access system settings"),
     AUDIT_LOG_VIEW("View audit logs"),
-    CATEGORY_MANAGE("Manage categories");
+    CATEGORY_MANAGE("Manage categories"),
+
+    // Platform / Super Admin permissions
+    SUPER_ADMIN_ACCESS("Super admin system-wide access"),
+    SUBSCRIPTION_MANAGE("Manage company subscriptions and quotas");
 
     private final String description;
 
