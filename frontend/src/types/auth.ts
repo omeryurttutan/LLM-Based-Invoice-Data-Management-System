@@ -1,0 +1,93 @@
+
+
+// User role enum matching backend
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'ACCOUNTANT' | 'INTERN';
+export type Role = UserRole;
+
+// User entity
+export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  role: UserRole;
+  companyId: string;
+  companyName: string;
+  accessibleCompanies: { id: string; name: string }[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// Auth tokens
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+}
+
+// Login request
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+// Register request
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  fullName: string;
+  companyId?: string;
+  companyName?: string;
+  taxNumber?: string;
+}
+
+// Auth response (login/register)
+export interface AuthResponse extends AuthTokens {
+  user: User;
+}
+
+// Refresh response
+export interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+}
+
+// API Error response
+export interface ApiError {
+  error: string;
+  message: string;
+  details?: Record<string, string>;
+  fieldErrors?: Array<{ field: string; message: string; rejectedValue?: any }>;
+}
+
+// Form validation schemas (for react-hook-form + zod)
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface RegisterFormData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  fullName: string;
+}
+
+// Quota info from backend
+export interface QuotaInfo {
+  usedInvoices: number;
+  maxInvoices: number;
+  dailyUsedInvoices: number;
+  dailyMaxInvoices: number;
+  usedUsers: number;
+  maxUsers: number;
+  subscriptionStatus: string;
+  trialEndsAt: string | null;
+  planId: string;
+  remainingInvoices: number;
+  dailyRemainingInvoices: number;
+}
+

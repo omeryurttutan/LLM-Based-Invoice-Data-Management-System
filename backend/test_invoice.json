@@ -1,0 +1,15 @@
+{
+  "invoiceNumber": "INV-TEST-004",
+  "invoiceDate": "2024-02-27",
+  "supplierName": "Test Supplier",
+  "currency": "TRY",
+  "items": [
+    {
+      "description": "Item 1",
+      "quantity": 1,
+      "unit": "ADET",
+      "unitPrice": 100,
+      "taxRate": 20
+    }
+  ]
+}

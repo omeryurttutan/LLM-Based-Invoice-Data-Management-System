@@ -1,0 +1,242 @@
+{
+    "buttons": {
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "delete": "Sil",
+        "edit": "Düzenle",
+        "create": "Oluştur",
+        "close": "Kapat",
+        "confirm": "Onayla",
+        "retry": "Tekrar Dene",
+        "back": "Geri",
+        "next": "İleri",
+        "export": "Dışa Aktar",
+        "import": "İçe Aktar",
+        "upload": "Yükle",
+        "download": "İndir",
+        "search": "Ara",
+        "filter": "Filtrele",
+        "clearFilters": "Filtreleri Temizle",
+        "selectAll": "Tümünü Seç",
+        "verify": "Doğrula",
+        "reject": "Reddet",
+        "reopen": "Yeniden Aç",
+        "apply": "Uygula",
+        "login": "Giriş Yap",
+        "register": "Kayıt Ol",
+        "logout": "Çıkış Yap",
+        "profile": "Profil"
+    },
+    "status": {
+        "pending": "Beklemede",
+        "verified": "Doğrulandı",
+        "rejected": "Reddedildi",
+        "processing": "İşleniyor",
+        "active": "Aktif",
+        "inactive": "Pasif",
+        "locked": "Kilitli",
+        "created": "Oluşturuldu"
+    },
+    "messages": {
+        "success": {
+            "created": "{entity} başarıyla oluşturuldu",
+            "updated": "{entity} başarıyla güncellendi",
+            "deleted": "{entity} başarıyla silindi",
+            "generic": "İşlem başarıyla tamamlandı",
+            "logoutSuccess": "Başarıyla çıkış yapıldı"
+        },
+        "error": {
+            "generic": "Bir hata oluştu. Lütfen tekrar deneyin.",
+            "notFound": "{entity} bulunamadı",
+            "unauthorized": "Bu işlem için yetkiniz bulunmuyor",
+            "networkError": "Bağlantı hatası. İnternet bağlantınızı kontrol edin.",
+            "rateLimited": "Çok fazla istek gönderildi. Lütfen biraz bekleyin.",
+            "serverError": "Sunucu hatası. Lütfen daha sonra tekrar deneyin.",
+            "validation": "Lütfen formu kontrol edin."
+        },
+        "confirm": {
+            "delete": "{entity} silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+            "discard": "Kaydedilmemiş değişiklikler var. Çıkmak istediğinize emin misiniz?"
+        }
+    },
+    "roles": {
+        "admin": "Yönetici",
+        "manager": "Müdür",
+        "accountant": "Muhasebeci",
+        "intern": "Stajyer"
+    },
+    "labels": {
+        "createdAt": "Oluşturulma Tarihi",
+        "updatedAt": "Güncellenme Tarihi",
+        "actions": "İşlemler",
+        "details": "Detaylar",
+        "total": "Toplam",
+        "noData": "Veri bulunamadı",
+        "loading": "Yükleniyor...",
+        "showing": "{from}-{to} arası gösteriliyor, toplam {total}",
+        "rowsPerPage": "Sayfa başına satır",
+        "count": "Adet"
+    },
+    "time": {
+        "justNow": "Az önce",
+        "minutesAgo": "{count} dakika önce",
+        "hoursAgo": "{count} saat önce",
+        "daysAgo": "{count} gün önce",
+        "yesterday": "Dün",
+        "today": "Bugün"
+    },
+    "pages": {
+        "users": {
+            "title": "Kullanıcılar",
+            "description": "Sistem kullanıcılarını ve rollerini yönetin.",
+            "newUser": "Yeni Kullanıcı",
+            "listTitle": "Kullanıcı Listesi",
+            "listDescription": "Şirketinizdeki kayıtlı kullanıcılar burada listelenecek.",
+            "table": {
+                "name": "Ad Soyad",
+                "email": "E-posta",
+                "role": "Rol",
+                "status": "Durum",
+                "actions": "İşlemler",
+                "noUsers": "Kullanıcı bulunamadı",
+                "edit": "Düzenle",
+                "activate": "Aktifleştir",
+                "deactivate": "Devre Dışı Bırak"
+            },
+            "form": {
+                "newUser": "Yeni Kullanıcı Ekle",
+                "newDescription": "Sisteme yeni bir kullanıcı ekleyin.",
+                "editUser": "Kullanıcıyı Düzenle",
+                "editDescription": "Kullanıcı bilgilerini güncelleyin.",
+                "fullName": "Ad Soyad",
+                "nameRequired": "Ad Soyad en az 2 karakter olmalıdır.",
+                "email": "E-posta",
+                "emailInvalid": "Geçerli bir e-posta adresi giriniz.",
+                "role": "Rol",
+                "roleRequired": "Lütfen bir rol seçin.",
+                "selectRole": "Rol seçiniz",
+                "password": "Şifre",
+                "optional": "İsteğe bağlı",
+                "cancel": "İptal",
+                "save": "Kaydet",
+                "saving": "Kaydediliyor..."
+            },
+            "status": {
+                "active": "Aktif",
+                "inactive": "Pasif"
+            },
+            "messages": {
+                "createSuccess": "Kullanıcı başarıyla oluşturuldu.",
+                "updateSuccess": "Kullanıcı bilgileri güncellendi.",
+                "activated": "Kullanıcı aktifleştirildi.",
+                "deactivated": "Kullanıcı devre dışı bırakıldı.",
+                "unauthorizedRoleChange": "Yetkisiz işlem: Kendi rolünüzü değiştiremezsiniz.",
+                "lastAdmin": "Geçersiz işlem: Şirketin son yöneticisinin rolünü değiştiremezsiniz.",
+                "error": "Bir hata oluştu."
+            }
+        },
+        "company": {
+            "title": "Şirket Bilgileri",
+            "description": "Şirket detayları ve fatura ayarları.",
+            "edit": "Düzenle",
+            "profileTitle": "Şirket Profili",
+            "profileDescription": "Şirketinizin vergi ve adres bilgileri burada yer alacak.",
+            "retry": "Tekrar Dene",
+            "active": "Aktif",
+            "inactive": "Pasif",
+            "taxNumber": "Vergi Numarası",
+            "taxOffice": "Vergi Dairesi",
+            "currency": "Para Birimi",
+            "invoicePrefix": "Fatura Ön Eki",
+            "contactTitle": "İletişim Bilgileri",
+            "contactDescription": "Şirket iletişim detayları"
+        },
+        "auditLogs": {
+            "title": "Denetim Logu",
+            "description": "Sistemdeki tüm işlem geçmişini ve değişiklikleri izleyin.",
+            "historyTitle": "İşlem Geçmişi",
+            "historyDescription": "Kullanıcı aktiviteleri ve sistem olayları burada listelenecek.",
+            "table": {
+                "action": "İşlem",
+                "entity": "Kayıt/Nesne",
+                "user": "Kullanıcı",
+                "ip": "IP Adresi",
+                "date": "Tarih",
+                "details": "Detaylar",
+                "noLogs": "Kayıt bulunamadı",
+                "filterAction": "İşlem Filtrele"
+            },
+            "buttons": {
+                "back": "Önceki",
+                "next": "Sonraki"
+            },
+            "labels": {
+                "showing": "Sayfa {from} / {to}"
+            },
+            "messages": {
+                "error": "Denetim logları yüklenemedi."
+            }
+        },
+        "profile": {
+            "title": "Profil",
+            "description": "Kişisel bilgilerinizi ve tercihlerinizi güncelleyin.",
+            "save": "Kaydet",
+            "retry": "Tekrar Dene",
+            "profileTitle": "Kullanıcı Profili",
+            "profileDescription": "Genel hesap bilgilerinizi güncelleyin.",
+            "passwordTitle": "Şifre Değiştir",
+            "passwordDescription": "Hesap şifrenizi güncelleyin.",
+            "form": {
+                "email": "E-posta Adresi",
+                "emailHelp": "E-posta adresiniz değiştirilemez.",
+                "role": "Rol",
+                "company": "Şirket",
+                "fullName": "Ad Soyad",
+                "nameRequired": "Ad Soyad en az 2 karakter olmalıdır.",
+                "saving": "Kaydediliyor...",
+                "currentPassword": "Mevcut Şifre",
+                "newPassword": "Yeni Şifre",
+                "confirmPassword": "Yeni Şifre (Tekrar)",
+                "passwordMin": "Şifre en az 6 karakter olmalıdır.",
+                "passwordMatch": "Şifreler eşleşmiyor.",
+                "changePassword": "Şifreyi Değiştir"
+            },
+            "messages": {
+                "updateSuccess": "Profil başarıyla güncellendi.",
+                "passwordSuccess": "Şifre başarıyla değiştirildi.",
+                "passwordError": "Şifre değiştirilemedi. Lütfen mevcut şifrenizi kontrol edin.",
+                "error": "Profil verileri yüklenemedi."
+            }
+        },
+        "settings": {
+            "title": "Ayarlar",
+            "description": "Uygulama genel yapılandırması ve tercihler.",
+            "settingsTitle": "Uygulama Ayarları",
+            "settingsDescription": "Tema, bildirimler ve dil seçenekleri burada yönetilecek.",
+            "notificationsTitle": "Bildirim Tercihleri",
+            "notificationsDescription": "Bildirimleri nasıl alacağınızı yönetin.",
+            "emailNotifications": "E-posta Bildirimleri",
+            "emailNotificationsHint": "Önemli güncellemeleri e-posta ile alın.",
+            "systemNotifications": "Sistem Bildirimleri",
+            "systemNotificationsHint": "Uygulama içi anlık bildirimler alın.",
+            "save": "Ayarları Kaydet",
+            "saving": "Kaydediliyor...",
+            "generalTitle": "Uygulama Tercihleri",
+            "generalDescription": "Tema ve dil seçeneklerinizi yönetin.",
+            "theme": "Tema",
+            "language": "Dil",
+            "messages": {
+                "saveSuccess": "Ayarlar başarıyla kaydedildi.",
+                "error": "Ayarlar yüklenemedi.",
+                "saveError": "Ayarlar kaydedilemedi."
+            }
+        },
+        "upload": {
+            "title": "Fatura Yükle",
+            "description": "Fatura görüntülerini veya PDF dosyalarını sisteme yükleyin.",
+            "moduleTitle": "Yükleme Modülü",
+            "moduleDescription": "Dosya sürükle-bırak ve OCR işleme alanı burada olacak.",
+            "selectFile": "Dosya Seç (Demo)"
+        }
+    }
+}

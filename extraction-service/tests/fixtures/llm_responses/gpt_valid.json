@@ -1,0 +1,19 @@
+{
+  "fatura_no": "GIB2024000000002",
+  "tarih": "2024-01-02",
+  "gonderici_vkn": "1234567890",
+  "gonderici_unvan": "GPT Tedarikçi A.Ş.",
+  "alici_vkn": "9876543210",
+  "alici_unvan": "GPT Müşteri Ltd.",
+  "vergi_toplam": 200.00,
+  "genel_toplam": 1200.00,
+  "para_birimi": "USD",
+  "kalemler": [
+    {
+      "aciklama": "GPT Hizmeti",
+      "miktar": 1,
+      "birim_fiyat": 1000.00,
+      "toplam_tutar": 1000.00
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+    "invoice_number": "TR-2024-099",
+    "invoice_date": "25.12.2024",
+    "due_date": "25/01/2025",
+    "supplier_name": "Güneş Ticaret Şirketi",
+    "supplier_tax_number": "3210987654",
+    "supplier_address": "Çankaya, Ankara",
+    "buyer_name": "Ömer İnşaat Ltd. Şti.",
+    "buyer_tax_number": "11122233344",
+    "items": [
+        {
+            "description": "Çelik Profil (HEA 200)",
+            "quantity": 50,
+            "unit": "kg",
+            "unit_price": "125,50",
+            "tax_rate": 20,
+            "tax_amount": "1.255,00",
+            "line_total": "7.530,00"
+        },
+        {
+            "description": "Bağlantı Elemanları Seti",
+            "quantity": 10,
+            "unit": "Adet",
+            "unit_price": "75,00",
+            "tax_rate": 10,
+            "tax_amount": "75,00",
+            "line_total": "825,00"
+        }
+    ],
+    "subtotal": "7.025,00",
+    "tax_amount": "1.330,00",
+    "total_amount": "8.355,00",
+    "currency": "TL",
+    "notes": "KDV Dahil fiyatlardır."
+}

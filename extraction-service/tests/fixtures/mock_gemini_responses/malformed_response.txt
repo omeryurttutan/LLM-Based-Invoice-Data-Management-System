@@ -1,0 +1,11 @@
+I analyzed the invoice image but encountered some issues. Here is my best attempt:
+
+{
+  "invoice_number": "MAL-123",
+  "invoice_date": "2024-01-01",
+  "total_amount": 500.00,
+  "items": [
+    {
+      "description": "Ürün A",
+      "quantity": 2
+    -- missing fields here --

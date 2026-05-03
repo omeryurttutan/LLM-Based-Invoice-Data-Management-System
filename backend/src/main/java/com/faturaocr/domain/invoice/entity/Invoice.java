@@ -1,0 +1,166 @@
+package com.faturaocr.domain.invoice.entity;
+
+import com.faturaocr.domain.audit.annotation.AuditMask;
+
+import com.faturaocr.domain.invoice.valueobject.Currency;
+import com.faturaocr.domain.invoice.valueobject.ExtractionCorrection;
+import com.faturaocr.domain.invoice.valueobject.InvoiceStatus;
+import com.faturaocr.domain.invoice.valueobject.LlmProvider;
+import com.faturaocr.domain.invoice.valueobject.SourceType;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Getter
+@Setter
+public class Invoice {
+    private UUID id;
+    private UUID companyId;
+    private UUID categoryId;
+    private UUID createdByUserId;
+    private UUID verifiedByUserId;
+    private UUID batchId;
+    private String correlationId;
+
+    // Identification
+    private String invoiceNumber;
+    private LocalDate invoiceDate;
+    private LocalDate dueDate;
+
+    // Supplier
+    private String supplierName;
+    @AuditMask(AuditMask.MaskType.PARTIAL)
+    private String supplierTaxNumber;
+    private String supplierTaxOffice;
+    @AuditMask(AuditMask.MaskType.FULL)
+    private String supplierAddress;
+    @AuditMask(AuditMask.MaskType.PHONE)
+    private String supplierPhone;
+    @AuditMask(AuditMask.MaskType.EMAIL)
+    private String supplierEmail;
+
+    // Buyer
+    @AuditMask(AuditMask.MaskType.PARTIAL)
+    private String buyerTaxNumber;
+
+    // Financial
+    private BigDecimal subtotal;
+    private BigDecimal taxAmount;
+    private BigDecimal totalAmount;
+    private Currency currency;
+    private BigDecimal exchangeRate;
+
+    // Status
+    private InvoiceStatus status;
+
+    // Source
+    private SourceType sourceType;
+    private LlmProvider llmProvider;
+    private BigDecimal confidenceScore;
+    private Integer processingDurationMs;
+
+    // File
+    private String originalFilePath;
+    private String storedFilePath;
+    private String originalFileName;
+    private String fileHash;
+    private Integer originalFileSize;
+    private String originalFileType;
+
+    // E-Invoice
+    private String eInvoiceUuid;
+    private String eInvoiceEttn;
+
+    private List<ExtractionCorrection> extractionCorrections;
+
+    // Notes
+    private String notes;
+    private String rejectionReason;
+
+    // Timestamps
+    private LocalDateTime verifiedAt;
+    private LocalDateTime rejectedAt;
+    private boolean isDeleted;
+    private LocalDateTime deletedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    // Items
+    private List<InvoiceItem> items = new ArrayList<>();
+
+    public Invoice() {
+        this.id = UUID.randomUUID();
+        this.status = InvoiceStatus.PENDING;
+        this.sourceType = SourceType.MANUAL;
+        this.currency = Currency.TRY;
+        this.exchangeRate = BigDecimal.ONE;
+        this.subtotal = BigDecimal.ZERO;
+        this.taxAmount = BigDecimal.ZERO;
+        this.totalAmount = BigDecimal.ZERO;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.isDeleted = false;
+    }
+
+    public void addItem(InvoiceItem item) {
+        item.setInvoiceId(this.id);
+        this.items.add(item);
+    }
+
+    public void removeItem(InvoiceItem item) {
+        this.items.remove(item);
+    }
+
+    public void calculateTotals() {
+        this.subtotal = BigDecimal.ZERO;
+        this.taxAmount = BigDecimal.ZERO;
+        this.totalAmount = BigDecimal.ZERO;
+
+        for (InvoiceItem item : items) {
+            this.subtotal = this.subtotal.add(item.getSubtotal());
+            this.taxAmount = this.taxAmount.add(item.getTaxAmount());
+            this.totalAmount = this.totalAmount.add(item.getTotalAmount());
+        }
+    }
+
+    public void verify(UUID verifiedByUserId) {
+        if (this.status == InvoiceStatus.VERIFIED) {
+            throw new IllegalStateException("Invoice is already verified");
+        }
+        if (this.status == InvoiceStatus.REJECTED) {
+            throw new IllegalStateException("Cannot verify a rejected invoice. Reopen it first.");
+        }
+        this.status = InvoiceStatus.VERIFIED;
+        this.verifiedAt = LocalDateTime.now();
+        this.verifiedByUserId = verifiedByUserId;
+    }
+
+    public void reject(String reason) {
+        if (this.status == InvoiceStatus.REJECTED) {
+            throw new IllegalStateException("Invoice is already rejected");
+        }
+        if (this.status == InvoiceStatus.VERIFIED) {
+            throw new IllegalStateException("Cannot reject a verified invoice. Reopen it first.");
+        }
+        this.status = InvoiceStatus.REJECTED;
+        this.rejectedAt = LocalDateTime.now();
+        this.rejectionReason = reason;
+    }
+
+    public void reopen() {
+        if (this.status == InvoiceStatus.PENDING) {
+            return; // Already pending
+        }
+        this.status = InvoiceStatus.PENDING;
+        this.verifiedAt = null;
+        this.verifiedByUserId = null;
+        this.rejectedAt = null;
+        this.rejectionReason = null;
+    }
+}

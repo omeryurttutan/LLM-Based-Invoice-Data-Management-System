@@ -1,0 +1,50 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend
+backend/target/
+backend/*.jar
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.pnp.*
+frontend/build/
+frontend/dist/
+
+# Extraction Service
+extraction-service/__pycache__/
+extraction-service/*.pyc
+extraction-service/.pytest_cache/
+extraction-service/venv/
+extraction-service/.venv/
+
+# Docker
+*.log
+
+# Coverage
+coverage/
+.coverage
+htmlcov/
+
+# Deployment & Secrets
+.env.staging
+.env.prod
+nginx/ssl/
+backups/

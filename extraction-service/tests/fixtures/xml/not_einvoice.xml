@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+    <book>
+        <title>XML Programlama</title>
+        <author>Ahmet Yılmaz</author>
+        <price>45.00</price>
+    </book>
+    <book>
+        <title>Python ile Veri Analizi</title>
+        <author>Mehmet Kaya</author>
+        <price>55.00</price>
+    </book>
+</catalog>

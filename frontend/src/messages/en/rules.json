@@ -1,0 +1,17 @@
+{
+    "title": "Automation Rules",
+    "create": "New Rule",
+    "condition": "Condition",
+    "action": "Action",
+    "isActive": "Active",
+    "conditions": {
+        "supplierEquals": "Supplier Equals",
+        "amountGreaterThan": "Amount Greater Than",
+        "descriptionContains": "Description Contains"
+    },
+    "actions": {
+        "setCategory": "Set Category",
+        "markVerified": "Auto Verify",
+        "flagReview": "Flag for Review"
+    }
+}

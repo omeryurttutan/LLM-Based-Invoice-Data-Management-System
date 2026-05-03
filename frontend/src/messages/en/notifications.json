@@ -1,0 +1,37 @@
+{
+    "title": "Notifications",
+    "markAllRead": "Mark All as Read",
+    "viewAll": "View All Notifications",
+    "empty": "No notifications",
+    "emptyDescription": "No notifications match the selected criteria.",
+    "types": {
+        "info": "Info",
+        "success": "Success",
+        "warning": "Warning",
+        "error": "Error",
+        "invoice_processed": "Invoice Processed",
+        "invoice_rejected": "Invoice Rejected",
+        "invoice_verified": "Invoice Verified"
+    },
+    "tabs": {
+        "all": "All",
+        "unread": "Unread",
+        "read": "Read"
+    },
+    "filters": {
+        "typePlaceholder": "Type",
+        "allTypes": "All Types",
+        "extraction": "Data Extraction",
+        "batchUpload": "Batch Upload",
+        "confidenceScore": "Confidence Score",
+        "autoVerification": "Auto Verification",
+        "verification": "Verification",
+        "system": "System",
+        "severityPlaceholder": "Severity",
+        "allSeverities": "All Severities",
+        "infoSeverity": "Info",
+        "warningSeverity": "Warning",
+        "errorSeverity": "Error",
+        "successSeverity": "Success"
+    }
+}

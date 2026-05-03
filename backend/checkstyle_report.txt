@@ -1,0 +1,174 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-----------------------< [0;36mcom.faturaocr:backend[0;1m >------------------------[m
+[[1;34mINFO[m] [1mBuilding fatura-ocr-backend 0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-checkstyle-plugin:3.3.1:check[m [1m(default-cli)[m @ [36mbackend[0;1m ---[m
+[[1;34mINFO[m] Starting audit...
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:19:8: Unused import - java.util.Set. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:20:8: Unused import - java.util.stream.Collectors. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:21:8: Unused import - java.util.stream.Stream. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:101:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:103:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:110:17: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:115:17: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:120:17: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/notification/NotificationRepository.java:29: Line is longer than 120 characters (found 121). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/rule/AutomationRuleJpaEntity.java:12:27: Using the '.*' form of import should be avoided - jakarta.persistence.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/rule/RuleExecutionLogJpaEntity.java:8:27: Using the '.*' form of import should be avoided - jakarta.persistence.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/kvkk/UserConsentJpaRepository.java:15: Line is longer than 120 characters (found 140). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/persistence/kvkk/UserConsentJpaEntity.java:7:27: Using the '.*' form of import should be avoided - jakarta.persistence.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/audit/AuditSerializer.java:147:13: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/audit/AuditSerializer.java:155:13: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/audit/AuditSerializer.java:161:13: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java:91: Line is longer than 120 characters (found 188). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java:93: Line is longer than 120 characters (found 121). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java:109: Line is longer than 120 characters (found 255). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java:144: Line is longer than 120 characters (found 121). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/security/LoginAttemptService.java:49:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/infrastructure/kvkk/KvkkDataMigrationRunner.java:112: Line is longer than 120 characters (found 124). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:191:13: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:193:13: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:230:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:235:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:243:13: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:264:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:269:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/template/valueobject/FieldAccuracy.java:30:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/notification/service/NotificationPreferenceService.java:3:8: Unused import - com.fasterxml.jackson.core.type.TypeReference. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/notification/service/NotificationPreferenceService.java:76:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/notification/service/channel/PushNotificationChannel.java:13:8: Unused import - nl.martijndwars.webpush.Subscription. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/notification/service/PushSubscriptionService.java:11:8: Unused import - java.util.List. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:8:8: Unused import - com.faturaocr.domain.rule.valueobject.ActionType. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:19:8: Unused import - java.time.LocalDate. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:21:8: Unused import - java.util.Objects. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:107:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:109:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:112:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:151:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:153:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:155:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:165:21: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:170:21: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/domain/invoice/entity/InvoiceVersion.java:6:27: Using the '.*' form of import should be avoided - jakarta.persistence.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/web/controller/KvkkAdminController.java:5:8: Unused import - com.faturaocr.domain.user.valueobject.Role. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/web/controller/KvkkAdminController.java:12:47: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/web/controller/ConsentController.java:13:47: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/web/controller/InvoiceVersionController.java:7:47: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/template/SupplierTemplateController.java:17:47: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/notification/NotificationController.java:38: Line is longer than 120 characters (found 121). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/rule/AutomationRuleController.java:14:47: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/rule/AutomationRuleController.java:31: Line is longer than 120 characters (found 144). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/invoice/InvoiceController.java:64: Line is longer than 120 characters (found 135). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/invoice/InvoiceUploadController.java:68: Line is longer than 120 characters (found 137). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/invoice/InvoiceUploadController.java:79: Line is longer than 120 characters (found 150). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/kvkk/KvkkController.java:6:8: Unused import - com.faturaocr.infrastructure.security.AuthenticatedUser. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/kvkk/KvkkController.java:13:47: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/kvkk/KvkkController.java:28: Line is longer than 120 characters (found 133). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/interfaces/rest/kvkk/ConsentController.java:13:47: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/config/KvkkDataMigrationRunner.java:14:8: Unused import - java.util.UUID. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/config/KvkkDataMigrationRunner.java:75: Line is longer than 120 characters (found 134). [LineLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/config/KvkkDataMigrationRunner.java:104:13: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/auth/service/AuthenticationService.java:24:8: Unused import - org.springframework.beans.factory.annotation.Value. [UnusedImports]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:20:17: Using the '.*' form of import should be avoided - java.util.*. [AvoidStarImport]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:179:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:201:13: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:228:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:230:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:241:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:243:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:245:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:247:9: 'if' construct must use '{}'s. [NeedBraces]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/invoice/InvoiceService.java:1: File length is 642 lines (max allowed is 500). [FileLength]
+[WARN] /home/omer/Desktop/fatura-project/Fatura-OCR/backend/src/main/java/com/faturaocr/application/kvkk/service/ConsentService.java:36:51: Must have at least one statement. [EmptyBlock]
+Audit done.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:[19,8] (imports) UnusedImports: Unused import - java.util.Set.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:[20,8] (imports) UnusedImports: Unused import - java.util.stream.Collectors.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:[21,8] (imports) UnusedImports: Unused import - java.util.stream.Stream.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:[101,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:[103,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:[110,17] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:[115,17] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/audit/DataMaskingService.java:[120,17] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/notification/NotificationRepository.java:[29] (sizes) LineLength: Line is longer than 120 characters (found 121).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/rule/AutomationRuleJpaEntity.java:[12,27] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - jakarta.persistence.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/rule/RuleExecutionLogJpaEntity.java:[8,27] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - jakarta.persistence.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/kvkk/UserConsentJpaRepository.java:[15] (sizes) LineLength: Line is longer than 120 characters (found 140).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/persistence/kvkk/UserConsentJpaEntity.java:[7,27] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - jakarta.persistence.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/audit/AuditSerializer.java:[147,13] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/audit/AuditSerializer.java:[155,13] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/audit/AuditSerializer.java:[161,13] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java:[91] (sizes) LineLength: Line is longer than 120 characters (found 188).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java:[93] (sizes) LineLength: Line is longer than 120 characters (found 121).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java:[109] (sizes) LineLength: Line is longer than 120 characters (found 255).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/common/config/SecurityConfig.java:[144] (sizes) LineLength: Line is longer than 120 characters (found 121).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/security/LoginAttemptService.java:[49,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/infrastructure/kvkk/KvkkDataMigrationRunner.java:[112] (sizes) LineLength: Line is longer than 120 characters (found 124).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:[191,13] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:[193,13] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:[230,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:[235,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:[243,13] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:[264,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/template/service/SupplierTemplateService.java:[269,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/template/valueobject/FieldAccuracy.java:[30,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/notification/service/NotificationPreferenceService.java:[3,8] (imports) UnusedImports: Unused import - com.fasterxml.jackson.core.type.TypeReference.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/notification/service/NotificationPreferenceService.java:[76,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/notification/service/channel/PushNotificationChannel.java:[13,8] (imports) UnusedImports: Unused import - nl.martijndwars.webpush.Subscription.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/notification/service/PushSubscriptionService.java:[11,8] (imports) UnusedImports: Unused import - java.util.List.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[8,8] (imports) UnusedImports: Unused import - com.faturaocr.domain.rule.valueobject.ActionType.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[19,8] (imports) UnusedImports: Unused import - java.time.LocalDate.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[21,8] (imports) UnusedImports: Unused import - java.util.Objects.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[107,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[109,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[112,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[151,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[153,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[155,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[165,21] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/rule/service/RuleEngine.java:[170,21] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/domain/invoice/entity/InvoiceVersion.java:[6,27] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - jakarta.persistence.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/web/controller/KvkkAdminController.java:[5,8] (imports) UnusedImports: Unused import - com.faturaocr.domain.user.valueobject.Role.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/web/controller/KvkkAdminController.java:[12,47] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/web/controller/ConsentController.java:[13,47] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/web/controller/InvoiceVersionController.java:[7,47] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/template/SupplierTemplateController.java:[17,47] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/notification/NotificationController.java:[38] (sizes) LineLength: Line is longer than 120 characters (found 121).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/rule/AutomationRuleController.java:[14,47] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/rule/AutomationRuleController.java:[31] (sizes) LineLength: Line is longer than 120 characters (found 144).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/invoice/InvoiceController.java:[64] (sizes) LineLength: Line is longer than 120 characters (found 135).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/invoice/InvoiceUploadController.java:[68] (sizes) LineLength: Line is longer than 120 characters (found 137).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/invoice/InvoiceUploadController.java:[79] (sizes) LineLength: Line is longer than 120 characters (found 150).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/kvkk/KvkkController.java:[6,8] (imports) UnusedImports: Unused import - com.faturaocr.infrastructure.security.AuthenticatedUser.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/kvkk/KvkkController.java:[13,47] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/kvkk/KvkkController.java:[28] (sizes) LineLength: Line is longer than 120 characters (found 133).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/interfaces/rest/kvkk/ConsentController.java:[13,47] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - org.springframework.web.bind.annotation.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/config/KvkkDataMigrationRunner.java:[14,8] (imports) UnusedImports: Unused import - java.util.UUID.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/config/KvkkDataMigrationRunner.java:[75] (sizes) LineLength: Line is longer than 120 characters (found 134).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/config/KvkkDataMigrationRunner.java:[104,13] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/auth/service/AuthenticationService.java:[24,8] (imports) UnusedImports: Unused import - org.springframework.beans.factory.annotation.Value.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[20,17] (imports) AvoidStarImport: Using the '.*' form of import should be avoided - java.util.*.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[179,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[201,13] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[228,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[230,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[241,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[243,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[245,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/service/InvoiceVersionServiceImpl.java:[247,9] (blocks) NeedBraces: 'if' construct must use '{}'s.
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/invoice/InvoiceService.java:[1] (sizes) FileLength: File length is 642 lines (max allowed is 500).
+[[1;33mWARNING[m] src/main/java/com/faturaocr/application/kvkk/service/ConsentService.java:[36,51] (blocks) EmptyBlock: Must have at least one statement.
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;31mBUILD FAILURE[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  2.001 s
+[[1;34mINFO[m] Finished at: 2026-02-16T00:31:03+03:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;31mERROR[m] Failed to execute goal [32morg.apache.maven.plugins:maven-checkstyle-plugin:3.3.1:check[m [1m(default-cli)[m on project [36mbackend[m: [1;31mYou have 76 Checkstyle violations.[m -> [1m[Help 1][m
+[[1;31mERROR[m] 
+[[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
+[[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
+[[1;31mERROR[m] 
+[[1;31mERROR[m] For more information about the errors and possible solutions, please read the following articles:
+[[1;31mERROR[m] [1m[Help 1][m http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

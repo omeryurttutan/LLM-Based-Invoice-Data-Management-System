@@ -1,0 +1,12 @@
+{
+    "title": "Version History",
+    "restore": "Restore This Version",
+    "current": "Current",
+    "changes": "Changes",
+    "diff": {
+        "added": "Added",
+        "removed": "Removed",
+        "modified": "Modified"
+    },
+    "confirmRestore": "Are you sure you want to restore the invoice to this version? Current changes will be saved as a new version."
+}

@@ -1,0 +1,81 @@
+{
+    "title": "Dashboard",
+    "dateSelect": "Select Date Range",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "currencyLabel": "Currency",
+    "startPeriod": "Start Period",
+    "endPeriod": "End Period",
+    "month": "Month",
+    "year": "Year",
+    "cards": {
+        "totalInvoices": "Total Invoices",
+        "totalAmount": "Total Amount",
+        "average": "Average",
+        "pending": "Pending",
+        "thisMonth": "This Month"
+    },
+    "charts": {
+        "monthlyTrend": "Monthly Invoice Trend",
+        "categoryDistribution": "Category Distribution",
+        "statusDistribution": "Status Distribution",
+        "statusTimeline": "Status Timeline",
+        "topSuppliers": "Top Suppliers",
+        "other": "Other"
+    },
+    "recent": {
+        "title": "Recent Activity",
+        "viewAll": "View All"
+    },
+    "presets": {
+        "title": "Quick Selection",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last7days": "Last 7 Days",
+        "last30days": "Last 30 Days",
+        "thisMonth": "This Month",
+        "lastMonth": "Last Month",
+        "last3Months": "Last 3 Months",
+        "thisYear": "This Year"
+    },
+    "pendingActions": {
+        "title": "Pending Actions",
+        "description": "Invoices requiring verification",
+        "noPending": "No pending invoices",
+        "allProcessed": "All invoices processed",
+        "daysWaiting": "Waiting for {days} days",
+        "viewAll": "View All"
+    },
+    "performance": {
+        "title": "LLM Extraction Performance",
+        "description": "Success rates of AI models",
+        "successRate": "Success Rate",
+        "totalExtractions": "Total Extractions",
+        "avgConfidence": "Avg. Confidence",
+        "avgDuration": "Avg. Duration",
+        "providerAttempts": "Provider Attempts",
+        "model": "Model",
+        "success": "Success",
+        "error": "Error",
+        "cost": "Cost",
+        "successful": "Successful",
+        "failed": "Failed"
+    },
+    "system": {
+        "title": "System Status",
+        "description": "Current status of server and services",
+        "adminDescription": "Current status of server and services (Admin Panel)",
+        "allSystemsUp": "All Systems Operational",
+        "serviceOutage": "Service Outage",
+        "running": "RUNNING",
+        "down": "DOWN",
+        "resourceUsage": "Resource Usage",
+        "jvmHeap": "JVM Heap",
+        "dbConnections": "DB Connections",
+        "diskSpace": "Disk Space",
+        "recentAlerts": "Recent Alerts",
+        "noCriticalAlerts": "No critical alerts in the last 24 hours.",
+        "loadError": "System status could not be loaded.",
+        "checkAdmin": "Ensure you have admin privileges or check the service."
+    }
+}

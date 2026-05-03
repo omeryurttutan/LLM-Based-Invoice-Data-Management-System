@@ -1,0 +1,242 @@
+{
+    "buttons": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "close": "Close",
+        "confirm": "Confirm",
+        "retry": "Retry",
+        "back": "Back",
+        "next": "Next",
+        "export": "Export",
+        "import": "Import",
+        "upload": "Upload",
+        "download": "Download",
+        "search": "Search",
+        "filter": "Filter",
+        "clearFilters": "Clear Filters",
+        "selectAll": "Select All",
+        "verify": "Verify",
+        "reject": "Reject",
+        "reopen": "Reopen",
+        "apply": "Apply",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "profile": "Profile"
+    },
+    "status": {
+        "pending": "Pending",
+        "verified": "Verified",
+        "rejected": "Rejected",
+        "processing": "Processing",
+        "active": "Active",
+        "inactive": "Inactive",
+        "locked": "Locked",
+        "created": "Created"
+    },
+    "messages": {
+        "success": {
+            "created": "{entity} successfully created",
+            "updated": "{entity} successfully updated",
+            "deleted": "{entity} successfully deleted",
+            "generic": "Operation completed successfully",
+            "logoutSuccess": "Logged out successfully"
+        },
+        "error": {
+            "generic": "An error occurred. Please try again.",
+            "notFound": "{entity} not found",
+            "unauthorized": "You are not authorized for this action",
+            "networkError": "Connection error. Please check your internet connection.",
+            "rateLimited": "Too many requests. Please wait a moment.",
+            "serverError": "Server error. Please try again later.",
+            "validation": "Please check the form."
+        },
+        "confirm": {
+            "delete": "Are you sure you want to delete {entity}? This action cannot be undone.",
+            "discard": "There are unsaved changes. Are you sure you want to discard them?"
+        }
+    },
+    "roles": {
+        "admin": "Admin",
+        "manager": "Manager",
+        "accountant": "Accountant",
+        "intern": "Intern"
+    },
+    "labels": {
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "actions": "Actions",
+        "details": "Details",
+        "total": "Total",
+        "noData": "No data found",
+        "loading": "Loading...",
+        "showing": "Showing {from}-{to} of {total}",
+        "rowsPerPage": "Rows per page",
+        "count": "Count"
+    },
+    "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{count} minutes ago",
+        "hoursAgo": "{count} hours ago",
+        "daysAgo": "{count} days ago",
+        "yesterday": "Yesterday",
+        "today": "Today"
+    },
+    "pages": {
+        "users": {
+            "title": "Users",
+            "description": "Manage system users and roles.",
+            "newUser": "New User",
+            "listTitle": "User List",
+            "listDescription": "Registered users in your company will be listed here.",
+            "table": {
+                "name": "Name",
+                "email": "Email",
+                "role": "Role",
+                "status": "Status",
+                "actions": "Actions",
+                "noUsers": "No users found",
+                "edit": "Edit",
+                "activate": "Activate",
+                "deactivate": "Deactivate"
+            },
+            "form": {
+                "newUser": "Add New User",
+                "newDescription": "Add a new user to the system.",
+                "editUser": "Edit User",
+                "editDescription": "Update user information.",
+                "fullName": "Full Name",
+                "nameRequired": "Full name must be at least 2 characters.",
+                "email": "Email",
+                "emailInvalid": "Please enter a valid email address.",
+                "role": "Role",
+                "roleRequired": "Please select a role.",
+                "selectRole": "Select a role",
+                "password": "Password",
+                "optional": "Optional",
+                "cancel": "Cancel",
+                "save": "Save",
+                "saving": "Saving..."
+            },
+            "status": {
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "messages": {
+                "createSuccess": "User created successfully.",
+                "updateSuccess": "User updated successfully.",
+                "activated": "User activated.",
+                "deactivated": "User deactivated.",
+                "unauthorizedRoleChange": "Unauthorized: You cannot change your own role.",
+                "lastAdmin": "Invalid operation: You cannot change the role of the last admin.",
+                "error": "An error occurred."
+            }
+        },
+        "company": {
+            "title": "Company Information",
+            "description": "Company details and invoice settings.",
+            "edit": "Edit",
+            "profileTitle": "Company Profile",
+            "profileDescription": "Your company's tax and address information will appear here.",
+            "retry": "Retry",
+            "active": "Active",
+            "inactive": "Inactive",
+            "taxNumber": "Tax Number",
+            "taxOffice": "Tax Office",
+            "currency": "Currency",
+            "invoicePrefix": "Invoice Prefix",
+            "contactTitle": "Contact Information",
+            "contactDescription": "Company contact details"
+        },
+        "auditLogs": {
+            "title": "Audit Log",
+            "description": "Monitor all activity history and changes in the system.",
+            "historyTitle": "Activity History",
+            "historyDescription": "User activities and system events will be listed here.",
+            "table": {
+                "action": "Action",
+                "entity": "Entity",
+                "user": "User",
+                "ip": "IP Address",
+                "date": "Date",
+                "details": "Details",
+                "noLogs": "No logs found",
+                "filterAction": "Filter by action"
+            },
+            "buttons": {
+                "back": "Previous",
+                "next": "Next"
+            },
+            "labels": {
+                "showing": "Page {from} of {to}"
+            },
+            "messages": {
+                "error": "Failed to load audit logs."
+            }
+        },
+        "profile": {
+            "title": "Profile",
+            "description": "Update your personal information and preferences.",
+            "save": "Save",
+            "retry": "Retry",
+            "profileTitle": "User Profile",
+            "profileDescription": "Update your general account information.",
+            "passwordTitle": "Change Password",
+            "passwordDescription": "Update your account password.",
+            "form": {
+                "email": "Email Address",
+                "emailHelp": "Your email address cannot be changed.",
+                "role": "Role",
+                "company": "Company",
+                "fullName": "Full Name",
+                "nameRequired": "Full name must be at least 2 characters.",
+                "saving": "Saving...",
+                "currentPassword": "Current Password",
+                "newPassword": "New Password",
+                "confirmPassword": "Confirm Password",
+                "passwordMin": "Password must be at least 6 characters.",
+                "passwordMatch": "Passwords do not match.",
+                "changePassword": "Change Password"
+            },
+            "messages": {
+                "updateSuccess": "Profile updated successfully.",
+                "passwordSuccess": "Password changed successfully.",
+                "passwordError": "Failed to change password. Please check your current password.",
+                "error": "Failed to load profile data."
+            }
+        },
+        "settings": {
+            "title": "Settings",
+            "description": "General application configuration and preferences.",
+            "settingsTitle": "Application Settings",
+            "settingsDescription": "Theme, notifications and language options will be managed here.",
+            "notificationsTitle": "Notification Preferences",
+            "notificationsDescription": "Manage how you receive notifications.",
+            "emailNotifications": "Email Notifications",
+            "emailNotificationsHint": "Receive important updates via email.",
+            "systemNotifications": "System Notifications",
+            "systemNotificationsHint": "Receive in-app push notifications.",
+            "save": "Save Settings",
+            "saving": "Saving...",
+            "generalTitle": "Application Preferences",
+            "generalDescription": "Manage your theme and language settings.",
+            "theme": "Theme",
+            "language": "Language",
+            "messages": {
+                "saveSuccess": "Settings saved successfully.",
+                "error": "Failed to load settings.",
+                "saveError": "Failed to save settings."
+            }
+        },
+        "upload": {
+            "title": "Upload Invoice",
+            "description": "Upload invoice images or PDF files to the system.",
+            "moduleTitle": "Upload Module",
+            "moduleDescription": "Drag-and-drop file upload and OCR processing area will be here.",
+            "selectFile": "Select File (Demo)"
+        }
+    }
+}

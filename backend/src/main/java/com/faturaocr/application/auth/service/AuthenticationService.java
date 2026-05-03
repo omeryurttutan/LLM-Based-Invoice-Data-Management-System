@@ -1,0 +1,338 @@
+package com.faturaocr.application.auth.service;
+
+import com.faturaocr.application.auth.dto.AuthResponse;
+import com.faturaocr.application.auth.dto.LoginCommand;
+import com.faturaocr.application.auth.dto.RefreshTokenCommand;
+import com.faturaocr.application.auth.dto.RegisterCommand;
+import com.faturaocr.application.common.service.ApplicationService;
+import com.faturaocr.domain.audit.entity.AuditLog;
+import com.faturaocr.domain.audit.port.AuditLogRepository;
+import com.faturaocr.domain.audit.valueobject.AuditActionType;
+import com.faturaocr.domain.common.exception.DomainException;
+import com.faturaocr.domain.common.util.TaxNumberValidator;
+import com.faturaocr.domain.user.entity.User;
+import com.faturaocr.domain.user.port.UserRepository;
+import com.faturaocr.domain.user.valueobject.Email;
+import com.faturaocr.domain.company.entity.Company;
+import com.faturaocr.domain.company.port.CompanyRepository;
+import com.faturaocr.domain.user.valueobject.Role;
+import com.faturaocr.infrastructure.audit.AuditRequestContext;
+import com.faturaocr.infrastructure.common.util.SanitizationUtils;
+import com.faturaocr.infrastructure.security.JwtTokenProvider;
+import com.faturaocr.infrastructure.security.LoginAttemptService;
+import com.faturaocr.infrastructure.security.RefreshTokenService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+/**
+ * Authentication application service.
+ */
+@ApplicationService
+public class AuthenticationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
+    private final AuditLogRepository auditLogRepository;
+    private final LoginAttemptService loginAttemptService;
+    private final CompanyRepository companyRepository;
+
+    @org.springframework.beans.factory.annotation.Value("${security.brute-force.max-attempts:5}")
+    private int maxLoginAttempts;
+
+    @org.springframework.beans.factory.annotation.Value("${security.brute-force.lock-duration-minutes:30}")
+    private int lockDurationMinutes;
+
+    public AuthenticationService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtTokenProvider jwtTokenProvider,
+            RefreshTokenService refreshTokenService,
+            AuditLogRepository auditLogRepository,
+            LoginAttemptService loginAttemptService,
+            CompanyRepository companyRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.refreshTokenService = refreshTokenService;
+        this.auditLogRepository = auditLogRepository;
+        this.loginAttemptService = loginAttemptService;
+        this.companyRepository = companyRepository;
+    }
+
+    /**
+     * Register a new user.
+     */
+    public AuthResponse register(RegisterCommand command) {
+        LOGGER.info("Registering new user with email: {}", command.email());
+
+        Email email = Email.of(command.email());
+        java.util.UUID actualCompanyId = command.companyId();
+        Role userRole = Role.ACCOUNTANT;
+
+        if (actualCompanyId == null) {
+            // Create new company
+            if (command.companyName() == null || command.companyName().isBlank()) {
+                throw new DomainException("VALIDATION_ERROR", "Company name is required when creating a new company");
+            }
+            if (command.taxNumber() == null || !command.taxNumber().matches("^\\d{10}$")) {
+                throw new DomainException("VALIDATION_ERROR", "Tax number must be exactly 10 digits");
+            }
+            // Validate VKN checksum
+            if (!TaxNumberValidator.isValidVKN(command.taxNumber())) {
+                throw new DomainException("VALIDATION_ERROR", "Geçersiz vergi kimlik numarası (VKN)");
+            }
+
+            Company newCompany = new Company(command.companyName(), command.taxNumber());
+            // TRIAL defaults are set automatically in Company constructor:
+            // 7 days trial, 350 total invoices, 50 daily, 2 max users
+            Company savedCompany = companyRepository.save(newCompany);
+            actualCompanyId = savedCompany.getId();
+            userRole = Role.ADMIN; // First user is company ADMIN (not SUPER_ADMIN)
+            LOGGER.info("Created new TRIAL company with ID: {}", actualCompanyId);
+        } else {
+            // Check if email already exists in the existing company
+            if (userRepository.existsByEmailAndCompanyId(email, actualCompanyId)) {
+                throw new DomainException("AUTH_EMAIL_EXISTS", "Email already registered in this company");
+            }
+        }
+
+        // Create user
+        String sanitizedFullName = SanitizationUtils.sanitizeHtml(command.fullName());
+
+        User user = User.builder()
+                .companyId(actualCompanyId)
+                .email(email)
+                .passwordHash(passwordEncoder.encode(command.password()))
+                .fullName(sanitizedFullName)
+                .phone(command.phone())
+                .role(userRole) // Assigned role (ADMIN if new company, ACCOUNTANT if joining)
+                .isActive(true)
+                .build();
+
+        User savedUser = userRepository.save(user);
+        LOGGER.info("User registered successfully with ID: {}", savedUser.getId());
+
+        // Generate tokens
+        return generateAuthResponse(savedUser);
+    }
+
+    /**
+     * Authenticate user and return tokens.
+     */
+    public AuthResponse login(LoginCommand command) {
+        LOGGER.info("Login attempt for email: {}", command.email());
+
+        // Check block status from Redis first
+        if (loginAttemptService.isBlocked(command.email())) {
+            long remaining = loginAttemptService.getRemainingBlockMinutes(command.email());
+            LOGGER.warn("Login failed: account is locked for email: {} (Redis)", command.email());
+            throw new DomainException("AUTH_ACCOUNT_LOCKED",
+                    "Hesabınız çok fazla başarısız giriş denemesi nedeniyle geçici olarak kilitlendi. " + remaining
+                            + " dakika sonra tekrar deneyin.");
+        }
+
+        Email email = Email.of(command.email());
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    LOGGER.warn("Login failed: user not found for email: {}", command.email());
+                    loginAttemptService.loginFailed(command.email());
+                    return new DomainException("AUTH_INVALID_CREDENTIALS", "Invalid email or password");
+                });
+
+        // Check if account is locked (DB fallback)
+        if (user.isLocked()) {
+            LOGGER.warn("Login failed: account is locked for email: {}", command.email());
+            throw new DomainException("AUTH_ACCOUNT_LOCKED",
+                    "Account is locked due to too many failed attempts. Please try again later.");
+        }
+
+        // Check if account is active
+        if (!user.isActive()) {
+            LOGGER.warn("Login failed: account is inactive for email: {}", command.email());
+            throw new DomainException("AUTH_ACCOUNT_INACTIVE", "Account is inactive");
+        }
+
+        // Verify password
+        if (!passwordEncoder.matches(command.password(), user.getPasswordHash())) {
+            loginAttemptService.loginFailed(command.email());
+            handleFailedLogin(user); // Keep DB logic for persistent history/locking if needed
+            throw new DomainException("AUTH_INVALID_CREDENTIALS", "Invalid email or password");
+        }
+
+        // Check company subscription status (SUPER_ADMIN is exempt)
+        if (user.getRole() != Role.SUPER_ADMIN && user.getCompanyId() != null) {
+            var companyOpt = companyRepository.findById(user.getCompanyId());
+            if (companyOpt.isPresent()) {
+                Company company = companyOpt.get();
+                if (company.isSuspended()) {
+                    throw new DomainException("SUBSCRIPTION_SUSPENDED",
+                            "Aboneliğiniz askıya alınmıştır. Devam etmek için ödeme yapınız.");
+                }
+                if (company.isTrialExpired()) {
+                    company.suspend("Trial period expired");
+                    companyRepository.save(company);
+                    throw new DomainException("TRIAL_EXPIRED",
+                            "Deneme süreniz sona ermiştir. Devam etmek için ödeme yapınız.");
+                }
+            }
+        }
+
+        // Successful login
+        loginAttemptService.loginSucceeded(command.email());
+        user.recordSuccessfulLogin();
+        userRepository.save(user);
+
+        // Audit: login event
+        saveAuditLog(user, AuditActionType.LOGIN, "User logged in successfully");
+
+        LOGGER.info("User logged in successfully: {}", user.getId());
+
+        return generateAuthResponse(user);
+    }
+
+    /**
+     * Get current user info by ID.
+     */
+    public AuthResponse.UserInfo getCurrentUser(java.util.UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DomainException("AUTH_USER_NOT_FOUND", "User not found"));
+
+        if (!user.isActive()) {
+            throw new DomainException("AUTH_ACCOUNT_INACTIVE", "Account is inactive");
+        }
+
+        return new AuthResponse.UserInfo(
+                user.getId(),
+                user.getEmailValue(),
+                user.getFullName(),
+                user.getRole().name(),
+                user.getCompanyId(),
+                user.getCompanyAccesses() != null ? user.getCompanyAccesses().stream()
+                        .map(a -> new AuthResponse.CompanyBasicInfo(a.getCompanyId(), a.getCompanyName()))
+                        .toList() : java.util.List.of());
+    }
+
+    /**
+     * Refresh access token using refresh token.
+     */
+    public AuthResponse refresh(RefreshTokenCommand command) {
+        LOGGER.debug("Token refresh requested");
+
+        // Validate refresh token
+        if (!refreshTokenService.validateRefreshToken(command.refreshToken())) {
+            throw new DomainException("AUTH_INVALID_TOKEN", "Invalid or expired refresh token");
+        }
+
+        // Get user ID from refresh token
+        String userId = refreshTokenService.getUserIdFromToken(command.refreshToken());
+
+        User user = userRepository.findById(java.util.UUID.fromString(userId))
+                .orElseThrow(() -> new DomainException("AUTH_USER_NOT_FOUND", "User not found"));
+
+        if (!user.isActive()) {
+            throw new DomainException("AUTH_ACCOUNT_INACTIVE", "Account is inactive");
+        }
+
+        // Revoke old refresh token and generate new tokens
+        refreshTokenService.revokeRefreshToken(command.refreshToken());
+
+        LOGGER.info("Token refreshed for user: {}", user.getId());
+
+        return generateAuthResponse(user);
+    }
+
+    /**
+     * Logout user by revoking refresh token.
+     */
+    public void logout(String refreshToken) {
+        LOGGER.debug("Logout requested");
+        // Extract user info before revoking token
+        String userId = null;
+        try {
+            userId = refreshTokenService.getUserIdFromToken(refreshToken);
+        } catch (Exception e) {
+            LOGGER.debug("Could not extract user from refresh token for audit: {}", e.getMessage());
+        }
+        refreshTokenService.revokeRefreshToken(refreshToken);
+
+        // Audit: logout event
+        if (userId != null) {
+            try {
+                User user = userRepository.findById(java.util.UUID.fromString(userId)).orElse(null);
+                if (user != null) {
+                    saveAuditLog(user, AuditActionType.LOGOUT, "User logged out");
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Failed to save logout audit log: {}", e.getMessage());
+            }
+        }
+        LOGGER.info("User logged out successfully");
+    }
+
+    /**
+     * Handle failed login attempt.
+     */
+    private void handleFailedLogin(User user) {
+        user.incrementFailedLoginAttempts();
+
+        if (user.getFailedLoginAttempts() >= maxLoginAttempts) {
+            user.lock(lockDurationMinutes);
+            LOGGER.warn("Account locked due to {} failed attempts: {}",
+                    maxLoginAttempts, user.getEmailValue());
+        }
+
+        userRepository.save(user);
+    }
+
+    /**
+     * Generate authentication response with tokens.
+     */
+    private AuthResponse generateAuthResponse(User user) {
+        String accessToken = jwtTokenProvider.generateAccessToken(user);
+        String refreshToken = refreshTokenService.createRefreshToken(user);
+        long expiresIn = jwtTokenProvider.getAccessTokenExpiration();
+
+        AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo(
+                user.getId(),
+                user.getEmailValue(),
+                user.getFullName(),
+                user.getRole().name(),
+                user.getCompanyId(),
+                user.getCompanyAccesses() != null ? user.getCompanyAccesses().stream()
+                        .map(a -> new AuthResponse.CompanyBasicInfo(a.getCompanyId(), a.getCompanyName()))
+                        .toList() : java.util.List.of());
+
+        return AuthResponse.of(accessToken, refreshToken, expiresIn, userInfo);
+    }
+
+    /**
+     * Save an audit log entry for auth events.
+     */
+    private void saveAuditLog(User user, AuditActionType action, String description) {
+        try {
+            AuditLog auditLog = AuditLog.builder()
+                    .userId(user.getId())
+                    .userEmail(user.getEmailValue())
+                    .actionType(action)
+                    .entityType("USER")
+                    .entityId(user.getId())
+                    .companyId(user.getCompanyId())
+                    .ipAddress(AuditRequestContext.getIpAddress())
+                    .userAgent(AuditRequestContext.getUserAgent())
+                    .requestId(AuditRequestContext.getRequestId())
+                    .description(description)
+                    .build();
+            auditLogRepository.save(auditLog);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to save audit log for {}: {}", action, e.getMessage());
+        }
+    }
+}

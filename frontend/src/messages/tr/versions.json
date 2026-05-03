@@ -1,0 +1,12 @@
+{
+    "title": "Versiyon Geçmişi",
+    "restore": "Bu Versiyona Dön",
+    "current": "Mevcut",
+    "changes": "Değişiklikler",
+    "diff": {
+        "added": "Eklendi",
+        "removed": "Kaldırıldı",
+        "modified": "Değiştirildi"
+    },
+    "confirmRestore": "Faturayı bu versiyona döndürmek istediğinize emin misiniz? Mevcut değişiklikler yeni bir versiyon olarak saklanacaktır."
+}

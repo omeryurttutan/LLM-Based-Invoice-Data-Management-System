@@ -1,0 +1,24 @@
+# Linting & Formatting
+ruff>=0.2.0
+
+# Type Checking
+mypy==1.8.0
+types-requests==2.31.0.20240125
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+httpx==0.26.0
+freezegun==1.4.0
+
+# Development
+black==24.1.1
+isort==5.13.2
+Faker==23.0.0
+
+# Integration Testing
+respx==0.20.2
+testcontainers[rabbitmq]==3.7.1
+aio-pika==9.4.0

@@ -1,0 +1,13 @@
+
+> fatura-ocr-frontend@0.1.0 dev
+> next dev --turbo -p 3001
+
+   ▲ Next.js 14.1.0 (turbo)
+   - Local:        http://localhost:3001
+   - Environments: .env.local
+   - Experiments (use at your own risk):
+     · turbo
+
+ ✓ Ready in 1278ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 9s

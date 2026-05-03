@@ -1,0 +1,353 @@
+{
+    "title": "Invoices",
+    "singular": "Invoice",
+    "filters": {
+        "title": "Filters",
+        "detailedOptions": "Detailed Filtering Options",
+        "apply": "Apply Filters",
+        "clear": "Clear",
+        "searchPlaceholder": "Search invoice no, supplier..."
+    },
+    "export": "Export",
+    "noExportPermission": "You do not have permission to export",
+    "uploadInvoice": "Upload Invoice",
+    "newInvoice": "New Invoice",
+    "backToList": "Back to List",
+    "notFound": "Invoice not found or an error occurred.",
+    "units": {
+        "ADET": "Piece",
+        "KG": "Kg",
+        "LT": "Lt",
+        "M": "M",
+        "M2": "M²",
+        "M3": "M³",
+        "PAKET": "Package",
+        "KUTU": "Box",
+        "SAAT": "Hour",
+        "GUN": "Day"
+    },
+    "table": {
+        "invoiceNumber": "Invoice No",
+        "supplier": "Supplier",
+        "date": "Invoice Date",
+        "dueDate": "Due Date",
+        "amount": "Amount",
+        "currency": "Currency",
+        "status": "Status",
+        "source": "Source",
+        "confidence": "Confidence Score",
+        "category": "Category",
+        "actions": "Actions"
+    },
+    "status": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "verified": "Verified",
+        "rejected": "Rejected"
+    },
+    "sort": {
+        "label": "Sort",
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "dateDesc": "Date (New-Old)",
+        "dateAsc": "Date (Old-New)",
+        "amountDesc": "Amount (High-Low)",
+        "amountAsc": "Amount (Low-High)"
+    },
+    "actions": {
+        "openMenu": "Open menu",
+        "view": "View",
+        "edit": "Edit",
+        "verify": "Verify",
+        "reject": "Reject",
+        "reopen": "Reopen",
+        "delete": "Delete",
+        "compare": "Compare",
+        "close": "Close"
+    },
+    "detail": {
+        "title": "Invoice Details",
+        "invoiceInfo": "Invoice Summary",
+        "supplierInfo": "Supplier Information",
+        "buyerInfo": "Buyer Information",
+        "items": "Invoice Items",
+        "summary": "Summary",
+        "subtotal": "Subtotal",
+        "taxAmount": "Total Tax",
+        "totalAmount": "Total Amount",
+        "exchangeRate": "Ex. Rate",
+        "notes": "Notes",
+        "tabs": {
+            "details": "Invoice Details",
+            "history": "History & Versions"
+        },
+        "supplier": {
+            "title": "Supplier Information",
+            "taxNo": "Tax No",
+            "taxOffice": "Tax Office",
+            "phone": "Phone",
+            "email": "Email"
+        },
+        "record": {
+            "title": "Record Information",
+            "created": "Created By",
+            "verified": "Verified By"
+        },
+        "history": {
+            "compareTitle": "Comparison",
+            "emptyTitle": "Version Comparison",
+            "emptyDescription": "Select a version from the list on the left and click the \"Compare\" button to view the changes.",
+            "diffError": "Failed to load difference data."
+        },
+        "itemsTable": {
+            "description": "Description",
+            "quantity": "Quantity",
+            "unitPrice": "Unit Price",
+            "tax": "Tax",
+            "total": "Total",
+            "code": "Code"
+        }
+    },
+    "create": {
+        "title": "Create New Invoice",
+        "subtitle": "Create a new record by entering invoice details.",
+        "manual": "Manual Invoice Entry"
+    },
+    "edit": {
+        "title": "Edit Invoice",
+        "subtitle": "You are editing invoice {invoiceNumber}.",
+        "pendingError": "Only pending invoices can be edited."
+    },
+    "form": {
+        "title": "Invoice Information",
+        "invoiceNumber": "Invoice No",
+        "invoiceNumberPlaceholder": "FTR-2024-...",
+        "date": "Invoice Date",
+        "datePlaceholder": "Select date",
+        "dueDate": "Due Date",
+        "currency": "Currency",
+        "selectPlaceholder": "Select",
+        "category": "Category",
+        "noCategory": "No Category",
+        "supplier": {
+            "title": "Supplier Information",
+            "name": "Company Name",
+            "namePlaceholder": "Company Name",
+            "taxId": "Tax ID / TCKN",
+            "taxIdPlaceholder": "Tax ID",
+            "taxOffice": "Tax Office",
+            "taxOfficePlaceholder": "Tax Office",
+            "phone": "Phone",
+            "phonePlaceholder": "Phone",
+            "email": "Email",
+            "emailPlaceholder": "Email",
+            "address": "Address",
+            "addressPlaceholder": "Address"
+        },
+        "items": {
+            "title": "Invoice Items",
+            "add": "Add Item",
+            "description": "Description",
+            "descriptionPlaceholder": "Product/Service",
+            "quantity": "Quantity",
+            "unit": "Unit",
+            "unitPrice": "Unit Price",
+            "taxRate": "Tax Rate %",
+            "subtotal": "Subtotal",
+            "totalTax": "Total Tax",
+            "grandTotal": "Grand Total",
+            "unitPlaceholder": "Unit"
+        },
+        "notes": {
+            "label": "Notes",
+            "placeholder": "Notes about the invoice..."
+        },
+        "buttons": {
+            "cancel": "Cancel",
+            "save": "Save",
+            "saving": "Saving..."
+        },
+        "validation": {
+            "invoiceNumberRequired": "Invoice number is required",
+            "supplierNameRequired": "Supplier name is required",
+            "taxIdInvalid": "Tax ID must be 10 or 11 digits",
+            "emailInvalid": "Enter a valid email address",
+            "descriptionRequired": "Description is required",
+            "quantityMin": "Quantity must be greater than 0",
+            "unitPriceMin": "Unit price cannot be less than 0",
+            "itemsMin": "You must add at least one item"
+        }
+    },
+    "verify": {
+        "title": "Invoice Verification",
+        "confirmVerify": "Are you sure you want to verify this invoice?",
+        "confirmReject": "Are you sure you want to reject this invoice?",
+        "rejectReason": "Rejection reason (optional)"
+    },
+    "reject": {
+        "title": "Reject Invoice",
+        "description": "You are about to reject this invoice. Please provide a reason.",
+        "reasonPlaceholder": "Rejection reason...",
+        "reasonLabel": "Rejection Reason"
+    },
+    "delete": {
+        "description": "You are about to delete this invoice. This action cannot be undone."
+    },
+    "filter": {
+        "dateRange": "Date Range",
+        "supplier": "Supplier",
+        "category": "Category",
+        "status": "Status",
+        "amountRange": "Amount Range",
+        "minAmount": "Min. Amount",
+        "maxAmount": "Max. Amount",
+        "sourceType": "Source Type",
+        "currency": "Currency",
+        "search": "Search by invoice no or supplier...",
+        "filters": "Filters",
+        "detailedFilters": "Detailed Filtering Options",
+        "clear": "Clear",
+        "applyFilters": "Apply Filters",
+        "activeFilters": "Active Filters",
+        "clearAll": "Clear All",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "min": "Min",
+        "max": "Max",
+        "selectCategory": "Select Category",
+        "noCategory": "No category found",
+        "searchSupplier": "Search Supplier",
+        "supplierName": "Supplier Name",
+        "searching": "Searching...",
+        "noSupplierFound": "No supplier found",
+        "llmProvider": "LLM Provider",
+        "confidenceScore": "Confidence Score"
+    },
+    "empty": {
+        "title": "No invoices found",
+        "description": "Upload your first invoice or add one manually.",
+        "cta": "Upload Invoice",
+        "filtered": "No invoices found matching the selected filters."
+    },
+    "llmProvider": {
+        "gemini": "Gemini",
+        "gpt": "GPT",
+        "claude": "Claude"
+    },
+    "sourceType": {
+        "llm": "LLM Extraction",
+        "eInvoice": "E-Invoice",
+        "manual": "Manual Entry"
+    },
+    "upload": {
+        "title": "Upload Invoice",
+        "subtitle": "Upload your files to add new invoices to the system.",
+        "dropzone": "Drag and drop your files",
+        "dropOrSelect": "or click to select files",
+        "supported": "Supported:",
+        "clear": "Clear",
+        "uploading": "Uploading...",
+        "uploadNew": "Upload New",
+        "startUpload": "Start Upload",
+        "info": {
+            "title": "Information",
+            "single": "Single Upload: Results are displayed immediately (may take 30-90 secs).",
+            "bulk": "Bulk Upload: Files are processed in the background. You can track progress here.",
+            "formats": "Supported formats:"
+        },
+        "batch": {
+            "title": "Batch Process Status",
+            "processed": "Processed",
+            "success": "Success",
+            "failed": "Failed"
+        },
+        "zone": {
+            "maxFiles": "You can upload a maximum of {maxFiles} files.",
+            "maxTotalSize": "Total file size cannot exceed {maxTotalSize} MB.",
+            "invalidExtension": "{fileName}: Unsupported file format.",
+            "sizeLimit": "{fileName}: File size exceeds limit ({limit} MB).",
+            "emptyFile": "{fileName}: Empty file cannot be uploaded.",
+            "dropTitle": "Drag and drop your files",
+            "dropSubtitle": "or click to select files",
+            "supported": "Supported:"
+        },
+        "list": {
+            "title": "Upload List",
+            "count": "{count} files",
+            "view": "View",
+            "retry": "Retry",
+            "remove": "Remove"
+        },
+        "duplicate": {
+            "title": "File Already Uploaded",
+            "description": "File {fileName} has already been uploaded to the system. Do you want to upload this file again and start a new analysis anyway?",
+            "confirm": "Continue",
+            "cancel": "Cancel"
+        }
+    },
+    "verification": {
+        "title": "Invoice Verification",
+        "saveDraft": "Save Draft",
+        "revalidate": "Revalidate",
+        "validating": "Validating...",
+        "submitting": "Processing...",
+        "consistent": "Amounts Consistent",
+        "inconsistent": "Subtotal + Tax Amount does not equal Total Amount! Please check.",
+        "shortcuts": "Shortcuts:",
+        "tabShortcut": "Tab (Switch)",
+        "ctrlEnterShortcut": "Ctrl+Enter (Verify)",
+        "ctrlSShortcut": "Ctrl+S (Save Draft)",
+        "form": {
+            "general": "General Information",
+            "supplier": "Supplier Information",
+            "buyer": "Buyer Information",
+            "items": "Invoice Items",
+            "amounts": "Amounts",
+            "notes": "Notes",
+            "invoiceNumber": "Invoice Number",
+            "invoiceDate": "Invoice Date",
+            "dueDate": "Due Date",
+            "currency": "Currency",
+            "supplierName": "Supplier Name",
+            "taxNumber": "Tax Number",
+            "address": "Address",
+            "buyerName": "Buyer Name",
+            "subtotal": "Subtotal",
+            "taxAmount": "Tax Amount",
+            "totalAmount": "Total Amount",
+            "notesPlaceholder": "Notes about the invoice..."
+        },
+        "dialogs": {
+            "reject": {
+                "title": "Reject Invoice",
+                "description": "Are you sure you want to reject this invoice? Please provide a reason.",
+                "placeholder": "Rejection reason...",
+                "confirm": "Reject"
+            },
+            "verify": {
+                "title": "Verification Process",
+                "description": "Are you sure you want to verify this invoice? Verified invoices are locked for editing.",
+                "confirm": "Verify"
+            }
+        },
+        "messages": {
+            "draftSaved": "Draft Saved",
+            "draftSavedDesc": "Changes have been saved as draft.",
+            "draftError": "Save Draft Failed",
+            "draftErrorDesc": "An error occurred while saving the draft.",
+            "revalidateSuccess": "Revalidation Completed",
+            "revalidateSuccessDesc": "Confidence Score: {score}/100",
+            "revalidateError": "Revalidation Failed",
+            "revalidateErrorDesc": "Revalidation was not successful.",
+            "verifySuccess": "Invoice Verified",
+            "verifySuccessDesc": "Invoice has been successfully verified and approved.",
+            "verifyError": "Verification Error",
+            "verifyErrorDesc": "An error occurred while verifying the invoice.",
+            "rejectSuccess": "Invoice Rejected",
+            "rejectSuccessDesc": "Invoice has been rejected.",
+            "rejectError": "Rejection Error",
+            "rejectErrorDesc": "An error occurred while rejecting the invoice.",
+            "reasonRequired": "Please provide a rejection reason."
+        }
+    }
+}

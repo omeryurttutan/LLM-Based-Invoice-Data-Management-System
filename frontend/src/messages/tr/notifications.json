@@ -1,0 +1,37 @@
+{
+    "title": "Bildirimler",
+    "markAllRead": "Tümünü Okundu İşaretle",
+    "viewAll": "Tüm Bildirimleri Göster",
+    "empty": "Bildirim bulunamadı",
+    "emptyDescription": "Seçilen kriterlere uygun bildirim yok.",
+    "types": {
+        "info": "Bilgi",
+        "success": "Başarılı",
+        "warning": "Uyarı",
+        "error": "Hata",
+        "invoice_processed": "Fatura İşlendi",
+        "invoice_rejected": "Fatura Reddedildi",
+        "invoice_verified": "Fatura Doğrulandı"
+    },
+    "tabs": {
+        "all": "Tümü",
+        "unread": "Okunmamış",
+        "read": "Okunmuş"
+    },
+    "filters": {
+        "typePlaceholder": "Tür",
+        "allTypes": "Tüm Türler",
+        "extraction": "Veri Çıkarımı",
+        "batchUpload": "Toplu Yükleme",
+        "confidenceScore": "Güven Skoru",
+        "autoVerification": "Otomatik Doğrulama",
+        "verification": "Doğrulama",
+        "system": "Sistem",
+        "severityPlaceholder": "Önem Derecesi",
+        "allSeverities": "Tüm Dereceler",
+        "infoSeverity": "Bilgi (Info)",
+        "warningSeverity": "Uyarı (Warning)",
+        "errorSeverity": "Hata (Error)",
+        "successSeverity": "Başarılı (Success)"
+    }
+}

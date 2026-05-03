@@ -1,0 +1,53 @@
+{
+    "title": "Export",
+    "description": "Export <strong>{count}</strong> invoices matching your current filters.",
+    "noData": "No data to export. Please adjust your filters.",
+    "largeDataset": "Large dataset ({count} records). Export may take a while.",
+    "format": "Select Format",
+    "sections": {
+        "general": "General Formats",
+        "accounting": "Accounting Formats"
+    },
+    "formats": {
+        "excel": "Excel (.xlsx)",
+        "csv": {
+            "label": "CSV (.csv)",
+            "description": "Comma-separated values, suitable for data import."
+        },
+        "logo": "Logo Accounting",
+        "mikro": "Mikro Software",
+        "netsis": "Netsis",
+        "luca": "Luca",
+        "xlsx": {
+            "label": "Excel (.xlsx)",
+            "description": "Excel spreadsheet format, suitable for general use."
+        }
+    },
+    "options": {
+        "all": "All Invoices",
+        "filtered": "Filtered Results",
+        "selected": "Selected Invoices ({count})",
+        "includeItems": "Include Invoice Line Items",
+        "includeItemsDesc": "Each invoice item will be exported as a separate row.",
+        "includeItemsMandatory": "Line items are always included for accounting formats."
+    },
+    "fileExtension": "File Extension",
+    "accountingTooltip": "Accounting formats are designed for direct import into accounting software.",
+    "importantInfo": "Important",
+    "accountingWarning": "Accounting formats <strong>always include line items</strong> and are formatted for direct import.",
+    "download": "Download",
+    "exporting": "Exporting",
+    "downloading": "Preparing...",
+    "success": {
+        "title": "Export Successful",
+        "description": "File {filename} has been downloaded."
+    },
+    "error": {
+        "title": "Export Failed",
+        "description": "An error occurred while exporting. Please try again."
+    },
+    "formatsError": {
+        "title": "Format Loading Error",
+        "description": "Could not load export formats. Using default formats."
+    }
+}

@@ -1,0 +1,81 @@
+{
+    "title": "Panel",
+    "dateSelect": "Tarih Aralığı Seçin",
+    "startDate": "Başlangıç Tarihi",
+    "endDate": "Bitiş Tarihi",
+    "currencyLabel": "Para Birimi",
+    "startPeriod": "Başlangıç Dönemi",
+    "endPeriod": "Bitiş Dönemi",
+    "month": "Ay",
+    "year": "Yıl",
+    "cards": {
+        "totalInvoices": "Toplam Fatura",
+        "totalAmount": "Toplam Tutar",
+        "average": "Ortalama",
+        "pending": "Bekleyen",
+        "thisMonth": "Bu Ay"
+    },
+    "charts": {
+        "monthlyTrend": "Aylık Fatura Trendi",
+        "categoryDistribution": "Kategori Dağılımı",
+        "statusDistribution": "Durum Dağılımı",
+        "statusTimeline": "Durum Zaman Çizelgesi",
+        "topSuppliers": "En Çok Çalışılan Tedarikçiler",
+        "other": "Diğer"
+    },
+    "recent": {
+        "title": "Son Hareketler",
+        "viewAll": "Tümünü Gör"
+    },
+    "presets": {
+        "title": "Hızlı Seçim",
+        "today": "Bugün",
+        "yesterday": "Dün",
+        "last7days": "Son 7 Gün",
+        "last30days": "Son 30 Gün",
+        "thisMonth": "Bu Ay",
+        "lastMonth": "Geçen Ay",
+        "last3Months": "Son 3 Ay",
+        "thisYear": "Bu Yıl"
+    },
+    "pendingActions": {
+        "title": "Bekleyen İşlemler",
+        "description": "Doğrulanması gereken faturalar",
+        "noPending": "Bekleyen faturanız yok",
+        "allProcessed": "Tüm faturalar işlendi",
+        "daysWaiting": "{days} gündür bekliyor",
+        "viewAll": "Tümünü Gör"
+    },
+    "performance": {
+        "title": "LLM Çıkarım Performansı",
+        "description": "Yapay zeka modellerinin başarı oranları",
+        "successRate": "Başarı Oranı",
+        "totalExtractions": "Toplam Çıkarım",
+        "avgConfidence": "Ort. Güven",
+        "avgDuration": "Ort. Süre",
+        "providerAttempts": "Sağlayıcı Bazlı Denemeler",
+        "model": "Model",
+        "success": "Başarı",
+        "error": "Hata",
+        "cost": "Maliyet",
+        "successful": "Başarılı",
+        "failed": "Başarısız"
+    },
+    "system": {
+        "title": "Sistem Durumu",
+        "description": "Sunucu ve servislerin anlık durumu",
+        "adminDescription": "Sunucu ve servislerin anlık durumu (Admin Paneli)",
+        "allSystemsUp": "Tüm Sistemler Çalışıyor",
+        "serviceOutage": "Servis Kesintisi Var",
+        "running": "ÇALIŞIYOR",
+        "down": "KAPALI",
+        "resourceUsage": "Kaynak Kullanımı",
+        "jvmHeap": "JVM Heap",
+        "dbConnections": "DB Bağlantıları",
+        "diskSpace": "Disk Alanı",
+        "recentAlerts": "Son Alarmlar",
+        "noCriticalAlerts": "Son 24 saatte kritik alarm yok.",
+        "loadError": "Sistem durumu yüklenemedi.",
+        "checkAdmin": "Yönetici yetkisine sahip olduğunuzdan emin olun veya servisi kontrol edin."
+    }
+}

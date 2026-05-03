@@ -1,0 +1,44 @@
+{
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "invoices": "Invoices",
+        "upload": "Upload",
+        "categories": "Categories",
+        "automation": {
+            "title": "Automation",
+            "templates": "Templates",
+            "rules": "Rules"
+        },
+        "notifications": "Notifications",
+        "settings": "Settings",
+        "users": "Users",
+        "company": "Company",
+        "audit": "Audit Log",
+        "profile": "Profile",
+        "management": "Management",
+        "other": "Other"
+    },
+    "header": {
+        "theme": {
+            "light": "Light Mode",
+            "dark": "Dark Mode",
+            "system": "System"
+        },
+        "userMenu": {
+            "profile": "Profile",
+            "settings": "Settings",
+            "logout": "Logout"
+        }
+    },
+    "breadcrumbs": {
+        "home": "Home",
+        "invoices": "Invoices",
+        "upload": "Upload Invoice",
+        "categories": "Categories",
+        "templates": "Templates",
+        "rules": "Rules",
+        "notifications": "Notifications",
+        "settings": "Settings",
+        "detail": "Detail"
+    }
+}

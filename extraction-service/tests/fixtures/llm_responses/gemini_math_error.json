@@ -1,0 +1,20 @@
+{
+    "fatura_no": "MATH-2024",
+    "tarih": "2024-01-01",
+    "gonderici_vkn": "1111111111",
+    "gonderici_unvan": "Math Error Corp",
+    "alici_vkn": "2222222222",
+    "alici_unvan": "Test Buyer",
+    "toplam_tutar": 1000.00,
+    "vergi_toplam": 100.00,
+    "para_birimi": "TRY",
+    "kalemler": [
+        {
+            "aciklama": "Item 1",
+            "miktar": 1.0,
+            "birim_fiyat": 500.00,
+            "kdv_orani": 20,
+            "toplam": 500.00
+        }
+    ]
+}
